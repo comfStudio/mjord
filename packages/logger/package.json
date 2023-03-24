@@ -1,0 +1,21 @@
+{
+  "name": "@mjord/logger",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --onSuccess 'tsc --emitDeclarationOnly --declaration'",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --onSuccess 'tsc --emitDeclarationOnly --declaration'",
+    "clean": "rimraf .turbo && rimraf dist"
+  },
+  "dependencies": {
+    "@grabrinc/isomorphic-logger": "https://github.com/iSplasher/isomorphic-logger#commit=c49fbe2d479ca12ec68937e4cc010963554708b2"
+  },
+  "devDependencies": {
+    "tsup": "^6.7.0"
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "name": "@mjord/app",
+  "name": "@mjord/freya",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -8,10 +8,12 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@types/react": "~18.0.27"
+    "@types/react": "~18.0.27",
+    "babel-plugin-module-resolver": "^5.0.0"
   },
   "dependencies": {
     "@react-navigation/bottom-tabs": "^6.5.7",
+    "@shopify/flash-list": "1.4.0",
     "expo": "~48.0.9",
     "expo-constants": "^14.2.1",
     "expo-linking": "^4.0.1",
@@ -20,7 +22,8 @@
     "react": "^18.2.0",
     "react-native": "0.71.4",
     "react-native-safe-area-context": "^4.5.0",
-    "react-native-screens": "^3.20.0"
+    "react-native-screens": "^3.20.0",
+    "recoil": "^0.7.7"
   },
   "packageManager": "yarn@3.5.0"
 }

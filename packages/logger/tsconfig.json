@@ -1,0 +1,9 @@
+{
+  "include": ["."],
+  "compilerOptions": {
+    "outDir": "dist",
+    "declarationMap": true,
+    "declaration": true
+  },
+  "exclude": ["dist", "build", "node_modules"]
+}

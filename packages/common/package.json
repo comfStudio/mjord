@@ -1,0 +1,14 @@
+{
+  "name": "@mjord/common",
+  "sideEffects": false,
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rimraf .turbo && rimraf lib && rimraf dist && rimraf *.tsbuildinfo"
+  },
+  "files": [
+    "lib/**"
+  ],
+  "packageManager": "yarn@3.5.0"
+}
