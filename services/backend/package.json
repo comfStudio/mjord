@@ -1,0 +1,17 @@
+{
+  "name": "@mjord/backend",
+  "scripts": {
+    "dev": "cd supabase/docker && docker compose up -d",
+    "seed": "ts-node seed.ts"
+  },
+  "packageManager": "yarn@3.5.0",
+  "private": true,
+  "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
+    "pg-promise": "^11.4.3",
+    "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.12.1"
+  }
+}

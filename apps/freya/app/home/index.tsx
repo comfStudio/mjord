@@ -1,15 +1,18 @@
 import { Tabs } from "expo-router";
 import { Dimensions, StyleSheet, View } from "react-native";
 
-import { HorizontalGroupCardList } from "../../feature/GroupCard";
-import { VerticalGroupList } from "../../feature/GroupList";
+import { HorizontalGroupCardList } from "../../feature/group/GroupCard";
+import { VerticalGroupList } from "../../feature/group/GroupList";
+import { useFeaturedGroups } from "../../services/group";
 
 export default function HomeScreen() {
+  const { data } = useFeaturedGroups();
+
   return (
     <View style={styles.container}>
       <Tabs.Screen options={{ title: "Home" }} />
       <View style={styles.cardContainer}>
-        <HorizontalGroupCardList />
+        <HorizontalGroupCardList data={data} />
       </View>
       <View
         style={[
@@ -17,7 +20,7 @@ export default function HomeScreen() {
           { width: Dimensions.get("screen").width },
         ]}
       >
-        <VerticalGroupList />
+        <VerticalGroupList data={data} />
       </View>
     </View>
   );

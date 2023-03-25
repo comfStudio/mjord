@@ -1,5 +1,6 @@
 // Learn more https://docs.expo.dev/guides/monorepos
 const { getDefaultConfig } = require("expo/metro-config");
+const exclusionList = require("metro-config/src/defaults/exclusionList");
 const path = require("path");
 
 // Find the project and workspace directories
@@ -18,5 +19,7 @@ config.resolver.nodeModulesPaths = [
 ];
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true;
+
+config.resolver.blockList = exclusionList([/backend\/supabase\/.*/]);
 
 module.exports = config;

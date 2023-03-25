@@ -1,7 +1,17 @@
 {
   "extends": "expo/tsconfig.base",
+  "baseUrl": ".",
   "compilerOptions": {},
   "references": [{ "path": "../../packages/common" }],
   "include": ["./**/*", "../../packages/common/types.d.ts"],
-  "exclude": ["dist", "build", "node_modules", "lib", ".expo"]
+  "exclude": ["dist", "build", "node_modules", "lib", ".expo"],
+  "paths": {
+    "@/feature/*": ["feature/*"],
+    "@/components/*": ["components/*"],
+    "@/services": ["services/index"],
+    "@/services/*": ["services/*"],
+    "@/state": ["state/index"],
+    "@/state/*": ["state/*"],
+    "constants": ["constants"]
+  }
 }

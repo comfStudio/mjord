@@ -1,6 +1,9 @@
 
 import type { Logger } from '@mjord/logger';
-// import type { LocalUser } from './common/types';
+import { Database } from '@mjord/database-types';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { QueryClient } from '@tanstack/react-query';
+
 import type { ServiceLocator } from './services/base';
 
 export enum ServiceType {
@@ -27,7 +30,9 @@ export class Constant {
 
     static log: Logger;
 
-    //   static user: LocalUser;
+    static supabase: SupabaseClient<Database>
+
+    static client: QueryClient
 
     static service: ServiceLocator;
 
@@ -47,9 +52,8 @@ export class Constant {
         //   (process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT as string) ?? '',
         // WEBSOCKET_ENDPOINT:
         //   (process.env.NEXT_PUBLIC_WEBSOCKET_ENDPOINT as string) ?? '',
-        // SUPABASE_URL: (process.env.NEXT_PUBLIC_SUPABASE_URL as string) ?? '',
-        // SUPABASE_ANON_KEY:
-        //   (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string) ?? '',
+        SUPABASE_URL: 'http://192.168.1.35:8484',
+        SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJhbm9uIiwKICAgICJpc3MiOiAic3VwYWJhc2UtZGVtbyIsCiAgICAiaWF0IjogMTY0MTc2OTIwMCwKICAgICJleHAiOiAxNzk5NTM1NjAwCn0.dc_X5iR_VP_qT0zsiyj_I_OZ2T9FtRU2BBNWN8Bu4GE',
     };
 }
 

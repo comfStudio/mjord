@@ -1,6 +1,8 @@
 import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { ImageSkeleton } from "./Skeleton";
+
 export default function ListItem({
   imageUrl,
   title,
@@ -28,7 +30,9 @@ export default function ListItem({
         })
       }
     >
-      <Image style={styles.image} source={{ uri: imageUrl }} />
+      <ImageSkeleton loading={true} style={styles.image} height={64} width={64}>
+        <Image style={styles.image} source={{ uri: imageUrl }} />
+      </ImageSkeleton>
       <View style={styles.textContainer}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>

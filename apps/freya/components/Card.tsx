@@ -1,6 +1,8 @@
 import { useRouter } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { ImageSkeleton } from "./Skeleton";
+
 export default function Card({
   title,
   description,
@@ -28,7 +30,14 @@ export default function Card({
         })
       }
     >
-      <Image source={{ uri: imageUrl }} style={styles.image} />
+      <ImageSkeleton
+        style={styles.image}
+        loading={true}
+        height={200}
+        width={200}
+      >
+        <Image source={{ uri: imageUrl }} style={styles.image} />
+      </ImageSkeleton>
       <View style={styles.content}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>

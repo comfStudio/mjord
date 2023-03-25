@@ -3,19 +3,31 @@
   "name": "mjord",
   "version": "1.0.0",
   "scripts": {
+    "build": "turbo run build --no-daemon",
+    "dev": "turbo run dev --no-cache --continue --no-daemon",
+    "clean": "turbo run clean  --no-daemon",
     "run:app": "yarn workspace @mjord/freya",
     "add:app": "yarn workspace @mjord/freya add",
     "remove:app": "yarn workspace @mjord/freya remove",
-    "start:app": "yarn workspace @mjord/freya start"
+    "start:app": "yarn workspace @mjord/freya start",
+    "run:backend": "yarn workspace @mjord/backend",
+    "add:backend": "yarn workspace @mjord/backend add",
+    "remove:backend": "yarn workspace @mjord/backend remove",
+    "start:backend": "yarn workspace @mjord/backend dev",
+    "bin:supabase": "./node_modules/supabase/bin/supabase"
   },
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "services/*"
   ],
   "packageManager": "yarn@3.5.0",
   "devDependencies": {
+    "dotenv-cli": "^7.1.0",
     "rimraf": "^4.4.1",
+    "supabase": "^1.45.2",
     "tsc": "^2.0.4",
+    "turbo": "^1.8.5",
     "typescript": "^5.0.2"
   }
 }
