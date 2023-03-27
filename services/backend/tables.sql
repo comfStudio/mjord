@@ -19,12 +19,18 @@ CREATE TABLE media (
 -- Create 'groups' table to store group information
 CREATE TABLE groups (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
     primary_media_id INTEGER,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     visibility visibility_type NOT NULL DEFAULT 'hidden',
+
+    location_name VARCHAR(255) NOT NULL DEFAULT '',
+    address TEXT NOT NULL DEFAULT '',
+    latitude NUMERIC NOT NULL DEFAULT 0,
+    longitude NUMERIC NOT NULL DEFAULT 0,
+
     FOREIGN KEY (primary_media_id) REFERENCES media (id) ON DELETE SET NULL
 );
 
@@ -131,3 +137,38 @@ CREATE TABLE comment_reactions (
     FOREIGN KEY (comment_id) REFERENCES discussion_comments (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES auth.users (id) ON DELETE CASCADE
 );
+
+-- Create 'events' table to store group event information
+CREATE TABLE events (
+    id SERIAL PRIMARY KEY,
+    group_id INTEGER NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP,
+    location_name VARCHAR(255) NOT NULL DEFAULT '',
+    address TEXT NOT NULL DEFAULT '',
+    latitude NUMERIC NOT NULL DEFAULT 0,
+    longitude NUMERIC NOT NULL DEFAULT 0,
+    visibility visibility_type NOT NULL DEFAULT 'public',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE CASCADE
+);
+
+
+-- Create 'event_members' table to store user-event relationships
+CREATE TABLE event_members (
+    user_id UUID NOT NULL,
+    event_id INTEGER NOT NULL,
+    joined_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, event_id),
+    FOREIGN KEY (user_id) REFERENCES auth.users (id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
+);
+
+
+-- Associate events with group discussions
+ALTER TABLE group_discussions
+ADD COLUMN event_id INTEGER,
+ADD FOREIGN KEY (event_id) REFERENCES events (id);

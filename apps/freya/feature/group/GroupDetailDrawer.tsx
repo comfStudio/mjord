@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useRecoilState } from "recoil";
 
 import { Ionicons } from "@expo/vector-icons";
+import { t } from "@mjord/common";
 
 import Button from "../../components/Button";
 import DrawerSheet from "../../components/DrawerSheet";
@@ -19,7 +20,12 @@ export default function GroupDetailDrawer() {
   };
 
   const goToDetail = () => {
-    router.push("/detail");
+    router.push({
+      pathname: "/detail",
+      params: {
+        id: group?.id,
+      },
+    });
     handleCloseDrawer();
   };
 
@@ -42,20 +48,18 @@ export default function GroupDetailDrawer() {
           <Image
             style={styles.image}
             source={{
-              uri:
-                group?.primary_media?.url ??
-                "https://placeimg.com/200/200/architecture",
+              uri: group?.primary_media?.url,
             }}
           />
         </ImageSkeleton>
-        <Text style={styles.title}>{group?.name}</Text>
+        <Text style={styles.title}>{group?.title}</Text>
         <TouchableOpacity onPress={handleIconPress}>
           <Ionicons name="ios-arrow-forward" size={24} color="black" />
         </TouchableOpacity>
       </TouchableOpacity>
       <View style={styles.container}>
         <Text style={styles.description}>{group?.description}</Text>
-        <Button value="More details" onPress={handleMoreDetailsPress} />
+        <Button value={t`More details`} onPress={handleMoreDetailsPress} />
       </View>
     </DrawerSheet>
   );

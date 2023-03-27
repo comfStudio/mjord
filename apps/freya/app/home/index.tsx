@@ -1,16 +1,14 @@
-import { Tabs } from "expo-router";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 
 import { HorizontalGroupCardList } from "../../feature/group/GroupCard";
-import { VerticalGroupList } from "../../feature/group/GroupList";
+import { VerticalLoadMoreGroupList } from "../../feature/group/GroupList";
 import { useFeaturedGroups } from "../../services/group";
 
 export default function HomeScreen() {
   const { data } = useFeaturedGroups();
 
   return (
-    <View style={styles.container}>
-      <Tabs.Screen options={{ title: "Home" }} />
+    <ScrollView style={styles.container}>
       <View style={styles.cardContainer}>
         <HorizontalGroupCardList data={data} />
       </View>
@@ -20,17 +18,19 @@ export default function HomeScreen() {
           { width: Dimensions.get("screen").width },
         ]}
       >
-        <VerticalGroupList data={data} />
+        <VerticalLoadMoreGroupList
+          initialPageSize={30}
+          pageSize={10}
+          data={data}
+        />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
   },
   cardContainer: {
     flex: 1,
@@ -38,8 +38,6 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flexGrow: 1,
-    height: 200,
-    maxHeight: 960,
   },
   title: {
     fontSize: 64,

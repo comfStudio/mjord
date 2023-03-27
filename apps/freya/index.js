@@ -8,9 +8,15 @@ import getLogger from "@mjord/logger";
 import constant from "./constants";
 import { setupState } from "./state";
 
+import { useLocale, addLocale } from "@mjord/common";
+import { languages } from "./state/_app";
+
 import { createClient } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { QueryClient } from "@tanstack/react-query";
+import { getLocales } from "expo-localization";
+
+import langDA from "./i18n/da.json";
 
 async function main() {
   constant.log = getLogger();
@@ -46,3 +52,21 @@ async function main() {
 }
 
 main();
+
+function applyLocale() {
+  const deviceLanguage = getLocales()[0].languageCode;
+  const langs = {
+    da: langDA,
+  };
+
+  languages.forEach((lang) => {
+    if (lang === "en") return; // English is the default language
+    if (!langs[lang]) throw new Error(`Language ${lang}.json not found`);
+    addLocale(lang, langs[lang]);
+    if (lang === deviceLanguage) {
+      useLocale(lang);
+    }
+  });
+}
+
+applyLocale();

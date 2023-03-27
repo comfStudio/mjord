@@ -5,7 +5,16 @@ module.exports = function (api) {
     plugins: [
       // NOTE: `expo-router/babel` is a temporary extension to `babel-preset-expo`.
       require.resolve("expo-router/babel"),
-      ["module-resolver"],
+      "transform-inline-environment-variables",
+      [
+        "ttag",
+        {
+          extract: {
+            output: "i18n/en.pot",
+          },
+          moduleName: "@mjord/common",
+        },
+      ],
     ],
   };
 };

@@ -1,15 +1,12 @@
-import React from "react";
 import { TouchableOpacity } from "react-native";
 import { useSetRecoilState } from "recoil";
 
 import ListItem from "../../components/ListItem";
-import VerticalList, {
-  VerticalLoadMoreList,
-} from "../../components/VerticalList";
+import VerticalList from "../../components/VerticalList";
 import { BasicGroupWithMediaData } from "../../services/group";
 import { GroupState } from "../../state";
 
-export default function GroupListItem({
+export default function GroupList({
   data,
   onPress,
 }: {
@@ -41,32 +38,12 @@ export function VerticalGroupList({
   onPress,
 }: {
   data: BasicGroupWithMediaData[];
-  onPress?: React.ComponentProps<typeof GroupListItem>["onPress"];
+  onPress?: React.ComponentProps<typeof GroupList>["onPress"];
 }) {
   return (
     <VerticalList
       data={data}
-      renderItem={({ item }) => <GroupListItem data={item} onPress={onPress} />}
-    />
-  );
-}
-
-export function VerticalLoadMoreGroupList({
-  data,
-  onPress,
-  ...props
-}: {
-  data: BasicGroupWithMediaData[];
-  onPress?: React.ComponentProps<typeof GroupListItem>["onPress"];
-} & Omit<
-  React.ComponentProps<typeof VerticalLoadMoreList>,
-  "renderItem" | "data"
->) {
-  return (
-    <VerticalLoadMoreList
-      {...props}
-      data={data ?? []}
-      renderItem={(item) => <GroupListItem data={item} onPress={onPress} />}
+      renderItem={({ item }) => <GroupList data={item} onPress={onPress} />}
     />
   );
 }

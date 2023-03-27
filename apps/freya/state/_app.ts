@@ -1,13 +1,17 @@
+import { getLocales } from 'expo-localization';
+
 import StateBlock, { defineAtom } from './base';
 
-export default class _AppState extends StateBlock {
+const deviceLanguage = getLocales()[0].languageCode;
+export const languages = ['en', 'da'];
 
-  static user = defineAtom({
-    default: null,
-  });
+export default class _AppState extends StateBlock {
 
   static isOnline = defineAtom({
     default: true,
   });
 
+  static language = defineAtom({
+    default: languages.includes(deviceLanguage) ? deviceLanguage : 'en'
+  });
 }

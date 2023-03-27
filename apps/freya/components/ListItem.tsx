@@ -5,22 +5,36 @@ import { ImageSkeleton } from "./Skeleton";
 
 export default function ListItem({
   imageUrl,
+  image,
   title,
   description,
   href,
   onPress,
+  children,
+  muted,
 }: {
-  imageUrl: string;
   title: string;
+  imageUrl?: string;
+  image?: boolean;
+  muted?: boolean;
   description: string;
+  children?: React.ReactNode;
   href?: string;
   onPress?: React.ComponentProps<typeof TouchableOpacity>["onPress"];
 }) {
   const router = useRouter();
 
+  const containerStyles: any[] = [styles.container];
+  const titleStyles: any[] = [styles.title];
+
+  if (muted) {
+    containerStyles.push(styles.mutedContainer);
+    titleStyles.push(styles.mutedTitle);
+  }
+
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={containerStyles}
       onPress={
         onPress ??
         ((ev) => {
@@ -30,12 +44,20 @@ export default function ListItem({
         })
       }
     >
-      <ImageSkeleton loading={true} style={styles.image} height={64} width={64}>
-        <Image style={styles.image} source={{ uri: imageUrl }} />
-      </ImageSkeleton>
+      {image && (
+        <ImageSkeleton
+          loading={true}
+          style={styles.image}
+          height={64}
+          width={64}
+        >
+          <Image style={styles.image} source={{ uri: imageUrl }} />
+        </ImageSkeleton>
+      )}
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.description}>{description}</Text>
+        <Text style={titleStyles}>{title}</Text>
+        {!!description && <Text style={styles.description}>{description}</Text>}
+        {children}
       </View>
     </TouchableOpacity>
   );
@@ -48,6 +70,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderColor: "#ccc",
+  },
+  mutedContainer: {
+    opacity: 0.5,
   },
   image: {
     width: 64,
@@ -62,6 +87,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 5,
+  },
+  mutedTitle: {
+    color: "#888",
   },
   description: {
     fontSize: 14,

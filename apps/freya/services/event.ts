@@ -1,0 +1,61 @@
+import { useQuery } from '@tanstack/react-query';
+
+import constant, { ServiceType } from '../constants';
+import { Service, ServiceLocator } from './base';
+import { EventData } from './types';
+
+export default class Event extends Service {
+
+    constructor() {
+        super(ServiceType.Event);
+
+    }
+
+    async init(locator: ServiceLocator) {
+    }
+
+    async getFeaturedEvents(groupId: number) {
+        // date for beginning of today in UTC
+        const dateToday = new Date(new Date().setUTCHours(0, 0, 0, 0));
+
+        const { data: futureData, error } = await constant.supabase
+            .from("events")
+            .select(`
+                *
+            `)
+            .eq('group_id', groupId)
+            .gte('start_time', dateToday.toISOString()).order('start_time', { ascending: true }).limit(10);
+
+        if (error) {
+            throw error;
+        }
+
+        const { data: pastData } = await constant.supabase
+            .from("events")
+            .select(`
+                *
+            `)
+            .eq('group_id', groupId)
+            .lte('start_time', dateToday.toISOString()).order('start_time', { ascending: false }).limit(10);
+
+        return {
+            future: futureData as EventData[],
+            past: pastData as EventData[]
+        }
+    }
+
+
+}
+
+export function useFeaturedEvents(groupId: number) {
+    const service = constant.service.get(ServiceType.Event);
+
+    const q = useQuery(
+        ['featuredEvents', groupId],
+        async () => {
+            const data = await service.getFeaturedEvents(groupId);
+            return data;
+        }
+    );
+    return q
+}

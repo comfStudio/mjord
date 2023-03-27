@@ -112,10 +112,75 @@ export interface Database {
           tag_id?: number
         }
       }
+      event_members: {
+        Row: {
+          event_id: number
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          event_id: number
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          event_id?: number
+          joined_at?: string
+          user_id?: string
+        }
+      }
+      events: {
+        Row: {
+          address: string
+          created_at: string
+          description: string
+          end_time: string | null
+          group_id: number
+          id: number
+          latitude: number
+          location_name: string | null
+          longitude: number
+          start_time: string
+          title: string
+          updated_at: string
+          visibility: Database["public"]["Enums"]["visibility_type"]
+        }
+        Insert: {
+          address?: string
+          created_at?: string
+          description?: string
+          end_time?: string | null
+          group_id: number
+          id?: number
+          latitude?: number
+          location_name?: string | null
+          longitude?: number
+          start_time: string
+          title: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["visibility_type"]
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          description?: string
+          end_time?: string | null
+          group_id?: number
+          id?: number
+          latitude?: number
+          location_name?: string | null
+          longitude?: number
+          start_time?: string
+          title?: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["visibility_type"]
+        }
+      }
       group_discussions: {
         Row: {
           content: string
           created_at: string
+          event_id: number | null
           group_id: number
           id: number
           title: string
@@ -126,6 +191,7 @@ export interface Database {
         Insert: {
           content: string
           created_at?: string
+          event_id?: number | null
           group_id: number
           id?: number
           title: string
@@ -136,6 +202,7 @@ export interface Database {
         Update: {
           content?: string
           created_at?: string
+          event_id?: number | null
           group_id?: number
           id?: number
           title?: string
@@ -197,29 +264,41 @@ export interface Database {
       }
       groups: {
         Row: {
+          address: string
           created_at: string
           description: string
           id: number
-          name: string
+          latitude: number
+          location_name: string | null
+          longitude: number
           primary_media_id: number | null
+          title: string
           updated_at: string
           visibility: Database["public"]["Enums"]["visibility_type"]
         }
         Insert: {
+          address?: string
           created_at?: string
-          description: string
+          description?: string
           id?: number
-          name: string
+          latitude?: number
+          location_name?: string | null
+          longitude?: number
           primary_media_id?: number | null
+          title: string
           updated_at?: string
           visibility?: Database["public"]["Enums"]["visibility_type"]
         }
         Update: {
+          address?: string
           created_at?: string
           description?: string
           id?: number
-          name?: string
+          latitude?: number
+          location_name?: string | null
+          longitude?: number
           primary_media_id?: number | null
+          title?: string
           updated_at?: string
           visibility?: Database["public"]["Enums"]["visibility_type"]
         }

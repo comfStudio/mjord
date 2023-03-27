@@ -89,16 +89,24 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
 
     // Insert test data for groups
     for (let i = 0; i < numGroups; i++) {
-        const groupName = faker.lorem.words(3);
+        const groupTitle = faker.lorem.words(3);
         const groupDescription = faker.lorem.sentences(3);
         const groupVisibility = faker.helpers.arrayElement(["public", "private", "hidden"]);
         const primaryMediaId = faker.helpers.arrayElement(mediaIds.concat([null as any]));
+        const groupLocationName = faker.address.city();
+        const groupAddress = faker.address.streetAddress();
+        const groupLatitude = faker.address.latitude();
+        const groupLongitude = faker.address.longitude();
 
-        const result = await db.one("INSERT INTO groups (name, description, primary_media_id, visibility) VALUES ($1, $2, $3, $4) RETURNING id", [
-            groupName,
+        const result = await db.one("INSERT INTO groups (title, description, primary_media_id, visibility, location_name, address, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id", [
+            groupTitle,
             groupDescription,
             primaryMediaId,
             groupVisibility,
+            groupLocationName,
+            groupAddress,
+            groupLatitude,
+            groupLongitude,
         ]);
 
         groupIds.push(result.id);
@@ -106,30 +114,85 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
 
     console.log("Test groups created successfully")
 
-    // Insert test data for group_members
-    for (let groupID of groupIds) {
-        const numGroupMembers = faker.datatype.number({ min: 1, max: 20 });
 
-        for (let j = 0; j < numGroupMembers; j++) {
-            const userID = faker.helpers.arrayElement(userIds);
+    const eventIds: number[] = [];
 
-            await db.none("INSERT INTO group_members (group_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", [groupID, userID]);
+    // Insert test data for events
+    for (let groupId of groupIds) {
+        const groupID = groupId;
+        const numEvents = faker.datatype.number({ min: 0, max: 10 });
+        for (let i = 0; i < numEvents; i++) {
+            const eventTitle = faker.lorem.words(3);
+            const eventDescription = faker.lorem.sentences(3);
+            const eventStartTime = faker.helpers.arrayElement([faker.date.past(), faker.date.future()]);
+            const eventEndTime = faker.date.between(eventStartTime, new Date(eventStartTime.getTime() + 86400000));
+            const eventLocationName = faker.address.city();
+            const eventAddress = faker.address.streetAddress();
+            const eventLatitude = faker.address.latitude();
+            const eventLongitude = faker.address.longitude();
+
+            const result = await db.one("INSERT INTO events (group_id, title, description, start_time, end_time, location_name, address, latitude, longitude) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id", [
+                groupID,
+                eventTitle,
+                eventDescription,
+                eventStartTime,
+                eventEndTime,
+                eventLocationName,
+                eventAddress,
+                eventLatitude,
+                eventLongitude,
+            ]);
+
+            eventIds.push(result.id);
         }
     }
 
+    console.log("Test events created successfully")
+
+
+    // Insert test data for group_members
+    for (let groupID of groupIds) {
+        const numGroupMembers = faker.datatype.number({ min: 1, max: 20 });
+        const groupUserIds: string[] = []
+
+        for (let j = 0; j < numGroupMembers; j++) {
+            const userID = faker.helpers.arrayElement(userIds);
+            groupUserIds.push(userID);
+
+            await db.none("INSERT INTO group_members (group_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", [groupID, userID]);
+        }
+
+
+        // Insert test data for event_members
+        for (let eventID of eventIds) {
+            const numEventMembers = faker.datatype.number({ min: 1, max: 20 });
+
+            for (let j = 0; j < numEventMembers; j++) {
+                const userID = groupUserIds.pop();
+                if (!userID) continue;
+
+                await db.none("INSERT INTO event_members (event_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", [eventID, userID]);
+            }
+        }
+
+
+    }
+
+    console.log("Test event members created successfully")
     console.log("Test group members created successfully")
 
     // Insert test data for group_discussions
     for (let i = 0; i < numDiscussions; i++) {
         const groupID = faker.helpers.arrayElement(groupIds);
         const userID = faker.helpers.arrayElement(userIds);
+        const eventID = faker.helpers.arrayElement(eventIds.concat([null as any]));
         const discussionTitle = faker.lorem.words(5);
         const discussionContent = faker.lorem.sentences(5);
         const discussionVisibility = faker.helpers.arrayElement(["public", "private", "hidden"]);
 
         const result = await db.one(
-            "INSERT INTO group_discussions (group_id, user_id, title, content, visibility) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-            [groupID, userID, discussionTitle, discussionContent, discussionVisibility]
+            "INSERT INTO group_discussions (group_id, event_id, user_id, title, content, visibility) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+            [groupID, eventID, userID, discussionTitle, discussionContent, discussionVisibility]
         );
 
         discussionIds.push(result.id);
@@ -246,6 +309,9 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
 
         await db.none("INSERT INTO group_media (group_id, media_id) VALUES ($1, $2)", [groupID, mediaID]);
     }
+
+    console.log("Test media created successfully")
+
 
 };
 

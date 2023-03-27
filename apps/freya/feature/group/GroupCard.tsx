@@ -3,21 +3,21 @@ import { useSetRecoilState } from "recoil";
 
 import Card from "../../components/Card";
 import { HorizontalCardList } from "../../components/CardList";
-import { GroupWithMediaData } from "../../services/group";
+import { BasicGroupWithMediaData } from "../../services/group";
 import { GroupState } from "../../state";
 
 export default function GroupCard({
   data,
   onPress,
 }: {
-  data: GroupWithMediaData;
+  data: BasicGroupWithMediaData;
   onPress?: React.ComponentProps<typeof TouchableOpacity>["onPress"];
 }) {
   const setGroup = useSetRecoilState(GroupState.currentGroupDetail);
 
   return (
     <Card
-      title={data.name}
+      title={data.title}
       imageUrl={data?.primary_media?.url}
       description={data.description}
       onPress={
@@ -36,7 +36,7 @@ export function HorizontalGroupCardList({
   data,
   onPress,
 }: {
-  data: GroupWithMediaData[];
+  data: BasicGroupWithMediaData[];
   onPress?: React.ComponentProps<typeof GroupCard>["onPress"];
 }) {
   return (

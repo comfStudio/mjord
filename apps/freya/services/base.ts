@@ -4,6 +4,7 @@ import { ServiceType } from '../constants';
 
 import type DatabaseService from './database';
 import type GroupService from './group';
+import type EventService from './event';
 export class Service {
     type: ServiceType;
 
@@ -17,6 +18,7 @@ export class Service {
 type ServiceTypeMap = {
     [ServiceType.Database]: DatabaseService;
     [ServiceType.Group]: GroupService;
+    [ServiceType.Event]: EventService;
     // [ServiceType.Character]: CharacterService;
     // [ServiceType.Template]: TemplateService;
     // [ServiceType.Tag]: TagService;

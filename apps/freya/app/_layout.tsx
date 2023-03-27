@@ -1,8 +1,10 @@
 import { Tabs } from "expo-router";
 import { useEffect } from "react";
-import { AppState, Platform } from "react-native";
-import { RecoilRoot } from "recoil";
+import { AppState as NativeAppState, Platform } from "react-native";
+import { RecoilRoot, useSetRecoilState } from "recoil";
 
+import { Feather } from "@expo/vector-icons";
+import { t } from "@mjord/common";
 import NetInfo from "@react-native-community/netinfo";
 import {
   focusManager,
@@ -11,6 +13,7 @@ import {
 } from "@tanstack/react-query";
 
 import constant from "../constants";
+import { AppState } from "../state";
 
 import type { AppStateStatus } from "react-native";
 function useRefetchOnFocus() {
@@ -21,29 +24,40 @@ function useRefetchOnFocus() {
       }
     }
 
-    const subscription = AppState.addEventListener("change", onAppStateChange);
+    const subscription = NativeAppState.addEventListener(
+      "change",
+      onAppStateChange
+    );
 
     return () => subscription.remove();
   }, []);
 }
 
 function useOnlineStatusManagement() {
+  const setIsOnline = useSetRecoilState(AppState.isOnline);
+
   useEffect(() => {
     onlineManager.setEventListener((setOnline) => {
       return NetInfo.addEventListener((state) => {
         setOnline(!!state.isConnected);
+        setIsOnline(!!state.isConnected);
       });
     });
   }, []);
 }
 
-export default function RootLayout() {
+function Init() {
   useOnlineStatusManagement();
   useRefetchOnFocus();
 
+  return null;
+}
+
+export default function RootLayout() {
   return (
     <RecoilRoot>
       <QueryClientProvider client={constant.client}>
+        <Init />
         <Tabs>
           <Tabs.Screen
             // Name of the route to hide.
@@ -59,6 +73,24 @@ export default function RootLayout() {
             options={{
               // This tab will no longer show up in the tab bar.
               href: null,
+            }}
+          />
+          <Tabs.Screen
+            name="home"
+            options={{
+              title: t`Explore`,
+              tabBarIcon: ({ color }) => (
+                <Feather name="navigation" color={color} size={26} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="user/index"
+            options={{
+              title: t`You`,
+              tabBarIcon: ({ color }) => (
+                <Feather name="user" color={color} size={26} />
+              ),
             }}
           />
         </Tabs>

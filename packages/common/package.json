@@ -7,6 +7,9 @@
     "dev": "tsc --watch",
     "clean": "rimraf .turbo && rimraf lib && rimraf dist && rimraf *.tsbuildinfo"
   },
+  "dependencies": {
+    "ttag": "^1.7.24"
+  },
   "files": [
     "lib/**"
   ],
