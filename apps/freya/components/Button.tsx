@@ -1,4 +1,6 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Button({
   value,
@@ -7,13 +9,17 @@ export default function Button({
   textStyle,
   primary,
   secondary,
+  icon,
+  children,
   size = "medium",
 }: {
-  value: string;
+  value?: string;
   onPress: () => void;
   style?: object;
   textStyle?: object;
+  icon?: React.ComponentProps<typeof MaterialIcons>["name"];
   primary?: boolean;
+  children?: React.ReactNode;
   secondary?: boolean;
   size?: "small" | "medium" | "large";
 }) {
@@ -30,6 +36,10 @@ export default function Button({
     textStyles.push(styles.buttonTextSecondary);
   }
 
+  if (icon) {
+    buttonStyles.push(styles.buttonBaseIcon);
+  }
+
   switch (size) {
     case "small":
       buttonStyles.push(styles.buttonSmall);
@@ -42,11 +52,17 @@ export default function Button({
   }
 
   return (
-    <Pressable style={buttonStyles} onPress={onPress}>
-      <Text textBreakStrategy="simple" style={textStyles}>
-        {value}
-      </Text>
-    </Pressable>
+    <TouchableOpacity style={buttonStyles} onPress={onPress}>
+      {!!value && (
+        <Text textBreakStrategy="simple" style={textStyles}>
+          {value}
+        </Text>
+      )}
+      {!!icon && (
+        <MaterialIcons name={icon} style={[textStyles, styles.buttonIcon]} />
+      )}
+      {children}
+    </TouchableOpacity>
   );
 }
 
@@ -54,11 +70,18 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "white",
     borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
     alignItems: "center",
     borderColor: "#007AFF",
     borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  buttonBaseIcon: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  buttonIcon: {
+    fontSize: 18,
   },
   buttonText: {
     fontSize: 14,

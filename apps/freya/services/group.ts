@@ -2,17 +2,21 @@ import { useQuery } from '@tanstack/react-query';
 
 import constant, { ServiceType } from '../constants';
 import { Service, ServiceLocator } from './base';
-import { GroupData, MediaData } from './types';
+import { GroupData, GroupMemberData, MediaData, ProfileData } from './types';
 
 export type GroupWithtExtraData = GroupData & {
     primary_media: MediaData | null;
-    member_count: {
+    members: {
         count: number;
     };
 }
 
 export type BasicGroupWithMediaData = Pick<GroupData, 'id' | 'description' | 'title' | 'visibility'> & {
     primary_media: Pick<MediaData, 'url' | 'media_type'> | null;
+}
+
+export type GroupMemberWithProfileData = GroupMemberData & {
+    profile: ProfileData;
 }
 
 export default class Group extends Service {
@@ -31,6 +35,8 @@ export default class Group extends Service {
             .select(`
                 id,
                 title,
+                description,
+                visibility,
                 primary_media:primary_media_id (
                     media_type,
                     url
@@ -47,21 +53,36 @@ export default class Group extends Service {
         const { data, error } = await constant.supabase
             .from("groups")
             .select(`
-                member_count:group_members (count),
+                members:group_members (count),
                 *,
                 primary_media:primary_media_id (
                     media_type,
                     url
                 )
-            `).eq('id', id).single(
-                {foreignTable: 'group_members'}
-            );
-
-        console.debug(data);
+            `)
+            .eq('id', id)
+            .single()
         if (error) {
             throw error;
         }
-        return data as GroupWithtExtraData;
+
+
+        return { ...data, members: data?.members?.[0] ?? { count: 0 } } as GroupWithtExtraData;
+    }
+
+    async getGroupMembers(id: number, from: number = 0, to: number = 30) {
+        const { data, error } = await constant.supabase
+            .from("group_members")
+            .select(`
+                *,
+                profile:profile_id(*)
+            `)
+            .eq('group_id', id)
+            .range(from, to)
+        if (error) {
+            throw error;
+        }
+        return data as GroupMemberWithProfileData[];
     }
 
 }
@@ -87,6 +108,19 @@ export function useGroup(id: number) {
         async () => {
             const group = await service.getGroup(id);
             return group;
+        }
+    );
+    return q
+}
+
+export function useGroupMembers(id: number, from: number = 0, to: number = 30) {
+    const service = constant.service.get(ServiceType.Group);
+
+    const q = useQuery(
+        ['groupMembers', id],
+        async () => {
+            const members = await service.getGroupMembers(id, from, to);
+            return members;
         }
     );
     return q

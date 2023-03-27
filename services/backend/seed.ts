@@ -32,6 +32,11 @@ const createUser = async (email: string, password: string) => {
         console.error("Error creating user:", error.message);
         return null;
     } else {
+
+        if (user?.id) {
+            await db.none("UPDATE profiles SET name = $1 WHERE id = $2", [faker.name.fullName(), user.id]);
+        }
+
         return user?.id;
     }
 };
@@ -159,7 +164,7 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
             const userID = faker.helpers.arrayElement(userIds);
             groupUserIds.push(userID);
 
-            await db.none("INSERT INTO group_members (group_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", [groupID, userID]);
+            await db.none("INSERT INTO group_members (group_id, profile_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", [groupID, userID]);
         }
 
 
@@ -171,7 +176,7 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
                 const userID = groupUserIds.pop();
                 if (!userID) continue;
 
-                await db.none("INSERT INTO event_members (event_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", [eventID, userID]);
+                await db.none("INSERT INTO event_members (event_id, profile_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", [eventID, userID]);
             }
         }
 
@@ -191,7 +196,7 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
         const discussionVisibility = faker.helpers.arrayElement(["public", "private", "hidden"]);
 
         const result = await db.one(
-            "INSERT INTO group_discussions (group_id, event_id, user_id, title, content, visibility) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+            "INSERT INTO group_discussions (group_id, event_id, profile_id, title, content, visibility) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
             [groupID, eventID, userID, discussionTitle, discussionContent, discussionVisibility]
         );
 
@@ -206,7 +211,7 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
         const userID = faker.helpers.arrayElement(userIds);
         const commentContent = faker.lorem.sentences(2);
 
-        const result = await db.one("INSERT INTO discussion_comments (discussion_id, user_id, content) VALUES ($1, $2, $3) RETURNING id", [
+        const result = await db.one("INSERT INTO discussion_comments (discussion_id, profile_id, content) VALUES ($1, $2, $3) RETURNING id", [
             discussionID,
             userID,
             commentContent,
@@ -223,7 +228,7 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
         const userID = faker.helpers.arrayElement(userIds);
         const reactionType = faker.helpers.arrayElement(["like", "dislike", "heart", "clap"]);
 
-        await db.none("INSERT INTO discussion_reactions (discussion_id, user_id, reaction) VALUES ($1, $2, $3)", [
+        await db.none("INSERT INTO discussion_reactions (discussion_id, profile_id, reaction) VALUES ($1, $2, $3)", [
             discussionID,
             userID,
             reactionType,
@@ -236,7 +241,7 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
         const userID = faker.helpers.arrayElement(userIds);
         const reactionType = faker.helpers.arrayElement(["like", "dislike", "heart", "clap"]);
 
-        await db.none("INSERT INTO comment_reactions (comment_id, user_id, reaction) VALUES ($1, $2, $3)", [
+        await db.none("INSERT INTO comment_reactions (comment_id, profile_id, reaction) VALUES ($1, $2, $3)", [
             commentID,
             userID,
             reactionType,

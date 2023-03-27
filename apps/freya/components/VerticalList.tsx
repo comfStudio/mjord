@@ -1,69 +1,73 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   FlatList,
   ListRenderItem as ListRenderItemFlat,
   StyleSheet,
   View,
-} from "react-native";
+} from 'react-native';
 
-import { FlashList, ListRenderItem } from "@shopify/flash-list";
+import { FlashList, ListRenderItem } from '@shopify/flash-list';
 
-import Button from "./Button";
+import Button from './Button';
 
-export function VirtualizedVerticalList<T extends { id: any }>({
+export function VirtualizedVerticalList<
+  T extends Record<string, any> = { id: any }
+>({
   data,
   renderItem,
+  keyExtractor = (item) => item.id,
 }: {
   data: T[];
   renderItem: ListRenderItem<T>;
+  keyExtractor?: (item: T, index: number) => string;
 }) {
   return (
     <FlashList
       data={data}
-      keyExtractor={(item) => item.id}
+      keyExtractor={keyExtractor}
       renderItem={renderItem}
       estimatedItemSize={10}
     />
   );
 }
 
-export default function VerticalList<T extends { id: any }>({
+export default function VerticalList<
+  T extends Record<string, any> = { id: any }
+>({
   data,
   renderItem,
+  keyExtractor = (item) => item?.id,
 }: {
   data: T[];
   renderItem: ListRenderItemFlat<T>;
+  keyExtractor?: (item: T, index: number) => string;
 }) {
   return (
-    <FlatList
-      data={data}
-      keyExtractor={(item) => item.id}
-      renderItem={renderItem}
-    />
+    <FlatList data={data} keyExtractor={keyExtractor} renderItem={renderItem} />
   );
 }
 
-function VerticalLoadMoreListRenderItem<T extends { id: any }>({
-  item,
-  renderItem,
-}: {
-  item: T;
-  renderItem: (item: T) => JSX.Element;
-}) {
+function VerticalLoadMoreListRenderItem<
+  T extends Record<string, any> = { id: any }
+>({ item, renderItem }: { item: T; renderItem: (item: T) => JSX.Element }) {
   return renderItem(item);
 }
 
-export function VerticalLoadMoreList<T extends { id: any }>({
+export function VerticalLoadMoreList<
+  T extends Record<string, any> = { id: any }
+>({
   data,
   renderItem,
   pageSize = 5,
   initialPageSize,
   onShowMore,
+  keyExtractor = (item) => item?.id,
   style,
 }: {
   data: T[];
   renderItem: (item: T) => JSX.Element;
   onShowMore?: () => void;
+  keyExtractor?: (item: T) => string;
   initialPageSize?: number;
   pageSize?: number;
   style?: React.ComponentProps<typeof View>["style"];
@@ -82,7 +86,7 @@ export function VerticalLoadMoreList<T extends { id: any }>({
     <View style={[style]}>
       {displayedItems.map((item) => (
         <VerticalLoadMoreListRenderItem
-          key={item.id}
+          key={keyExtractor?.(item)}
           item={item}
           renderItem={renderItem}
         />

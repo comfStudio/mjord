@@ -1,7 +1,7 @@
-import * as React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import * as React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from '@expo/vector-icons';
 
 type IconNames = React.ComponentProps<typeof MaterialIcons>["name"];
 
@@ -9,10 +9,12 @@ export default function Label({
   icon,
   children,
   value,
+  style,
 }: {
   icon?: React.ReactNode | IconNames;
   children?: React.ReactNode;
   value?: string;
+  style?: React.ComponentProps<typeof View>["style"];
 }) {
   let iconEl: React.ReactNode;
 
@@ -25,7 +27,7 @@ export default function Label({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       {iconEl}
       <View style={styles.containerContent}>
         {!!value && <Text>{value}</Text>}

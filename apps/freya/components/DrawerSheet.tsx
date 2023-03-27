@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
+  Pressable,
   StyleSheet,
   TouchableOpacity,
   View,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function DrawerSheet({
   isVisible: controlledIsVisible,
@@ -21,7 +22,9 @@ export default function DrawerSheet({
 
   const windowHeight = Dimensions.get("window").height;
 
-  const minHeight = Math.max(insets.bottom + 80, 0.25 * windowHeight);
+  const minHeight = Math.max(insets.bottom + 80, 0.35 * windowHeight);
+
+  const [contentHeight, setContentHeight] = useState(minHeight);
 
   const slideAnimation = useRef(new Animated.Value(0)).current;
 
@@ -48,7 +51,7 @@ export default function DrawerSheet({
 
   const translateY = slideAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: [minHeight, 0],
+    outputRange: [contentHeight, 0],
   });
 
   if (!isVisibleInternal) {
@@ -64,18 +67,31 @@ export default function DrawerSheet({
         style={styles.overlay}
         activeOpacity={1}
         onPress={(e) => {
+          e.preventDefault();
           if (onClose) {
             onClose(e);
           }
         }}
       />
       <Animated.View
+        onLayout={(e) => {
+          setContentHeight(e.nativeEvent.layout.height);
+        }}
         style={[
           styles.contentContainer,
           { minHeight, transform: [{ translateY }] },
         ]}
       >
-        <View style={styles.handle} />
+        <Pressable
+          onPress={(e) => {
+            e.preventDefault();
+            if (onClose) {
+              onClose(e);
+            }
+          }}
+        >
+          <View style={styles.handle} />
+        </Pressable>
         {children}
       </Animated.View>
     </View>

@@ -10,3 +10,5 @@ BEGIN
         EXECUTE 'DROP TABLE IF EXISTS public.' || table_rec.table_name || ' CASCADE';
     END LOOP;
 END $$;
+
+DELETE FROM auth.users;

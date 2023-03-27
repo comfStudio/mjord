@@ -1,10 +1,10 @@
-import { TouchableOpacity } from "react-native";
-import { useSetRecoilState } from "recoil";
+import { TouchableOpacity } from 'react-native';
+import { useSetRecoilState } from 'recoil';
 
-import Card from "../../components/Card";
-import { HorizontalCardList } from "../../components/CardList";
-import { BasicGroupWithMediaData } from "../../services/group";
-import { GroupState } from "../../state";
+import Card from '../../components/Card';
+import { HorizontalCardList } from '../../components/CardList';
+import { BasicGroupWithMediaData } from '../../services/group';
+import { GroupState } from '../../state';
 
 export default function GroupCard({
   data,
@@ -24,7 +24,6 @@ export default function GroupCard({
         onPress ??
         ((e) => {
           e.preventDefault();
-          console.debug("Setting group", data);
           setGroup(data);
         })
       }

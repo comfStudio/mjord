@@ -23,7 +23,7 @@
   ],
   "packageManager": "yarn@3.5.0",
   "devDependencies": {
-    "babel-plugin-ttag": "https://github.com/iSplasher/babel-plugin-ttag#commit=https://github.com/iSplasher/babel-plugin-ttag/commit/0ce9f02410d851b8a8450eeaf767e025a1b9dfef",
+    "babel-plugin-ttag": "https://github.com/iSplasher/babel-plugin-ttag#commit=0ce9f02410d851b8a8450eeaf767e025a1b9dfef",
     "dotenv-cli": "^7.1.0",
     "rimraf": "^4.4.1",
     "supabase": "^1.45.2",

@@ -1,14 +1,14 @@
-import { useRouter } from "expo-router";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useRecoilState } from "recoil";
+import { useRouter } from 'expo-router';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRecoilState } from 'recoil';
 
-import { Ionicons } from "@expo/vector-icons";
-import { t } from "@mjord/common";
+import { Ionicons } from '@expo/vector-icons';
+import { t } from '@mjord/common';
 
-import Button from "../../components/Button";
-import DrawerSheet from "../../components/DrawerSheet";
-import { ImageSkeleton } from "../../components/Skeleton";
-import { GroupState } from "../../state";
+import Button from '../../components/Button';
+import DrawerSheet from '../../components/DrawerSheet';
+import { ImageSkeleton } from '../../components/Skeleton';
+import { GroupState } from '../../state';
 
 export default function GroupDetailDrawer() {
   const [group, setGroup] = useRecoilState(GroupState.currentGroupDetail);
@@ -58,7 +58,7 @@ export default function GroupDetailDrawer() {
         </TouchableOpacity>
       </TouchableOpacity>
       <View style={styles.container}>
-        <Text style={styles.description}>{group?.description}</Text>
+        <Text style={styles.description}>{group?.description} hello world</Text>
         <Button value={t`More details`} onPress={handleMoreDetailsPress} />
       </View>
     </DrawerSheet>
@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   description: {
+    marginVertical: 16,
     fontSize: 16,
     color: "#666",
   },

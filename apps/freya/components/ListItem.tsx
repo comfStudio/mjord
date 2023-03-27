@@ -1,13 +1,14 @@
-import { useRouter } from "expo-router";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useRouter } from 'expo-router';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { ImageSkeleton } from "./Skeleton";
+import { ImageSkeleton } from './Skeleton';
 
 export default function ListItem({
   imageUrl,
   image,
   title,
   description,
+  size = "medium",
   href,
   onPress,
   children,
@@ -17,7 +18,8 @@ export default function ListItem({
   imageUrl?: string;
   image?: boolean;
   muted?: boolean;
-  description: string;
+  size?: "small" | "medium" | "large";
+  description?: string;
   children?: React.ReactNode;
   href?: string;
   onPress?: React.ComponentProps<typeof TouchableOpacity>["onPress"];
@@ -26,10 +28,25 @@ export default function ListItem({
 
   const containerStyles: any[] = [styles.container];
   const titleStyles: any[] = [styles.title];
+  const descriptionStyles: any[] = [styles.description];
 
   if (muted) {
     containerStyles.push(styles.mutedContainer);
     titleStyles.push(styles.mutedTitle);
+  }
+
+  switch (size) {
+    case "small":
+      titleStyles.push(styles.titleSmall);
+      descriptionStyles.push(styles.descriptionSmall);
+      break;
+
+    case "large":
+      titleStyles.push(styles.titleLarge);
+      break;
+
+    default:
+      break;
   }
 
   return (
@@ -56,7 +73,11 @@ export default function ListItem({
       )}
       <View style={styles.textContainer}>
         <Text style={titleStyles}>{title}</Text>
-        {!!description && <Text style={styles.description}>{description}</Text>}
+        {!!description && (
+          <Text numberOfLines={2} style={descriptionStyles}>
+            {description}
+          </Text>
+        )}
         {children}
       </View>
     </TouchableOpacity>
@@ -84,15 +105,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: "bold",
-    marginBottom: 5,
   },
   mutedTitle: {
     color: "#888",
   },
+  titleSmall: {
+    fontSize: 13,
+    marginBottom: 1,
+  },
+  titleLarge: {
+    fontSize: 18,
+    marginBottom: 5,
+  },
+
   description: {
     fontSize: 14,
     color: "#888",
+  },
+
+  descriptionSmall: {
+    fontSize: 12,
   },
 });

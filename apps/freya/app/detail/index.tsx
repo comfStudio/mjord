@@ -1,17 +1,28 @@
-import { useSearchParams } from "expo-router";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSearchParams } from 'expo-router';
+import { useState } from 'react';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
-import { MaterialIcons } from "@expo/vector-icons";
-import { t } from "@mjord/common";
+import { MaterialIcons } from '@expo/vector-icons';
+import { t } from '@mjord/common';
 
-import Button from "../../components/Button";
-import Separator from "../../components/Separator";
-import { ImageSkeleton, LineSkeleton } from "../../components/Skeleton";
-import FeaturedEvents from "../../feature/event/FeaturedEvents";
-import LocationLabel from "../../feature/location/LocationLabel";
-import { useGroup } from "../../services/group";
+import Button from '../../components/Button';
+import Separator from '../../components/Separator';
+import { ImageSkeleton, LineSkeleton } from '../../components/Skeleton';
+import FeaturedEvents from '../../feature/event/FeaturedEvents';
+import LocationLabel from '../../feature/location/LocationLabel';
+import MembersModal from '../../feature/member/MembersModal';
+import ShareButton from '../../feature/share/ShareButton';
+import { useGroup } from '../../services/group';
 
 export default function DetailScreen() {
+  const [membersVisible, setMembersVisible] = useState(false);
   const { id } = useSearchParams();
   const groupId = parseInt((id as string) || "0");
 
@@ -24,6 +35,11 @@ export default function DetailScreen() {
 
   return (
     <ScrollView style={styles.container}>
+      <MembersModal
+        groupId={groupId}
+        visible={membersVisible}
+        onClose={() => setMembersVisible(false)}
+      />
       <ImageSkeleton
         width={1000}
         // loading={!group?.primary_media?.url}
@@ -39,10 +55,20 @@ export default function DetailScreen() {
       </LineSkeleton>
 
       <View style={styles.tagLine}>
-        <MaterialIcons name="group" size={24} />
-        <Text style={styles.membersText}>{group?.members || 0}</Text>
+        <TouchableOpacity
+          style={styles.members}
+          onPress={(e) => {
+            e.preventDefault();
+            setMembersVisible(true);
+          }}
+        >
+          <MaterialIcons name="group" size={24} />
+          <Text style={styles.membersText}>{group?.members?.count || 0}</Text>
+        </TouchableOpacity>
         <Separator />
-        <LocationLabel data={group} />
+        <LocationLabel data={group} style={styles.locationLabel} />
+        <Separator />
+        <ShareButton url="" secondary />
       </View>
 
       <LineSkeleton
@@ -107,6 +133,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: 16,
+  },
+  locationLabel: {
+    flexGrow: 2,
+  },
+  members: {
+    flexDirection: "row",
   },
   membersText: {
     fontSize: 14,

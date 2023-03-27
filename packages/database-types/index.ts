@@ -14,22 +14,22 @@ export interface Database {
           comment_id: number
           created_at: string
           id: number
+          profile_id: string
           reaction: string
-          user_id: string
         }
         Insert: {
           comment_id: number
           created_at?: string
           id?: number
+          profile_id: string
           reaction: string
-          user_id: string
         }
         Update: {
           comment_id?: number
           created_at?: string
           id?: number
+          profile_id?: string
           reaction?: string
-          user_id?: string
         }
       }
       discussion_comments: {
@@ -38,24 +38,24 @@ export interface Database {
           created_at: string
           discussion_id: number
           id: number
+          profile_id: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           content: string
           created_at?: string
           discussion_id: number
           id?: number
+          profile_id: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           content?: string
           created_at?: string
           discussion_id?: number
           id?: number
+          profile_id?: string
           updated_at?: string
-          user_id?: string
         }
       }
       discussion_media: {
@@ -80,22 +80,22 @@ export interface Database {
           created_at: string
           discussion_id: number
           id: number
+          profile_id: string
           reaction: string
-          user_id: string
         }
         Insert: {
           created_at?: string
           discussion_id: number
           id?: number
+          profile_id: string
           reaction: string
-          user_id: string
         }
         Update: {
           created_at?: string
           discussion_id?: number
           id?: number
+          profile_id?: string
           reaction?: string
-          user_id?: string
         }
       }
       discussion_tags: {
@@ -116,17 +116,17 @@ export interface Database {
         Row: {
           event_id: number
           joined_at: string
-          user_id: string
+          profile_id: string
         }
         Insert: {
           event_id: number
           joined_at?: string
-          user_id: string
+          profile_id: string
         }
         Update: {
           event_id?: number
           joined_at?: string
-          user_id?: string
+          profile_id?: string
         }
       }
       events: {
@@ -138,7 +138,7 @@ export interface Database {
           group_id: number
           id: number
           latitude: number
-          location_name: string | null
+          location_name: string
           longitude: number
           start_time: string
           title: string
@@ -153,7 +153,7 @@ export interface Database {
           group_id: number
           id?: number
           latitude?: number
-          location_name?: string | null
+          location_name?: string
           longitude?: number
           start_time: string
           title: string
@@ -168,7 +168,7 @@ export interface Database {
           group_id?: number
           id?: number
           latitude?: number
-          location_name?: string | null
+          location_name?: string
           longitude?: number
           start_time?: string
           title?: string
@@ -183,9 +183,9 @@ export interface Database {
           event_id: number | null
           group_id: number
           id: number
+          profile_id: string
           title: string
           updated_at: string
-          user_id: string
           visibility: Database["public"]["Enums"]["visibility_type"]
         }
         Insert: {
@@ -194,9 +194,9 @@ export interface Database {
           event_id?: number | null
           group_id: number
           id?: number
+          profile_id: string
           title: string
           updated_at?: string
-          user_id: string
           visibility?: Database["public"]["Enums"]["visibility_type"]
         }
         Update: {
@@ -205,9 +205,9 @@ export interface Database {
           event_id?: number | null
           group_id?: number
           id?: number
+          profile_id?: string
           title?: string
           updated_at?: string
-          user_id?: string
           visibility?: Database["public"]["Enums"]["visibility_type"]
         }
       }
@@ -232,20 +232,20 @@ export interface Database {
         Row: {
           group_id: number
           joined_at: string
+          profile_id: string
           role: Database["public"]["Enums"]["member_role"]
-          user_id: string
         }
         Insert: {
           group_id: number
           joined_at?: string
+          profile_id: string
           role?: Database["public"]["Enums"]["member_role"]
-          user_id: string
         }
         Update: {
           group_id?: number
           joined_at?: string
+          profile_id?: string
           role?: Database["public"]["Enums"]["member_role"]
-          user_id?: string
         }
       }
       group_tags: {
@@ -269,7 +269,7 @@ export interface Database {
           description: string
           id: number
           latitude: number
-          location_name: string | null
+          location_name: string
           longitude: number
           primary_media_id: number | null
           title: string
@@ -282,7 +282,7 @@ export interface Database {
           description?: string
           id?: number
           latitude?: number
-          location_name?: string | null
+          location_name?: string
           longitude?: number
           primary_media_id?: number | null
           title: string
@@ -295,7 +295,7 @@ export interface Database {
           description?: string
           id?: number
           latitude?: number
-          location_name?: string | null
+          location_name?: string
           longitude?: number
           primary_media_id?: number | null
           title?: string
@@ -321,6 +321,23 @@ export interface Database {
           id?: number
           media_type?: Database["public"]["Enums"]["media_type"]
           url?: string
+        }
+      }
+      profiles: {
+        Row: {
+          id: string
+          name: string
+          primary_media_id: number | null
+        }
+        Insert: {
+          id: string
+          name?: string
+          primary_media_id?: number | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          primary_media_id?: number | null
         }
       }
       tags: {
