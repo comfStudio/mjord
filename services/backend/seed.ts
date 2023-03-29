@@ -120,7 +120,10 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
     console.log("Test groups created successfully")
 
 
-    const eventIds: number[] = [];
+    const eventIds: {
+        group: number,
+        event: number,
+    }[] = [];
 
     // Insert test data for events
     for (let groupId of groupIds) {
@@ -148,7 +151,10 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
                 eventLongitude,
             ]);
 
-            eventIds.push(result.id);
+            eventIds.push({
+                group: groupID,
+                event: result.id,
+            });
         }
     }
 
@@ -169,11 +175,13 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
 
 
         // Insert test data for event_members
-        for (let eventID of eventIds) {
+        for (let eventID of eventIds.filter(event => event.group === groupID).map(event => event.event)) {
             const numEventMembers = faker.datatype.number({ min: 1, max: 20 });
 
+            const eventUserIds = groupUserIds.slice();
+
             for (let j = 0; j < numEventMembers; j++) {
-                const userID = groupUserIds.pop();
+                const userID = eventUserIds.pop();
                 if (!userID) continue;
 
                 await db.none("INSERT INTO event_members (event_id, profile_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", [eventID, userID]);
@@ -190,7 +198,7 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
     for (let i = 0; i < numDiscussions; i++) {
         const groupID = faker.helpers.arrayElement(groupIds);
         const userID = faker.helpers.arrayElement(userIds);
-        const eventID = faker.helpers.arrayElement(eventIds.concat([null as any]));
+        const eventID = faker.helpers.arrayElement(eventIds.filter(event => event.group === groupID).map(event => event.event).concat([null as any]));
         const discussionTitle = faker.lorem.words(5);
         const discussionContent = faker.lorem.sentences(5);
         const discussionVisibility = faker.helpers.arrayElement(["public", "private", "hidden"]);

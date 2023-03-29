@@ -10,17 +10,24 @@ export default function Label({
   children,
   value,
   style,
+  iconStyle,
+  textStyle,
 }: {
   icon?: React.ReactNode | IconNames;
   children?: React.ReactNode;
   value?: string;
   style?: React.ComponentProps<typeof View>["style"];
+  iconStyle?: React.ComponentProps<typeof MaterialIcons>["style"];
+  textStyle?: React.ComponentProps<typeof Text>["style"];
 }) {
   let iconEl: React.ReactNode;
 
   if (typeof icon === "string") {
     iconEl = (
-      <MaterialIcons style={styles.icon} name={icon as IconNames} size={24} />
+      <MaterialIcons
+        style={[styles.icon, iconStyle]}
+        name={icon as IconNames}
+      />
     );
   } else {
     iconEl = icon;
@@ -30,7 +37,7 @@ export default function Label({
     <View style={[styles.container, style]}>
       {iconEl}
       <View style={styles.containerContent}>
-        {!!value && <Text>{value}</Text>}
+        {!!value && <Text style={textStyle}>{value}</Text>}
         {children}
       </View>
     </View>
@@ -53,5 +60,6 @@ const styles = StyleSheet.create({
 
   icon: {
     color: "#888",
+    fontSize: 24,
   },
 });

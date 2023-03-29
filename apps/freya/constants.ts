@@ -36,6 +36,8 @@ export class Constant {
 
     static client: QueryClient
 
+    static locale: string
+
     static service: ServiceLocator;
 
     //   static storage: LocalForage;

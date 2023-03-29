@@ -65,6 +65,7 @@ function applyLocale() {
     addLocale(lang, langs[lang]);
     if (lang === deviceLanguage) {
       useLocale(lang);
+      constant.locale = lang;
     }
   });
 }

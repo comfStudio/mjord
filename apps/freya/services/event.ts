@@ -4,6 +4,12 @@ import constant, { ServiceType } from '../constants';
 import { Service, ServiceLocator } from './base';
 import { EventData } from './types';
 
+export type EventWithtExtraData = EventData & {
+    members: {
+        count: number;
+    };
+}
+
 export default class Event extends Service {
 
     constructor() {
@@ -21,6 +27,7 @@ export default class Event extends Service {
         const { data: futureData, error } = await constant.supabase
             .from("events")
             .select(`
+                members:event_members (count),
                 *
             `)
             .eq('group_id', groupId)
@@ -33,14 +40,18 @@ export default class Event extends Service {
         const { data: pastData } = await constant.supabase
             .from("events")
             .select(`
+                members:event_members (count),
                 *
             `)
             .eq('group_id', groupId)
             .lte('start_time', dateToday.toISOString()).order('start_time', { ascending: false }).limit(10);
 
+
+
+
         return {
-            future: futureData as EventData[],
-            past: pastData as EventData[]
+            future: futureData.map(d => ({ ...d, members: d?.members?.[0] ?? { count: 0 } })) as EventWithtExtraData[],
+            past: pastData.map(d => ({ ...d, members: d?.members?.[0] ?? { count: 0 } })) as EventWithtExtraData[]
         }
     }
 
