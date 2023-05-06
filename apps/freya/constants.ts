@@ -8,9 +8,9 @@ import type { ServiceLocator } from './services/base';
 
 export enum ServiceType {
     Database,
+    User,
     Group,
     Event,
-    // User,
     // Character,
     // Template,
     // Tag,

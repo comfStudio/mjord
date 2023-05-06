@@ -1,6 +1,6 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-import { MaterialIcons } from '@expo/vector-icons';
+import { IconProp, useOptionalIconElement } from "../misc/ui-hooks";
 
 export default function Button({
   value,
@@ -8,6 +8,7 @@ export default function Button({
   style,
   textStyle,
   primary,
+  disabled,
   secondary,
   icon,
   children,
@@ -17,8 +18,9 @@ export default function Button({
   onPress: () => void;
   style?: object;
   textStyle?: object;
-  icon?: React.ComponentProps<typeof MaterialIcons>["name"];
+  icon?: IconProp;
   primary?: boolean;
+  disabled?: boolean;
   children?: React.ReactNode;
   secondary?: boolean;
   size?: "small" | "medium" | "large";
@@ -36,9 +38,19 @@ export default function Button({
     textStyles.push(styles.buttonTextSecondary);
   }
 
+  if (disabled) {
+    buttonStyles.push(styles.buttonDisabled);
+    textStyles.push(styles.buttonTextDisabled);
+  }
+
   if (icon) {
     buttonStyles.push(styles.buttonBaseIcon);
   }
+
+  const iconEl = useOptionalIconElement({
+    icon,
+    style: styles.buttonIcon,
+  });
 
   switch (size) {
     case "small":
@@ -58,9 +70,7 @@ export default function Button({
           {value}
         </Text>
       )}
-      {!!icon && (
-        <MaterialIcons name={icon} style={[textStyles, styles.buttonIcon]} />
-      )}
+      {!!iconEl && iconEl}
       {children}
     </TouchableOpacity>
   );
@@ -71,6 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
     borderColor: "#007AFF",
     borderWidth: 1,
     paddingHorizontal: 16,
@@ -105,6 +116,14 @@ const styles = StyleSheet.create({
 
   buttonTextPrimary: {
     color: "white",
+  },
+  buttonDisabled: {
+    backgroundColor: "#EFEFEF",
+    borderColor: "#EFEFEF",
+  },
+
+  buttonTextDisabled: {
+    color: "#AFAFAF",
   },
 
   buttonLarge: {

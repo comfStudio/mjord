@@ -1,5 +1,6 @@
 import AppState from './_app';
 import GroupState from './_group';
+import UserState from './_user';
 import StateBlock from './base';
 
 export {
@@ -17,14 +18,15 @@ export function setupState() {
     return;
   }
   initialized = true;
-  const cls = [AppState, GroupState]
+  const cls = [AppState, GroupState, UserState]
   cls.forEach((c) => StateBlock.setup(c));
 };
 
 setupState();
 
-export { AppState, GroupState };
+export { AppState, GroupState, UserState };
 export default {
   AppState,
-  GroupState
+  GroupState,
+  UserState
 }; 

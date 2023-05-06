@@ -53,12 +53,41 @@ function Init() {
   return null;
 }
 
+function LoginTabs() {
+  return [
+    <Tabs.Screen
+      // Name of the route to hide.
+      name="login/index"
+      options={{
+        // This tab will no longer show up in the tab bar.
+        href: null,
+      }}
+    />,
+    <Tabs.Screen
+      // Name of the route to hide.
+      name="login/1"
+      options={{
+        // This tab will no longer show up in the tab bar.
+        href: null,
+      }}
+    />,
+    <Tabs.Screen
+      // Name of the route to hide.
+      name="login/2"
+      options={{
+        // This tab will no longer show up in the tab bar.
+        href: null,
+      }}
+    />,
+  ];
+}
+
 export default function RootLayout() {
   return (
     <RecoilRoot>
       <QueryClientProvider client={constant.client}>
         <Init />
-        <Tabs>
+        <Tabs backBehavior="history">
           <Tabs.Screen
             // Name of the route to hide.
             name="index"
@@ -67,6 +96,8 @@ export default function RootLayout() {
               href: null,
             }}
           />
+          {LoginTabs()}
+
           <Tabs.Screen
             // Name of the route to hide.
             name="detail/index"

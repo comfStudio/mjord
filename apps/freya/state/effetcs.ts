@@ -39,6 +39,11 @@ export function sercureStoreEffect(key?: string | ((node: RecoilState<any>) => s
     };
 }
 
+/**
+ * Like localStorage
+ * @param key 
+ * @returns 
+ */
 export function asyncStorageEffect(key?: string | ((node: RecoilState<any>) => string),): AtomEffect<any> {
 
     return ({ setSelf, onSet, trigger, node }) => {

@@ -1,7 +1,7 @@
 {
   "name": "@mjord/backend",
   "scripts": {
-    "dev": "cd supabase/docker && docker compose up -d",
+    "dev": "docker compose up -d && cd supabase/docker && docker compose up -d",
     "seed": "ts-node seed.ts"
   },
   "packageManager": "yarn@3.5.0",
