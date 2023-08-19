@@ -325,18 +325,24 @@ export interface Database {
       }
       profiles: {
         Row: {
+          bio: string
           id: string
           name: string
+          occupation: string
           primary_media_id: number | null
         }
         Insert: {
+          bio?: string
           id: string
           name?: string
+          occupation?: string
           primary_media_id?: number | null
         }
         Update: {
+          bio?: string
           id?: string
           name?: string
+          occupation?: string
           primary_media_id?: number | null
         }
       }

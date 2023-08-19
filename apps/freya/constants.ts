@@ -25,6 +25,19 @@ const isWorkerRuntime =
         self instanceof Window
     );
 
+export enum ROUTES {
+    HOME = '/home',
+    LOGIN = '/login',
+    LOGIN_1 = '/login/1',
+    LOGIN_2 = '/login/2',
+    GROUP = '/group',
+    USER = '/user',
+    USER_ONBOARDING = '/user/onboard',
+
+    PRVACY_POLICY = '/privacy-policy',
+    TERMS_OF_SERVICE = '/terms-of-service',
+}
+
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export class Constant {

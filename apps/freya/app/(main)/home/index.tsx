@@ -1,8 +1,8 @@
 import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 
-import { HorizontalGroupCardList } from "../../feature/group/GroupCard";
-import { VerticalLoadMoreGroupList } from "../../feature/group/GroupList";
-import { useFeaturedGroups } from "../../services/group";
+import { HorizontalGroupCardList } from "../../../feature/group/GroupCard";
+import { VerticalLoadMoreGroupList } from "../../../feature/group/GroupList";
+import { useFeaturedGroups } from "../../../services/group";
 
 export default function HomeScreen() {
   const { data } = useFeaturedGroups();

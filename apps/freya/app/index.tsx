@@ -1,6 +1,8 @@
 import { Redirect } from 'expo-router';
 
+import { ROUTES } from "../constants";
+
 export default function Page() {
-  return <Redirect href="/home" />;
+  return <Redirect href={ROUTES.HOME} />;
 }
 

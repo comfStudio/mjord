@@ -2,6 +2,7 @@ import { Redirect, usePathname } from "expo-router";
 import { ReactElement } from "react";
 import { Text, View } from "react-native";
 
+import { ROUTES } from "../../constants";
 import { useAuthUser, useProfile } from "../../services/user";
 
 function OnboardUser({ children }: { children: React.ReactNode }) {
@@ -16,8 +17,8 @@ function OnboardUser({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!data.name && !path.startsWith("/user/onboard")) {
-    return <Redirect href="/user/onboard" />;
+  if (!data.name && !path.startsWith(ROUTES.USER_ONBOARDING)) {
+    return <Redirect href={ROUTES.USER_ONBOARDING} />;
   }
 
   return children as ReactElement;

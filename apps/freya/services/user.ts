@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { User as AuthUser } from '@supabase/supabase-js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import constant, { ServiceType } from '../constants';
+import constant, { ROUTES, ServiceType } from '../constants';
 import { Service } from './base';
 import { ProfileData } from './types';
 
@@ -109,8 +109,6 @@ export function useAuthUser() {
                     case 'SIGNED_OUT':
                         setUser(null);
                         break;
-                    case 'USER_DELETED':
-                        setUser(null);
                     case 'USER_UPDATED':
                         setUser(session.user);
                         break;
@@ -137,7 +135,7 @@ export function useAuthRedirect() {
 
     useEffect(() => {
         if (!user) {
-            router.replace('/login');
+            router.replace(ROUTES.LOGIN);
         }
     }, [user]);
 }

@@ -12,15 +12,15 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { t } from '@mjord/common';
 
-import Button from '../../components/Button';
-import Segment from '../../components/Segment';
-import Separator from '../../components/Separator';
-import { ImageSkeleton, LineSkeleton } from '../../components/Skeleton';
-import FeaturedEvents from '../../feature/event/FeaturedEvents';
-import LocationLabel from '../../feature/location/LocationLabel';
-import MembersModal from '../../feature/member/MembersModal';
-import ShareButton from '../../feature/share/ShareButton';
-import { useGroup } from '../../services/group';
+import Button from '../../../components/Button';
+import Segment from '../../../components/Segment';
+import Separator from '../../../components/Separator';
+import { ImageSkeleton, LineSkeleton } from '../../../components/Skeleton';
+import FeaturedEvents from '../../../feature/event/FeaturedEvents';
+import LocationLabel from '../../../feature/location/LocationLabel';
+import MembersModal from '../../../feature/member/MembersModal';
+import ShareButton from '../../../feature/share/ShareButton';
+import { useGroup } from '../../../services/group';
 
 type IconNames = React.ComponentProps<typeof MaterialIcons>["name"];
 
@@ -56,13 +56,13 @@ function AdvisorySegment({}: {}) {
   return (
     <Segment padded rounded secondary style={advisoryStyles.container}>
       <AdvisoryLabel icon="money">
-        {t`This group might incur a fee to join.`}
+        {t`This community might incur a fee to join.`}
       </AdvisoryLabel>
       <AdvisoryLabel icon="money">
-        {t`This group have activities that might incur a fee.`}
+        {t`This community have activities that might incur a fee.`}
       </AdvisoryLabel>
       <AdvisoryLabel>
-        {t`This group is not moderated by the app's administrators.`}
+        {t`This community is not moderated by the app's administrators.`}
       </AdvisoryLabel>
     </Segment>
   );

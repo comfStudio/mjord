@@ -1,29 +1,38 @@
 {
   "folders": [
-	{
-		"name": "✨ mjord",
-		"path": ".."
-	},
-	{
-		"name": "🚀 @mjord/freya",
-		"path": "../apps/freya"
-	},
-	{
-		"name": "📦 @mjord/common",
-		"path": "../packages/common"
-	},
-	{
-		"name": "📦 @mjord/database-types",
-		"path": "../packages/database-types"
-	},
-	{
-		"name": "📦 @mjord/logger",
-		"path": "../packages/logger"
-	},
-	{
-		"name": "🚀 @mjord/backend",
-		"path": "../services/backend"
-	}
-],
-  "settings": {}
+    {
+      "name": "✨ mjord",
+      "path": ".."
+    },
+    {
+      "name": "🚀 @mjord/freya",
+      "path": "../apps/freya"
+    },
+    {
+      "name": "📦 @mjord/common",
+      "path": "../packages/common"
+    },
+    {
+      "name": "📦 @mjord/database-types",
+      "path": "../packages/database-types"
+    },
+    {
+      "name": "📦 @mjord/logger",
+      "path": "../packages/logger"
+    },
+    {
+      "name": "🚀 @mjord/backend",
+      "path": "../services/backend"
+    }
+  ],
+  "settings": {
+    "jest.disabledWorkspaceFolders": [
+      "📦 @mjord/common",
+      "📦 @mjord/logger",
+      "✨ mjord",
+      "🚀 @mjord/freya",
+      "📦 @mjord/database-types",
+      "🚀 @mjord/backend"
+    ]
+  }
 }

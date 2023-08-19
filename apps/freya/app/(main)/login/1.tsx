@@ -5,12 +5,12 @@ import { useRecoilState } from "recoil";
 
 import { t } from "@mjord/common";
 
-import Button from "../../components/Button";
-import { IconInput } from "../../components/Input";
-import Segment from "../../components/Segment";
-import constant, { ServiceType } from "../../constants";
-import { UserHelpers } from "../../services/user";
-import { UserState } from "../../state";
+import Button from "../../../components/Button";
+import { IconInput } from "../../../components/Input";
+import Segment from "../../../components/Segment";
+import constant, { ROUTES, ServiceType } from "../../../constants";
+import { UserHelpers } from "../../../services/user";
+import { UserState } from "../../../state";
 
 enum Error {
   None = "",
@@ -72,7 +72,7 @@ export default function Login1Screen() {
           setError(Error.LoginFail);
           console.error(error);
         } else {
-          router.push("/login/2");
+          router.push(ROUTES.LOGIN_2);
         }
       } else {
         setError(Error.InvalidDomain);

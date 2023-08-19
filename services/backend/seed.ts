@@ -16,7 +16,7 @@ const supabase = createClient(supabaseConfig.supabaseUrl, supabaseConfig.supabas
 
 
 const dbConfig = {
-    host: "localhost",
+    host: "127.0.0.1",
     port: 8482,
     database: "postgres",
     user: "postgres",
@@ -65,6 +65,7 @@ const generateTestData = async (numUsers: number, numGroups: number, numDiscussi
         const password = faker.internet.password();
         const userId = await createUser(email, password);
 
+        
         if (userId) {
             userIds.push(userId);
         }

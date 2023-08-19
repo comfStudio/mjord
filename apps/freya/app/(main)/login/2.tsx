@@ -5,10 +5,10 @@ import { useRecoilState } from "recoil";
 
 import { t } from "@mjord/common";
 
-import Button from "../../components/Button";
-import { ButtonInput } from "../../components/Input";
-import constant, { ServiceType } from "../../constants";
-import { UserState } from "../../state";
+import Button from "../../../components/Button";
+import { ButtonInput } from "../../../components/Input";
+import constant, { ROUTES, ServiceType } from "../../../constants";
+import { UserState } from "../../../state";
 
 enum Error {
   None = "",
@@ -51,7 +51,7 @@ export default function Login2Screen() {
       setError(Error.InvalidToken);
       console.error(error);
     } else {
-      router.push("/user");
+      router.push(ROUTES.USER);
     }
   }, [token, loginState]);
 
@@ -80,7 +80,7 @@ export default function Login2Screen() {
           secondary
           value={t`Change`}
           onPress={() => {
-            router.push("/login/1");
+            router.push(ROUTES.LOGIN_1);
           }}
         />
       </View>
