@@ -17,6 +17,7 @@
     "expo-dev-client": "~2.4.6"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.2.0",
     "@react-native-async-storage/async-storage": "1.18.2",
     "@react-native-community/netinfo": "9.3.10",
     "@react-navigation/bottom-tabs": "^6.5.7",
@@ -34,6 +35,7 @@
     "expo-status-bar": "~1.6.0",
     "react": "^18.2.0",
     "react-content-loader": "^6.2.1",
+    "react-hook-form": "^7.45.4",
     "react-native": "0.72.3",
     "react-native-confirmation-code-field": "^7.3.1",
     "react-native-maps": "1.7.1",
@@ -42,7 +44,8 @@
     "react-native-svg": "13.9.0",
     "react-native-url-polyfill": "^1.3.0",
     "recoil": "^0.7.7",
-    "ttag": "^1.7.24"
+    "ttag": "^1.7.24",
+    "zod": "^3.22.2"
   },
   "packageManager": "yarn@3.5.0"
 }

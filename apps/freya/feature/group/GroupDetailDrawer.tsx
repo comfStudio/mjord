@@ -8,6 +8,7 @@ import { t } from '@mjord/common';
 import Button from '../../components/Button';
 import DrawerSheet from '../../components/DrawerSheet';
 import { ImageSkeleton } from '../../components/Skeleton';
+import { ROUTES } from "../../constants";
 import { GroupState } from '../../state';
 
 export default function GroupDetailDrawer() {
@@ -21,7 +22,7 @@ export default function GroupDetailDrawer() {
 
   const goToDetail = () => {
     router.push({
-      pathname: "/detail",
+      pathname: ROUTES.GROUP,
       params: {
         id: group?.id,
       },

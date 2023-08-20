@@ -2,17 +2,31 @@ import { StyleSheet, TextInput, View } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
 
+import { InputControl, useInputController } from "../misc/form";
 import { IconProp, useOptionalIconElement } from "../misc/ui-hooks";
 import Button from "./Button";
 
 export function Input({
   style,
+  control,
+  name,
   ...props
-}: {} & React.ComponentProps<typeof TextInput>) {
+}: { control: InputControl<any>; name: string } & React.ComponentProps<
+  typeof TextInput
+>) {
+  const { field } = useInputController({
+    name,
+    control,
+  });
+
   return (
     <TextInput
       style={[styles.input, style]}
       placeholderTextColor="#888"
+      value={field.value}
+      onBlur={field.onBlur}
+      onChangeText={field.onChange}
+      ref={field.ref}
       {...props}
     />
   );
@@ -43,7 +57,7 @@ export function IconInput({
   icon?: IconProp;
   viewStyle?: React.ComponentProps<typeof View>["style"];
   iconStyle?: React.ComponentProps<typeof MaterialIcons>["style"];
-} & Omit<React.ComponentProps<typeof TextInput>, "style">) {
+} & Omit<React.ComponentProps<typeof Input>, "style">) {
   const iconEl = useOptionalIconElement({
     icon,
     style: [iconInputStyles.icon, iconStyle],
@@ -85,7 +99,7 @@ export function ButtonInput({
   onPress: React.ComponentProps<typeof Button>["onPress"];
   ButtonIcon?: React.ComponentProps<typeof Button>["icon"];
   viewStyle?: React.ComponentProps<typeof View>["style"];
-} & Omit<React.ComponentProps<typeof TextInput>, "style">) {
+} & Omit<React.ComponentProps<typeof Input>, "style">) {
   return (
     <View style={[buttonInputStyles.inputWrapper, viewStyle]}>
       <Input style={[buttonInputStyles.input, style]} {...props} />

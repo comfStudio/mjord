@@ -1,9 +1,13 @@
-import { Redirect, usePathname } from "expo-router";
-import { ReactElement } from "react";
-import { Text, View } from "react-native";
+import { Redirect, usePathname } from 'expo-router';
+import { ReactElement } from 'react';
+import { Text, View } from 'react-native';
 
-import { ROUTES } from "../../constants";
-import { useAuthUser, useProfile } from "../../services/user";
+import constant, { ROUTES } from '../../constants';
+import {
+  useAuthUser,
+  useProfile,
+  userRequireOnboarding,
+} from '../../services/user';
 
 function OnboardUser({ children }: { children: React.ReactNode }) {
   const { data, isFetching } = useProfile();
@@ -17,8 +21,14 @@ function OnboardUser({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!data.name && !path.startsWith(ROUTES.USER_ONBOARDING)) {
-    return <Redirect href={ROUTES.USER_ONBOARDING} />;
+  // TODO: onboard data should be in profiles.extra
+  if (
+    data &&
+    userRequireOnboarding(data) &&
+    !path.startsWith(ROUTES.LOGIN_ONBOARDING)
+  ) {
+    constant.log.d("User require onboarding")
+    return <Redirect href={ROUTES.LOGIN_ONBOARDING} />;
   }
 
   return children as ReactElement;

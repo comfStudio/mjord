@@ -23,6 +23,9 @@ CREATE TABLE profiles (
   primary_media_id INTEGER,
   occupation TEXT NOT NULL DEFAULT '',
   bio TEXT NOT NULL DEFAULT '',
+  
+  -- column to save misc. data such as onboarding progress
+  extra JSONB NOT NULL DEFAULT '{}',
 
 
   PRIMARY KEY (id),
@@ -68,6 +71,7 @@ CREATE TABLE group_media (
     id SERIAL PRIMARY KEY,
     group_id INTEGER NOT NULL,
     media_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE CASCADE,
     FOREIGN KEY (media_id) REFERENCES media (id) ON DELETE CASCADE
 );
@@ -92,6 +96,7 @@ CREATE TABLE discussion_media (
     id SERIAL PRIMARY KEY,
     discussion_id INTEGER NOT NULL,
     media_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (discussion_id) REFERENCES group_discussions (id) ON DELETE CASCADE,
     FOREIGN KEY (media_id) REFERENCES media (id) ON DELETE CASCADE
 );
@@ -111,6 +116,7 @@ CREATE TABLE discussion_comments (
 -- Create 'tags' table to store tag information
 CREATE TABLE tags (
     id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     name VARCHAR(255) UNIQUE NOT NULL
 );
 
@@ -118,6 +124,7 @@ CREATE TABLE tags (
 CREATE TABLE group_tags (
     group_id INTEGER NOT NULL,
     tag_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (group_id, tag_id),
     FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
@@ -127,6 +134,7 @@ CREATE TABLE group_tags (
 CREATE TABLE discussion_tags (
     discussion_id INTEGER NOT NULL,
     tag_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (discussion_id, tag_id),
     FOREIGN KEY (discussion_id) REFERENCES group_discussions (id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE

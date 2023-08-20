@@ -1,11 +1,12 @@
 
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 
-import { User as AuthUser } from '@supabase/supabase-js';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import constant, { ROUTES, ServiceType } from '../constants';
+import { UserState } from '../state';
 import { Service } from './base';
 import { ProfileData } from './types';
 
@@ -39,7 +40,7 @@ export default class User extends Service {
         return data as ProfileData;
     }
 
-    async updateProfile(profile: Omit<ProfileData, "id">) {
+    async updateProfile(profile: Partial<Omit<ProfileData, "id">>) {
 
         const { data: { user } } = await constant.supabase.auth.getUser()
 
@@ -83,37 +84,39 @@ export default class User extends Service {
 
 
 export class UserHelpers {
-    static emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     static validEmailDomains = ["post.au.dk", "uni.au.dk"].sort((a, b) =>
         a.localeCompare(b)
     );
 }
 
+export function userRequireOnboarding(profile: ProfileData) {
+    // TODO: onboarding data should be in profiles.extra
+    return !profile?.name
+}
 
 export function useSupabaseClient() {
     return constant.supabase;
 }
 
-export function useAuthUser() {
+export function useAuthListener() {
     const client = useSupabaseClient();
+    const router = useRouter();
 
-    const [user, setUser] = useState<AuthUser | null>(null);
+    const setUser = useSetRecoilState(UserState.user)
 
     useEffect(() => {
         const { data: authListener } = client.auth.onAuthStateChange(
             async (event, session) => {
                 switch (event) {
+                    case 'MFA_CHALLENGE_VERIFIED':
+                    case 'TOKEN_REFRESHED':
+                    case 'USER_UPDATED':
+                    case 'INITIAL_SESSION':
                     case 'SIGNED_IN':
-                        setUser(session.user);
+                        setUser(session?.user ?? null);
                         break;
                     case 'SIGNED_OUT':
                         setUser(null);
-                        break;
-                    case 'USER_UPDATED':
-                        setUser(session.user);
-                        break;
-                    case 'TOKEN_REFRESHED':
-                        setUser(session.user);
                         break;
                 }
             }
@@ -124,7 +127,23 @@ export function useAuthUser() {
         };
     }, []);
 
-    return user
+   
+    const refresh = useCallback(async (redirect = "") => {
+        const { data: { user } } = await client.auth.getUser()
+
+        setUser(user ?? null);
+
+        if (redirect && !user) {
+            router.replace(redirect);
+        }
+
+    }, [client])
+
+    return refresh
+}
+
+export function useAuthUser() {
+    return useRecoilValue(UserState.user);
 }
 
 

@@ -1,7 +1,10 @@
 {
   "extends": "expo/tsconfig.base",
   "baseUrl": ".",
-  "compilerOptions": {},
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": false
+  },
   "references": [{ "path": "../../packages/common" }],
   "include": ["./**/*", "../../packages/common/types.d.ts"],
   "exclude": ["dist", "build", "node_modules", "lib", ".expo"],

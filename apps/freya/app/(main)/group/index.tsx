@@ -1,5 +1,5 @@
-import { useSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -7,20 +7,20 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
+} from "react-native";
 
-import { MaterialIcons } from '@expo/vector-icons';
-import { t } from '@mjord/common';
+import { MaterialIcons } from "@expo/vector-icons";
+import { t } from "@mjord/common";
 
-import Button from '../../../components/Button';
-import Segment from '../../../components/Segment';
-import Separator from '../../../components/Separator';
-import { ImageSkeleton, LineSkeleton } from '../../../components/Skeleton';
-import FeaturedEvents from '../../../feature/event/FeaturedEvents';
-import LocationLabel from '../../../feature/location/LocationLabel';
-import MembersModal from '../../../feature/member/MembersModal';
-import ShareButton from '../../../feature/share/ShareButton';
-import { useGroup } from '../../../services/group';
+import Button from "../../../components/Button";
+import Segment from "../../../components/Segment";
+import Separator from "../../../components/Separator";
+import { ImageSkeleton, LineSkeleton } from "../../../components/Skeleton";
+import FeaturedEvents from "../../../feature/event/FeaturedEvents";
+import LocationLabel from "../../../feature/location/LocationLabel";
+import MembersModal from "../../../feature/member/MembersModal";
+import ShareButton from "../../../feature/share/ShareButton";
+import { useGroup } from "../../../services/group";
 
 type IconNames = React.ComponentProps<typeof MaterialIcons>["name"];
 
@@ -92,7 +92,7 @@ const advisoryStyles = StyleSheet.create({
 
 export default function DetailScreen() {
   const [membersVisible, setMembersVisible] = useState(false);
-  const { id } = useSearchParams();
+  const { id } = useLocalSearchParams();
   const groupId = parseInt((id as string) || "0");
 
   const { data: group } = useGroup(groupId);

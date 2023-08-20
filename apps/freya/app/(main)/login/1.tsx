@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { Tabs, useRouter } from "expo-router";
+import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useRecoilState } from "recoil";
 
@@ -9,15 +9,11 @@ import Button from "../../../components/Button";
 import { IconInput } from "../../../components/Input";
 import Segment from "../../../components/Segment";
 import constant, { ROUTES, ServiceType } from "../../../constants";
+import { useInputData } from "../../../misc/form";
+import { useToggle } from "../../../misc/hooks";
+import { loginSchema1 } from "../../../schemas/login";
 import { UserHelpers } from "../../../services/user";
 import { UserState } from "../../../state";
-
-enum Error {
-  None = "",
-  InvalidEmail = "Invalid email",
-  InvalidDomain = "Invalid domain",
-  LoginFail = "Failed to login",
-}
 
 function AcceptedDomainsSegment() {
   return (
@@ -36,81 +32,79 @@ export default function Login1Screen() {
   const router = useRouter();
 
   const [loginState, setLoginState] = useRecoilState(UserState.loginState);
-  const [email, setEmail] = useState(loginState?.email ?? "");
-  const [validEmail, setValidEmail] = useState(
-    email ? UserHelpers.emailRegex.test(email) : false
-  );
-  const [error, setError] = useState(Error.None);
 
-  // on mount
+  const { control, handleSubmit, errors, isValid } = useInputData({
+    schema: loginSchema1.default({ email: loginState?.email ?? "" }),
+  });
+
+  const [loginFailed, setLoginFailed] = useToggle();
+
   useEffect(() => {
     // since we were led here, we clear the login state
     setLoginState({ email: "" });
   }, []);
 
-  const handleEmailChange = useCallback((text) => {
-    setEmail(text);
-    setValidEmail(UserHelpers.emailRegex.test(text));
-  }, []);
+  const onSubmit = handleSubmit(async (data) => {
+    setLoginFailed(false);
 
-  const onSubmit = useCallback(async () => {
-    if (validEmail) {
-      const domain = email.split("@")[1];
-      if (UserHelpers.validEmailDomains.includes(domain.toLocaleLowerCase())) {
-        setError(Error.None);
+    const { email } = data;
+    const service = constant.service.get(ServiceType.User);
 
-        setLoginState({
-          ...loginState,
-          email,
-        });
+    setLoginState((prev) => ({
+      ...prev,
+      email,
+    }));
 
-        const service = constant.service.get(ServiceType.User);
+    const { error } = await service.login(email);
 
-        const { error } = await service.login(email);
-
-        if (error) {
-          setError(Error.LoginFail);
-          console.error(error);
-        } else {
-          router.push(ROUTES.LOGIN_2);
-        }
-      } else {
-        setError(Error.InvalidDomain);
-      }
+    if (error) {
+      setLoginFailed(true);
+      constant.log.e(error);
     } else {
-      setError(Error.InvalidEmail);
+      router.push(ROUTES.LOGIN_2);
     }
-  }, [email, validEmail]);
+  });
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{t`Continue with your student email`}</Text>
-      <IconInput
-        icon="mail"
-        style={styles.emailInput}
-        viewStyle={styles.emailInputView}
-        onChangeText={handleEmailChange}
-        value={email}
-        keyboardType="email-address"
-        placeholder={t`Email`}
+    <>
+      <Tabs.Screen
+        options={{
+          headerShown: false,
+        }}
       />
-      {error === Error.LoginFail && (
-        <Text
-          style={styles.errorSegmentText}
-        >{t`Failed to login. Try again later.`}</Text>
-      )}
-      {error === Error.InvalidEmail && (
-        <Text style={styles.errorSegmentText}>{t`Invalid email`}</Text>
-      )}
-      {error === Error.InvalidDomain && <AcceptedDomainsSegment />}
-      <Button
-        primary
-        disabled={!validEmail}
-        icon="arrow-forward"
-        style={styles.loginButton}
-        onPress={onSubmit}
-      />
-    </View>
+      <View style={styles.container}>
+        <Text style={styles.title}>{t`Continue with your student email`}</Text>
+        <IconInput
+          control={control}
+          name="email"
+          icon="mail"
+          style={styles.emailInput}
+          viewStyle={styles.emailInputView}
+          keyboardType="email-address"
+          placeholder={t`Email`}
+        />
+        {loginFailed && (
+          <Text
+            style={styles.errorSegmentText}
+          >{t`Failed to login. Try again later.`}</Text>
+        )}
+        {errors?.email?.message &&
+          (errors?.email?.message === "domain" ? (
+            <AcceptedDomainsSegment />
+          ) : (
+            <Text style={styles.errorSegmentText}>
+              {errors?.email?.message}
+            </Text>
+          ))}
+        <Button
+          primary
+          disabled={!isValid}
+          icon="arrow-forward"
+          style={styles.loginButton}
+          onPress={onSubmit}
+        />
+      </View>
+    </>
   );
 }
 

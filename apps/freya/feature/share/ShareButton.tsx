@@ -5,6 +5,7 @@ import { StyleSheet } from 'react-native';
 import { t } from '@mjord/common';
 
 import Button from '../../components/Button';
+import constant from "../../constants";
 
 export default function ShareButton({
   url,
@@ -23,7 +24,7 @@ export default function ShareButton({
 
       await Sharing.shareAsync(url);
     } catch (error) {
-      console.error("An error occurred while sharing:", error);
+      constant.log.e("An error occurred while sharing:", error);
     }
   };
 

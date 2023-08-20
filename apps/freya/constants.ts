@@ -30,9 +30,9 @@ export enum ROUTES {
     LOGIN = '/login',
     LOGIN_1 = '/login/1',
     LOGIN_2 = '/login/2',
+    LOGIN_ONBOARDING = '/login/onboard',
     GROUP = '/group',
     USER = '/user',
-    USER_ONBOARDING = '/user/onboard',
 
     PRVACY_POLICY = '/privacy-policy',
     TERMS_OF_SERVICE = '/terms-of-service',

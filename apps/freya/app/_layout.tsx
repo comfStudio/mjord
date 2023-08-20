@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import { useEffect } from "react";
 import { AppState as NativeAppState, Platform } from "react-native";
 import { RecoilRoot, useSetRecoilState } from "recoil";
@@ -12,7 +12,8 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 
-import constant from "../constants";
+import constant, { ROUTES } from "../constants";
+import { AuthListener } from "../feature/auth/Auth";
 import { AppState } from "../state";
 
 import type { AppStateStatus } from "react-native";
@@ -53,61 +54,46 @@ function Init() {
   return null;
 }
 
-function LoginTabs() {
+function HiddenTabs() {
   return [
+    "index",
+    "(main)/login/index",
+    "(main)/login/onboard/index",
+    "(main)/login/1",
+    "(main)/login/2",
+    "(main)/group/index",
+    "(aux)/privacy-policy",
+    "(aux)/terms-of-service",
+  ].map((name) => (
     <Tabs.Screen
+      key={name}
       // Name of the route to hide.
-      name="login/index"
+      name={name}
       options={{
         // This tab will no longer show up in the tab bar.
         href: null,
       }}
-    />,
-    <Tabs.Screen
-      // Name of the route to hide.
-      name="login/1"
-      options={{
-        // This tab will no longer show up in the tab bar.
-        href: null,
-      }}
-    />,
-    <Tabs.Screen
-      // Name of the route to hide.
-      name="login/2"
-      options={{
-        // This tab will no longer show up in the tab bar.
-        href: null,
-      }}
-    />,
-  ];
+    />
+  ));
 }
 
 export default function RootLayout() {
+  const path = usePathname();
+
+  useEffect(() => {
+    constant.log.d("Navigating to", path);
+  }, [path]);
+
   return (
     <RecoilRoot>
       <QueryClientProvider client={constant.client}>
+        <AuthListener redirect={ROUTES.HOME} />
         <Init />
         <Tabs backBehavior="history">
-          <Tabs.Screen
-            // Name of the route to hide.
-            name="index"
-            options={{
-              // This tab will no longer show up in the tab bar.
-              href: null,
-            }}
-          />
-          {LoginTabs()}
+          {HiddenTabs()}
 
           <Tabs.Screen
-            // Name of the route to hide.
-            name="detail/index"
-            options={{
-              // This tab will no longer show up in the tab bar.
-              href: null,
-            }}
-          />
-          <Tabs.Screen
-            name="home"
+            name="(main)/home"
             options={{
               title: t`Explore`,
               tabBarIcon: ({ color }) => (
@@ -116,7 +102,7 @@ export default function RootLayout() {
             }}
           />
           <Tabs.Screen
-            name="user/index"
+            name="user"
             options={{
               title: t`You`,
               tabBarIcon: ({ color }) => (

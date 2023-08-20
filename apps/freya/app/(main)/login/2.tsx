@@ -1,59 +1,57 @@
-import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { Tabs, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 
 import { t } from "@mjord/common";
 
 import Button from "../../../components/Button";
 import { ButtonInput } from "../../../components/Input";
 import constant, { ROUTES, ServiceType } from "../../../constants";
+import { useInputData } from "../../../misc/form";
+import { useToggle } from "../../../misc/hooks";
+import { loginSchema2 } from "../../../schemas/login";
+import { userRequireOnboarding } from "../../../services/user";
 import { UserState } from "../../../state";
-
-enum Error {
-  None = "",
-  InvalidToken = "Invalid token",
-  MissingEmail = "Missing email",
-  ResendFail = "Failed to resend token",
-}
 
 export default function Login2Screen() {
   const router = useRouter();
 
-  const [loginState, setLoginState] = useRecoilState(UserState.loginState);
+  const loginState = useRecoilValue(UserState.loginState);
 
   const [resent, setResent] = useState(false);
-  const [token, setToken] = useState("");
-  const [error, setError] = useState(Error.None);
 
-  const handleTokenChange = (text) => {
-    setToken(text);
-  };
+  const { control, handleSubmit, errors, isValid } = useInputData({
+    schema: loginSchema2,
+  });
 
-  const onLogin = useCallback(async () => {
-    if (!token.length) {
-      setError(Error.InvalidToken);
-      return;
-    }
+  const [failed, setFailed] = useToggle([null, "login", "resend"]);
 
+  useEffect(() => {
     if (!loginState?.email) {
-      setError(Error.MissingEmail);
-      return;
+      router.push(ROUTES.LOGIN_1);
     }
+  }, [loginState]);
 
-    setError(Error.None);
+  const onLogin = handleSubmit(async (data) => {
+    const { token } = data;
+
+    setFailed(null);
 
     const service = constant.service.get(ServiceType.User);
 
     const { error } = await service.verifyLogin(loginState?.email, token);
 
     if (error) {
-      setError(Error.InvalidToken);
-      console.error(error);
+      setFailed("login");
+      constant.log.e(error);
     } else {
-      router.push(ROUTES.USER);
+      const profile = await service.getProfile();
+      userRequireOnboarding(profile)
+        ? router.push(ROUTES.LOGIN_ONBOARDING)
+        : router.push(ROUTES.USER);
     }
-  }, [token, loginState]);
+  });
 
   const onResend = useCallback(async () => {
     const service = constant.service.get(ServiceType.User);
@@ -61,60 +59,67 @@ export default function Login2Screen() {
     const { error } = await service.login(loginState?.email);
 
     if (error) {
-      setError(Error.ResendFail);
-      console.error(error);
+      setFailed("resend");
+      constant.log.e(error);
     } else {
       setResent(true);
     }
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text
-        style={styles.title}
-      >{t`We've sent a magic code to your email!`}</Text>
-      <View style={styles.emailView}>
-        <Text style={styles.emailText}>{loginState?.email}</Text>
+    <>
+      <Tabs.Screen
+        options={{
+          headerShown: false,
+        }}
+      />
+      <View style={styles.container}>
+        <Text
+          style={styles.title}
+        >{t`We've sent a magic code to your email!`}</Text>
+        <View style={styles.emailView}>
+          <Text style={styles.emailText}>{loginState?.email}</Text>
+          <Button
+            size="small"
+            secondary
+            value={t`Change`}
+            onPress={() => {
+              router.push(ROUTES.LOGIN_1);
+            }}
+          />
+        </View>
+        <ButtonInput
+          name="token"
+          control={control}
+          style={styles.tokenInput}
+          onPress={onResend}
+          buttonValue={resent ? undefined : t`Resend`}
+          ButtonIcon={resent ? "check" : undefined}
+          keyboardType="number-pad"
+          placeholder={t`Code`}
+        />
+        {failed === "login" && (
+          <Text
+            style={styles.errorSegmentText}
+          >{t`Code has expired or is invalid`}</Text>
+        )}
+        {failed === "resend" && (
+          <Text
+            style={styles.errorSegmentText}
+          >{t`Failed to resend magic code. Try again later.`}</Text>
+        )}
+        {errors?.token?.message && (
+          <Text style={styles.errorSegmentText}>{errors?.token?.message}</Text>
+        )}
         <Button
-          size="small"
-          secondary
-          value={t`Change`}
-          onPress={() => {
-            router.push(ROUTES.LOGIN_1);
-          }}
+          primary
+          disabled={!isValid}
+          icon="arrow-forward"
+          style={styles.loginButton}
+          onPress={onLogin}
         />
       </View>
-      <ButtonInput
-        style={styles.tokenInput}
-        onPress={onResend}
-        buttonValue={resent ? undefined : t`Resend`}
-        ButtonIcon={resent ? "check" : undefined}
-        onChangeText={handleTokenChange}
-        value={token}
-        keyboardType="number-pad"
-        placeholder={t`Code`}
-      />
-      {error === Error.MissingEmail && (
-        <Text style={styles.errorSegmentText}>{t`Missing email`}</Text>
-      )}
-      {error === Error.InvalidToken && (
-        <Text
-          style={styles.errorSegmentText}
-        >{t`Code has expired or is invalid`}</Text>
-      )}
-      {error === Error.ResendFail && (
-        <Text
-          style={styles.errorSegmentText}
-        >{t`Failed to resend magic code. Try again later.`}</Text>
-      )}
-      <Button
-        primary
-        disabled={!token.length}
-        icon="arrow-forward"
-        style={styles.loginButton}
-        onPress={onLogin}
-      />
-    </View>
+    </>
   );
 }
 

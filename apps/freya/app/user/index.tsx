@@ -32,7 +32,8 @@ export default function UserScreen() {
         <Text style={styles.userName}>{userData.name}</Text>
       </View>
 
-      <Text style={styles.sectionTitle}>{t`Joined Groups`}</Text>
+      <Text style={styles.sectionTitle}>{t`Your Communities`}</Text>
+      <Text style={styles.sectionTitle}>{t`Joined Communities`}</Text>
       {/* <GroupList groups={userData.groups} />  */}
 
       <TouchableOpacity style={styles.settingsButton}>
