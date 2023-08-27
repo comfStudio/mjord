@@ -16,14 +16,6 @@ export enum ServiceType {
     // Tag,
 }
 
-const isWorkerRuntime =
-    typeof self !== 'undefined' &&
-    self.postMessage &&
-    !(
-        typeof self !== 'undefined' &&
-        typeof Window !== 'undefined' &&
-        self instanceof Window
-    );
 
 export enum ROUTES {
     HOME = '/home',
@@ -55,11 +47,9 @@ export class Constant {
 
     //   static storage: LocalForage;
 
-    static isWorkerRuntime = isWorkerRuntime;
-
     static options = {
-        SUPABASE_URL: process.env.SUPABASE_URL,
-        SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+        SUPABASE_URL: process.env.SUPABASE_URL ?? '',
+        SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ?? '',
     };
 }
 

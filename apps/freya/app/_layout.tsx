@@ -1,22 +1,87 @@
+import "react-native-url-polyfill/auto";
+
+import { getLocales } from "expo-localization";
 import { Tabs, usePathname } from "expo-router";
 import { useEffect } from "react";
 import { AppState as NativeAppState, Platform } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { RecoilRoot, useSetRecoilState } from "recoil";
 
 import { Feather } from "@expo/vector-icons";
-import { t } from "@mjord/common";
+import { addLocale, t, useLocale } from "@mjord/common";
+import getLogger from "@mjord/logger";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
+import { createClient } from "@supabase/supabase-js";
 import {
   focusManager,
   onlineManager,
+  QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
 
 import constant, { ROUTES } from "../constants";
 import { AuthListener } from "../feature/auth/Auth";
-import { AppState } from "../state";
+import langDA from "../i18n/da.json";
+import setupServices from "../services";
+import { AppState, setupState } from "../state";
+import { languages } from "../state/_app";
 
 import type { AppStateStatus } from "react-native";
+async function main() {
+  constant.log = getLogger();
+
+  constant.log("initializing app");
+
+  constant.log("Setting up states");
+  setupState();
+
+  constant.log("Setting up supabase");
+  constant.supabase = createClient(
+    constant.options.SUPABASE_URL,
+    constant.options.SUPABASE_ANON_KEY,
+    {
+      auth: {
+        storage: AsyncStorage,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+      },
+    }
+  );
+
+  constant.log("Setting up react query");
+  constant.client = new QueryClient();
+
+  constant.log("Setting up services");
+  constant.service = await setupServices();
+
+  constant.initialized = true;
+
+  constant.log("initialized app");
+}
+
+main();
+
+function applyLocale() {
+  const deviceLanguage = getLocales()[0].languageCode;
+  const langs = {
+    da: langDA,
+  };
+
+  languages.forEach((lang) => {
+    if (lang === "en") return; // English is the default language
+    if (!langs[lang]) throw new Error(`Language ${lang}.json not found`);
+    addLocale(lang, langs[lang]);
+    if (lang === deviceLanguage) {
+      useLocale(lang);
+      constant.locale = lang;
+    }
+  });
+}
+
+applyLocale();
+
 function useRefetchOnFocus() {
   useEffect(() => {
     function onAppStateChange(status: AppStateStatus) {
@@ -89,28 +154,37 @@ export default function RootLayout() {
       <QueryClientProvider client={constant.client}>
         <AuthListener redirect={ROUTES.HOME} />
         <Init />
-        <Tabs backBehavior="history">
-          {HiddenTabs()}
+        <SafeAreaProvider>
+          <Tabs
+            backBehavior="history"
+            initialRouteName="(main)/home"
+            screenOptions={{
+              headerShown: true,
+              title: "",
+            }}
+          >
+            {HiddenTabs()}
 
-          <Tabs.Screen
-            name="(main)/home"
-            options={{
-              title: t`Explore`,
-              tabBarIcon: ({ color }) => (
-                <Feather name="navigation" color={color} size={26} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="user"
-            options={{
-              title: t`You`,
-              tabBarIcon: ({ color }) => (
-                <Feather name="user" color={color} size={26} />
-              ),
-            }}
-          />
-        </Tabs>
+            <Tabs.Screen
+              name="(main)/home"
+              options={{
+                title: t`Explore`,
+                tabBarIcon: ({ color }) => (
+                  <Feather name="navigation" color={color} size={26} />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="user"
+              options={{
+                title: t`You`,
+                tabBarIcon: ({ color }) => (
+                  <Feather name="user" color={color} size={26} />
+                ),
+              }}
+            />
+          </Tabs>
+        </SafeAreaProvider>
       </QueryClientProvider>
     </RecoilRoot>
   );

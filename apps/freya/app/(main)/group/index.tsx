@@ -1,22 +1,17 @@
-import { useLocalSearchParams } from "expo-router";
+import { Tabs, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { MaterialIcons } from "@expo/vector-icons";
+import FeaturedEvents from "@feature/event/FeaturedEvents";
 import { t } from "@mjord/common";
 
 import Button from "../../../components/Button";
+import { AnimatedHeaderScrollView } from "../../../components/Header";
 import Segment from "../../../components/Segment";
 import Separator from "../../../components/Separator";
 import { ImageSkeleton, LineSkeleton } from "../../../components/Skeleton";
-import FeaturedEvents from "../../../feature/event/FeaturedEvents";
 import LocationLabel from "../../../feature/location/LocationLabel";
 import MembersModal from "../../../feature/member/MembersModal";
 import ShareButton from "../../../feature/share/ShareButton";
@@ -95,6 +90,8 @@ export default function DetailScreen() {
   const { id } = useLocalSearchParams();
   const groupId = parseInt((id as string) || "0");
 
+  const insets = useSafeAreaInsets();
+
   const { data: group } = useGroup(groupId);
 
   const handleApplyToJoin = () => {
@@ -103,84 +100,106 @@ export default function DetailScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <MembersModal
-        groupId={groupId}
-        visible={membersVisible}
-        onClose={() => setMembersVisible(false)}
+    <>
+      <Tabs.Screen
+        options={{
+          headerRight: () => (
+            <>
+              <ShareButton
+                url=""
+                style={{
+                  marginRight: insets.right,
+                }}
+                secondary
+              />
+            </>
+          ),
+        }}
       />
-      <ImageSkeleton
-        width={1000}
-        // loading={!group?.primary_media?.url}
-        style={styles.image}
+      <AnimatedHeaderScrollView
+        header={{
+          startOffset: 50,
+          endOffset: 110,
+        }}
+        style={styles.container}
       >
-        <Image
-          source={{ uri: group?.primary_media?.url }}
-          style={styles.image}
+        <MembersModal
+          groupId={groupId}
+          visible={membersVisible}
+          onClose={() => setMembersVisible(false)}
         />
-      </ImageSkeleton>
-      <LineSkeleton style={styles.title} loading={!group?.title}>
-        <Text style={styles.title}>{group?.title}</Text>
-      </LineSkeleton>
-
-      <View style={styles.tagLine}>
-        <TouchableOpacity
-          style={styles.members}
-          onPress={(e) => {
-            e.preventDefault();
-            setMembersVisible(true);
-          }}
+        <ImageSkeleton
+          width={1000}
+          // loading={!group?.primary_media?.url}
+          style={styles.image}
         >
-          <MaterialIcons name="group" size={24} />
-          <Text style={styles.membersText}>{group?.members?.count || 0}</Text>
-        </TouchableOpacity>
-        <Separator />
-        <LocationLabel data={group} style={styles.locationLabel} />
-        <Separator />
-        <ShareButton url="" secondary />
-      </View>
+          <Image
+            source={{ uri: group?.primary_media?.url }}
+            style={styles.image}
+          />
+        </ImageSkeleton>
+        <LineSkeleton style={styles.title} loading={!group?.title}>
+          <Text style={styles.title}>{group?.title}</Text>
+        </LineSkeleton>
 
-      <LineSkeleton
-        lines={3}
-        style={styles.description}
-        loading={!group?.description}
-      >
-        <Text style={styles.description}>{group?.description}</Text>
-      </LineSkeleton>
-      <Button
-        primary
-        style={styles.applyButton}
-        value={t`Apply to join`}
-        onPress={handleApplyToJoin}
-      />
-
-      <AdvisorySegment />
-
-      <Text style={styles.sectionTitle}>{t`Activity`}</Text>
-      <FeaturedEvents groupId={groupId} />
-      <Text style={styles.sectionTitle}>{t`Discussions`}</Text>
-
-      {[].map(({ item }) => (
-        <View style={styles.discussion}>
-          <Text style={styles.discussionTitle}>{item.title}</Text>
-          <Text style={styles.discussionContent}>
-            {item.content.substring(0, 100)}...
-          </Text>
-          <View style={styles.reactions}>
-            {item.reactions.map((reaction) => (
-              <Text key={reaction.id} style={styles.reaction}>
-                {reaction.type}
-              </Text>
-            ))}
-          </View>
+        <View style={styles.tagLine}>
+          <TouchableOpacity
+            style={styles.members}
+            onPress={(e) => {
+              e.preventDefault();
+              setMembersVisible(true);
+            }}
+          >
+            <MaterialIcons name="group" size={24} />
+            <Text style={styles.membersText}>{group?.members?.count || 0}</Text>
+          </TouchableOpacity>
+          <Separator />
+          <LocationLabel data={group} style={styles.locationLabel} />
+          <Separator />
         </View>
-      ))}
 
-      <Text style={styles.sectionSubTitle}>{t`Tags`}</Text>
-      <Segment secondary padded rounded margin="large">
-        <Text>Tag 1</Text>
-      </Segment>
-    </ScrollView>
+        <LineSkeleton
+          lines={3}
+          style={styles.description}
+          loading={!group?.description}
+        >
+          <Text style={styles.description}>{group?.description}</Text>
+        </LineSkeleton>
+        <Button
+          primary
+          style={styles.applyButton}
+          value={t`Apply to join`}
+          onPress={handleApplyToJoin}
+        />
+
+        <AdvisorySegment />
+
+        <Text style={styles.sectionTitle}>{t`Activity`}</Text>
+        <FeaturedEvents groupId={groupId} />
+        <Text style={styles.sectionTitle}>{t`Discussions`}</Text>
+
+        {[].map(({ item }) => (
+          <View style={styles.discussion}>
+            <Text style={styles.discussionTitle}>{item.title}</Text>
+            <Text style={styles.discussionContent}>
+              {item.content.substring(0, 100)}...
+            </Text>
+            <View style={styles.reactions}>
+              {item.reactions.map((reaction) => (
+                <Text key={reaction.id} style={styles.reaction}>
+                  {reaction.type}
+                </Text>
+              ))}
+            </View>
+          </View>
+        ))}
+
+        <Text style={styles.sectionSubTitle}>{t`Tags`}</Text>
+        <Segment secondary padded rounded margin="large">
+          <Text>Tag 1</Text>
+        </Segment>
+      </AnimatedHeaderScrollView>
+    </>
   );
 }
 

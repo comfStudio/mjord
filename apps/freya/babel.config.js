@@ -3,8 +3,8 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: [
-      // NOTE: `expo-router/babel` is a temporary extension to `babel-preset-expo`.
-      require.resolve("expo-router/babel"),
+      // Required for expo-router
+      "expo-router/babel",
       "transform-inline-environment-variables",
       [
         "ttag",
@@ -15,6 +15,8 @@ module.exports = function (api) {
           moduleName: "@mjord/common",
         },
       ],
+      // has to be last on the list as per docs https://docs.expo.dev/develop/user-interface/animation/
+      "react-native-reanimated/plugin",
     ],
   };
 };

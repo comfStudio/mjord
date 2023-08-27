@@ -105,6 +105,7 @@ export function useAuthListener() {
     const setUser = useSetRecoilState(UserState.user)
 
     useEffect(() => {
+        if (!client?.auth) return;
         const { data: authListener } = client.auth.onAuthStateChange(
             async (event, session) => {
                 switch (event) {
@@ -125,10 +126,12 @@ export function useAuthListener() {
         return () => {
             authListener?.subscription?.unsubscribe?.();
         };
-    }, []);
+    }, [client?.auth]);
 
    
     const refresh = useCallback(async (redirect = "") => {
+        if (!client?.auth) return;
+        
         const { data: { user } } = await client.auth.getUser()
 
         setUser(user ?? null);
@@ -137,7 +140,7 @@ export function useAuthListener() {
             router.replace(redirect);
         }
 
-    }, [client])
+    }, [client?.auth])
 
     return refresh
 }

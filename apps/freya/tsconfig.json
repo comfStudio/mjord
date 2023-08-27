@@ -1,20 +1,26 @@
 {
   "extends": "expo/tsconfig.base",
-  "baseUrl": ".",
   "compilerOptions": {
     "strict": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
   },
   "references": [{ "path": "../../packages/common" }],
-  "include": ["./**/*", "../../packages/common/types.d.ts"],
+  "include": [
+    "**/*.ts",
+    "**/*.json",
+    "**/*.tsx",
+    "../../packages/common/types.d.ts"
+  ],
   "exclude": ["dist", "build", "node_modules", "lib", ".expo"],
   "paths": {
-    "@/feature/*": ["feature/*"],
-    "@/components/*": ["components/*"],
-    "@/services": ["services/index"],
-    "@/services/*": ["services/*"],
-    "@/state": ["state/index"],
-    "@/state/*": ["state/*"],
-    "constants": ["constants"]
+    "@/feature/*": ["./feature/*"],
+    "@/components/*": ["./components/*"],
+    "@/services": ["./services/index"],
+    "@/services/*": ["./services/*"],
+    "@/state": ["./state/index"],
+    "@/state/*": ["./state/*"],
+    "constants": ["./constants"]
   }
 }
