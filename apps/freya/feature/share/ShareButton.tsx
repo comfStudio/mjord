@@ -1,18 +1,34 @@
 import * as Sharing from 'expo-sharing';
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import React from "react";
 
 import Button from "@/components/Button";
+import { createComponent } from "@app/components";
+import { IconVariant } from "@app/components/Icon";
 import constant from "@app/constants";
+import { composeStyles, createStyles, useStyles } from "@app/styles/theme";
 import { t } from '@mjord/common';
 
-export default function ShareButton({
-  url,
-  ...props
-}: { url: string } & Omit<
-  React.ComponentProps<typeof Button>,
-  "onPress" | "icon"
->) {
+const ShareButton = createComponent(function ShareButton(
+  {
+    url,
+    style,
+    ...props
+  }: { url: string } & Omit<
+    React.ComponentProps<typeof Button>,
+    "onPress" | keyof IconVariant
+  >,
+  ref
+) {
+  const stl = useStyles(styles);
+
+  const compStyles = composeStyles(
+    stl,
+    {
+      base: true,
+    },
+    style
+  );
+
   const handleShare = async () => {
     try {
       const isAvailable = await Sharing.isAvailableAsync();
@@ -27,21 +43,23 @@ export default function ShareButton({
     }
   };
 
-  return <Button {...props} onPress={handleShare} icon="share" />;
-}
-
-const styles = StyleSheet.create({
-  shareButton: {
-    backgroundColor: "#2196F3",
-    borderRadius: 4,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  shareButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
+  return (
+    <Button
+      {...props}
+      ref={ref}
+      onPress={handleShare}
+      iconName="share"
+      style={compStyles}
+    />
+  );
 });
+
+export default ShareButton;
+
+const styles = createStyles((t) => ({
+  base: {},
+  // text: {
+  //   fontWeight: "bold",
+  //   fontSize: 16,
+  // },
+}));

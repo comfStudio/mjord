@@ -52,3 +52,28 @@ export function trueFromUnion<
     return acc;
   }, {} as Pick<O, U>);
 }
+
+export function isObject(item: any) {
+  return typeof item === "object" && !Array.isArray(item);
+}
+
+export function deepMerge<A = Object, B = Object>(target: A, source: B): A & B {
+  const isDeep = (prop: string) =>
+    isObject(source[prop]) &&
+    // @ts-expect-error
+    target.hasOwnProperty(prop) &&
+    isObject(target[prop]);
+
+  const replaced = Object.getOwnPropertyNames(source)
+    .map((prop) => ({
+      [prop]: isDeep(prop)
+        ? deepMerge(target[prop], source[prop])
+        : source[prop],
+    }))
+    .reduce((a, b) => ({ ...a, ...b }), {});
+
+  return {
+    ...(target as Object),
+    ...(replaced as Object),
+  } as A & B;
+}

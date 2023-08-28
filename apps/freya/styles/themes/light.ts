@@ -1,8 +1,8 @@
 import { Colors } from "../colors";
 import { reduce } from "../utils";
 
-import type { Theme } from "../theme";
-export default function lightTheme(): Theme {
+import type { CustomTheme, Theme } from "../theme";
+export default function lightTheme(): CustomTheme {
   const colors = reduce<Colors>(
     {
       /*---  Colors  ---*/
@@ -12,13 +12,14 @@ export default function lightTheme(): Theme {
       olive: "",
       green: "#E3F7F2",
       teal: "",
-      blue: "#E9F3FF",
+      blue: "#007AFF",
       violet: "#F0EEFF",
       purple: "#faebfd",
       pink: "",
       brown: "",
       grey: "#F8f9FA",
       black: "#000000",
+      white: "#FFFFFF",
 
       /*---  Light Colors  ---*/
       lightRed: "#FF695E",
@@ -37,20 +38,21 @@ export default function lightTheme(): Theme {
     },
 
     (v) => ({
-      primaryColor: v.blue,
-      secondaryColor: v.black,
-
-      lightPrimaryColor: v.lightBlue,
-      lightSecondaryColor: v.lightBlack,
-    }),
-
-    (v) => ({
       /*---   Neutrals  ---*/
       fullBlack: "#000000",
       offWhite: "#F9FAFB",
       darkWhite: "#F3F4F5",
       midWhite: "#DCDDDE",
-      white: "#FFFFFF",
+    }),
+
+    (v) => ({
+      primary: v.blue,
+      secondary: v.black,
+      primaryAlternate: v.white,
+      secondaryAlternate: v.white,
+
+      lightPrimary: v.lightBlue,
+      lightSecondary: v.lightBlack,
     }),
 
     (v) => ({
@@ -70,17 +72,17 @@ export default function lightTheme(): Theme {
 
     /*--- Colored Text ---*/
     (v) => ({
-      redTextColor: v.red,
-      orangeTextColor: v.orange,
-      yellowTextColor: "#B58105", // Yellow text is difficult to read
-      oliveTextColor: v.olive, // Olive is difficult to read
-      greenTextColor: "#1EBC30", // Green is difficult to read
-      tealTextColor: v.teal, // Teal text is difficult to read
-      blueTextColor: v.blue,
-      violetTextColor: v.violet,
-      purpleTextColor: v.purple,
-      pinkTextColor: v.pink,
-      brownTextColor: v.brown,
+      redText: v.red,
+      orangeText: v.orange,
+      yellowText: "#B58105", // Yellow text is difficult to read
+      oliveText: v.olive, // Olive is difficult to read
+      greenText: "#1EBC30", // Green is difficult to read
+      tealText: v.teal, // Teal text is difficult to read
+      blueText: v.blue,
+      violetText: v.violet,
+      purpleText: v.purple,
+      pinkText: v.pink,
+      brownText: v.brown,
     }),
 
     (v) => ({
@@ -100,17 +102,17 @@ export default function lightTheme(): Theme {
 
     (v) => ({
       /*--- Colored Border ---*/
-      redBorderColor: v.redTextColor,
-      orangeBorderColor: v.orangeTextColor,
-      yellowBorderColor: v.yellowTextColor,
-      oliveBorderColor: v.oliveTextColor,
-      greenBorderColor: v.greenTextColor,
-      tealBorderColor: v.tealTextColor,
-      blueBorderColor: v.blueTextColor,
-      violetBorderColor: v.violetTextColor,
-      purpleBorderColor: v.purpleTextColor,
-      pinkBorderColor: v.pinkTextColor,
-      brownBorderColor: v.brownTextColor,
+      redBorder: v.redText,
+      orangeBorder: v.orangeText,
+      yellowBorder: v.yellowText,
+      oliveBorder: v.oliveText,
+      greenBorder: v.greenText,
+      tealBorder: v.tealText,
+      blueBorder: v.blueText,
+      violetBorder: v.violetText,
+      purpleBorder: v.purpleText,
+      pinkBorder: v.pinkText,
+      brownBorder: v.brownText,
     }),
 
     (v) => ({
@@ -130,32 +132,32 @@ export default function lightTheme(): Theme {
 
     (v) => ({
       /* Positive */
-      positiveColor: v.green,
-      positiveBackgroundColor: "#FCFFF5",
-      positiveBorderColor: "#A3C293",
-      positiveHeaderColor: "#1A531B",
-      positiveTextColor: "#2C662D",
+      positive: v.green,
+      positiveBackground: "#FCFFF5",
+      positiveBorder: "#A3C293",
+      positiveHeader: "#1A531B",
+      positiveText: "#2C662D",
 
       /* Negative */
-      negativeColor: v.red,
-      negativeBackgroundColor: "#FFF6F6",
-      negativeBorderColor: "#E0B4B4",
-      negativeHeaderColor: "#912D2B",
-      negativeTextColor: "#9F3A38",
+      negative: v.red,
+      negativeBackground: "#FFF6F6",
+      negativeBorder: "#E0B4B4",
+      negativeHeader: "#912D2B",
+      negativeText: "#9F3A38",
 
       /* Info */
-      infoColor: "#31CCEC",
-      infoBackgroundColor: "#F8FFFF",
-      infoBorderColor: "#A9D5DE",
-      infoHeaderColor: "#0E566C",
-      infoTextColor: "#276F86",
+      info: "#31CCEC",
+      infoBackground: "#F8FFFF",
+      infoBorder: "#A9D5DE",
+      infoHeader: "#0E566C",
+      infoText: "#276F86",
 
       /* Warning */
-      warningColor: "#F2C037",
-      warningBorderColor: "#C9BA9B",
-      warningBackgroundColor: "#FFFAF3",
-      warningHeaderColor: "#794B02",
-      warningTextColor: "#573A08",
+      warning: "#F2C037",
+      warningBorder: "#C9BA9B",
+      warningBackground: "#FFFAF3",
+      warningHeader: "#794B02",
+      warningText: "#573A08",
     }),
 
     (v) => ({
@@ -163,39 +165,39 @@ export default function lightTheme(): Theme {
      Neutral Text
 --------------------*/
 
-      darkTextColor: "rgba(0, 0, 0, 0.85)",
-      mutedTextColor: "rgba(0, 0, 0, 0.6)",
-      lightTextColor: "rgba(0, 0, 0, 0.4)",
+      darkText: "rgba(0, 0, 0, 0.85)",
+      mutedText: "rgba(0, 0, 0, 0.6)",
+      lightText: "rgba(0, 0, 0, 0.4)",
 
-      unselectedTextColor: "rgba(0, 0, 0, 0.4)",
-      hoveredTextColor: "rgba(0, 0, 0, 0.8)",
-      pressedTextColor: "rgba(0, 0, 0, 0.9)",
-      selectedTextColor: "rgba(0, 0, 0, 0.95)",
-      disabledTextColor: "rgba(0, 0, 0, 0.2)",
+      unselectedText: "rgba(0, 0, 0, 0.4)",
+      hoveredText: "rgba(0, 0, 0, 0.8)",
+      pressedText: "rgba(0, 0, 0, 0.9)",
+      selectedText: "rgba(0, 0, 0, 0.95)",
+      disabledText: "rgba(0, 0, 0, 0.2)",
 
-      invertedTextColor: "rgba(255, 255, 255, 0.9)",
-      invertedMutedTextColor: "rgba(255, 255, 255, 0.8)",
-      invertedLightTextColor: "rgba(255, 255, 255, 0.7)",
-      invertedUnselectedTextColor: "rgba(255, 255, 255, 0.5)",
-      invertedHoveredTextColor: "rgba(255, 255, 255, 1)",
-      invertedPressedTextColor: "rgba(255, 255, 255, 1)",
-      invertedSelectedTextColor: "rgba(255, 255, 255, 1)",
-      invertedDisabledTextColor: "rgba(255, 255, 255, 0.2)",
+      invertedText: "rgba(255, 255, 255, 0.9)",
+      invertedMutedText: "rgba(255, 255, 255, 0.8)",
+      invertedLightText: "rgba(255, 255, 255, 0.7)",
+      invertedUnselectedText: "rgba(255, 255, 255, 0.5)",
+      invertedHoveredText: "rgba(255, 255, 255, 1)",
+      invertedPressedText: "rgba(255, 255, 255, 1)",
+      invertedSelectedText: "rgba(255, 255, 255, 1)",
+      invertedDisabledText: "rgba(255, 255, 255, 0.2)",
     }),
 
     (v) => ({
       /* Positive / Negative Dupes */
-      successBackgroundColor: v.positiveBackgroundColor,
-      successColor: v.positiveColor,
-      successBorderColor: v.positiveBorderColor,
-      successHeaderColor: v.positiveHeaderColor,
-      successTextColor: v.positiveTextColor,
+      successBackground: v.positiveBackground,
+      success: v.positive,
+      successBorder: v.positiveBorder,
+      successHeader: v.positiveHeader,
+      successText: v.positiveText,
 
-      errorBackgroundColor: v.negativeBackgroundColor,
-      errorColor: v.negativeColor,
-      errorBorderColor: v.negativeBorderColor,
-      errorHeaderColor: v.negativeHeaderColor,
-      errorTextColor: v.negativeTextColor,
+      errorBackground: v.negativeBackground,
+      error: v.negative,
+      errorBorder: v.negativeBorder,
+      errorHeader: v.negativeHeader,
+      errorText: v.negativeText,
     }),
 
     (v) => ({
@@ -203,15 +205,15 @@ export default function lightTheme(): Theme {
       inputBackground: v.white,
 
       /* Input Text Color */
-      inputColor: v.textColor,
-      inputPlaceholderColor: v.textColor,
-      inputPlaceholderFocusColor: v.textColor,
+      input: v.text,
+      inputPlaceholder: v.text,
+      inputPlaceholderFocus: v.text,
 
       /* Used on inputs, textarea etc */
-      focusedFormBorderColor: "#85B7D9",
+      focusedFormBorder: "#85B7D9",
 
       /* Used on dropdowns, other larger blocks */
-      focusedFormMutedBorderColor: "#96C8DA",
+      focusedFormMutedBorder: "#96C8DA",
     })
   );
 

@@ -14,20 +14,31 @@ import {
   useColorScheme,
   ViewStyle,
 } from "react-native";
+import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRecoilValue } from "recoil";
 
-import { ComponentStyles } from "@app/components/interface";
+import { deepMerge } from "@app/misc/utils";
 import { AppState } from "@app/state";
+import {
+  ComponentStyles,
+  VariantTypeGroups,
+  VariantTypes,
+} from "@app/styles/interface";
 
 import { Colors } from "./colors";
+import sizing, { Sizing } from "./sizing";
+import spacing, { Spacing } from "./spacing";
 import lightTheme from "./themes/light";
-import { VariantTypeGroups, VariantTypes } from "./variants";
 
-type NativeStyle = ViewStyle | TextStyle | ImageStyle;
+type NativeStyle =
+  | ViewStyle
+  | TextStyle
+  | ImageStyle
+  | StyleProp<ViewStyle | TextStyle | ImageStyle>;
 
 export type NamedStyles<S> = StyleSheet.NamedStyles<Omit<S, "overrides">> &
   (S extends { overrides?: NamedStyles<unknown> }
-    ? { overrides: S["overrides"] }
+    ? { overrides?: S["overrides"] }
     : {});
 
 export type StyleFactory<T = any> = {
@@ -36,9 +47,13 @@ export type StyleFactory<T = any> = {
 
 export interface Theme {
   colors: Partial<Colors>;
-  spacing: {};
+  spacing: Spacing;
+  sizing: Sizing;
   typography: {};
+  insets: EdgeInsets;
 }
+
+export type CustomTheme = DeepPartial<Theme>;
 
 export type ThemeVariant = "light" | "dark";
 
@@ -51,25 +66,62 @@ interface ContextProps {
 export class ThemeManager {
   context: ContextProps;
 
-  constructor(variant: ThemeVariant = "light") {
-    this.context = this.setVariant(variant);
+  constructor({
+    variant = "light",
+    insets,
+  }: {
+    variant: ThemeVariant;
+    insets?: EdgeInsets;
+  }) {
+    this.context = {
+      manager: this,
+      variant,
+      theme: {
+        colors: {},
+        spacing: spacing(),
+        sizing: sizing(spacing()),
+        typography: {},
+        insets: {
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          ...insets,
+        },
+      },
+    };
+
+    this.setVariant(variant);
   }
 
   setVariant(variant: ThemeVariant): ContextProps {
-    if (this.context?.variant === variant) {
-      return this.context;
+    let ctheme: CustomTheme;
+
+    switch (variant) {
+      case "light":
+        ctheme = lightTheme();
+        break;
+      default:
+        ctheme = lightTheme();
+        break;
     }
 
-    return {
-      theme: variant === "light" ? lightTheme() : lightTheme(),
+    const theme = this.context.theme
+      ? deepMerge(this.context.theme, ctheme)
+      : (ctheme as Theme);
+
+    this.context = {
+      ...this.context,
+      theme,
       variant: variant,
-      manager: this,
     };
+
+    return this.context;
   }
 
   mergeOverrides<S extends unknown>(
     styles: NamedStyles<S>,
-    ...overrides: (Partial<S> | undefined)[]
+    ...overrides: (Partial<S> | undefined | null)[]
   ): NamedStyles<S> {
     const s = { ...styles };
 
@@ -105,13 +157,17 @@ export function ThemeProvider({
   variant?: ThemeVariant | null;
   children: React.ReactNode;
 }) {
+  const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const userVariant = useRecoilValue(AppState.themeVariant);
   const [currentVariant, setVariant] = useState<ThemeVariant>(
     variant ?? userVariant ?? colorScheme ?? "light"
   );
 
-  const manager = useMemo(() => new ThemeManager(currentVariant), []);
+  const manager = useMemo(
+    () => new ThemeManager({ variant: currentVariant, insets }),
+    []
+  );
 
   useLayoutEffect(() => {
     const sub = Appearance.addChangeListener(({ colorScheme }) => {
@@ -140,17 +196,30 @@ export function useThemeManager() {
   return useContext(ThemeContext);
 }
 
-export function createStyles<C extends keyof ComponentStyles>(
-  styles: (theme: Theme) => NamedStyles<ComponentStyles[C]>
-): StyleFactory<ComponentStyles[C]> {
+export function useTheme() {
+  return useThemeManager().theme;
+}
+
+export function createStyles<
+  C extends keyof ComponentStyles | "" = "",
+  K extends string = string,
+  O1 extends Record<K, NativeStyle> = Record<K, NativeStyle>,
+  O2 extends ComponentStyles[Exclude<C, "">] = ComponentStyles[Exclude<C, "">]
+>(
+  styles: C extends ""
+    ? (theme: Theme) => NamedStyles<O1>
+    : (theme: Theme) => NamedStyles<O2>
+): StyleFactory<C extends "" ? O1 : O2> {
   return {
-    factory: styles,
+    factory: styles as any,
   };
 }
 
+const t = createStyles<"">;
+
 export function useStyles<S extends unknown>(
   style: StyleFactory<S>,
-  ...overrides: (Partial<S> | undefined)[]
+  ...overrides: (Partial<S> | undefined | null)[]
 ) {
   const ctx = useThemeManager();
   return useMemo(() => {
@@ -165,24 +234,23 @@ export function composeStyles<S extends unknown>(
   filter: { [P in keyof S]?: boolean | (() => boolean) },
   ...propStyles: (StyleProp<any> | undefined)[]
 ) {
-  return Object.keys(styles).reduce(
-    (acc, key) => {
-      if (filter[key] === undefined) {
-        return acc;
-      }
-
-      if (filter[key]) {
-        if (
-          (typeof filter[key] === "function" && filter[key]()) ||
-          filter[key] === true
-        ) {
-          acc.push(styles[key]);
-        }
-      }
+  const s = Object.keys(styles).reduce((acc, key) => {
+    if (filter[key] === undefined) {
       return acc;
-    },
-    [...propStyles.filter(Boolean)] as NativeStyle[]
-  );
+    }
+
+    if (filter[key]) {
+      if (
+        (typeof filter[key] === "function" && filter[key]()) ||
+        filter[key] === true
+      ) {
+        acc.push(styles[key]);
+      }
+    }
+    return acc;
+  }, [] as NativeStyle[]);
+
+  return [...s, ...propStyles.filter(Boolean)];
 }
 
 export interface ThemeStyleProps<
@@ -216,13 +284,18 @@ export type ThemeProps<
 
 export type defineComponentStyles<
   T extends string,
-  O extends keyof ComponentStyles = any
-> = { base: NativeStyle } & {
-  [P in T]: NativeStyle;
-} & (O extends never
+  O extends keyof ComponentStyles | "" = ""
+> = UnionToIntersection<
+  { base: NativeStyle } & (T extends ""
     ? {}
     : {
-        overrides?: {
-          [P in O]?: Partial<ComponentStyles[P]>;
-        };
-      });
+        [P in T]: NativeStyle;
+      }) &
+    (O extends ""
+      ? {}
+      : {
+          overrides?: {
+            [P in Exclude<O, "">]?: Partial<ComponentStyles[P]>;
+          };
+        })
+>;

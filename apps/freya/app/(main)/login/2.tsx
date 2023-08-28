@@ -113,7 +113,7 @@ export default function Login2Screen() {
         <Button
           primary
           disabled={!isValid}
-          icon="arrow-forward"
+          iconName="arrow-forward"
           style={styles.loginButton}
           onPress={onLogin}
         />

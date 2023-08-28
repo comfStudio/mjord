@@ -13,7 +13,7 @@ import { Size, ToggleVariant, Variant } from "@app/styles/variants";
 import { sizeFromUnion } from "../styles/variants";
 import { createComponent } from "./";
 
-declare module "./interface" {
+declare module "@app/styles/interface" {
   export interface ComponentStyles {
     text: defineComponentStyles<
       keyof Variant | Size | PickKeys<ToggleVariant, "disabled">
@@ -66,16 +66,21 @@ export default StyleText;
 
 const styles = createStyles<"text">((t) => ({
   base: {
-    color: t.colors.textColor,
+    color: t.colors.text,
+    fontSize: t.sizing.text.body,
   },
 
   medium: {},
   outline: {},
   tertiary: {},
 
-  secondary: {},
+  secondary: {
+    color: t.colors.secondary,
+  },
 
-  primary: {},
+  primary: {
+    color: t.colors.primary,
+  },
 
   disabled: {
     backgroundColor: "#EFEFEF",

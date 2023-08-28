@@ -152,10 +152,10 @@ export default function RootLayout() {
   return (
     <RecoilRoot>
       <QueryClientProvider client={constant.client}>
-        <ThemeProvider>
-          <AuthListener redirect={ROUTES.HOME} />
-          <Init />
-          <SafeAreaProvider>
+        <SafeAreaProvider>
+          <ThemeProvider>
+            <AuthListener redirect={ROUTES.HOME} />
+            <Init />
             <Tabs
               backBehavior="history"
               initialRouteName="(main)/home"
@@ -185,8 +185,8 @@ export default function RootLayout() {
                 }}
               />
             </Tabs>
-          </SafeAreaProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </SafeAreaProvider>
       </QueryClientProvider>
     </RecoilRoot>
   );

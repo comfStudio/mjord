@@ -2,10 +2,10 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import DateLabel from "@/components/DateLabel";
 import ListItem from "@/components/ListItem";
-import Separator from "@/components/Separator";
 import VerticalList from "@/components/VerticalList";
 import { EventWithtExtraData } from "@/services/event";
 import { BasicGroupWithMediaData } from "@/services/group";
+import Divider from "@app/components/Divider";
 import { MaterialIcons } from '@expo/vector-icons';
 
 import LocationLabel from '../location/LocationLabel';
@@ -50,11 +50,11 @@ export default function EventListItem({
           {" "}
           {data?.members?.count ?? "??"}
         </Text>
-        <Separator style={itemStyles.tagLineSeparator} />
+        <Divider style={itemStyles.tagLineSeparator} />
         <DateLabel
           value={data.start_time ? new Date(data.start_time) : undefined}
         />
-        <Separator style={itemStyles.tagLineSeparator} />
+        <Divider style={itemStyles.tagLineSeparator} />
         {!!(data?.address && data?.location_name) && (
           <LocationLabel
             iconStyle={itemStyles.tagLineText}

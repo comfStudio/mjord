@@ -1,6 +1,6 @@
-import React, { forwardRef, ForwardRefRenderFunction } from "react";
+import React, { forwardRef, ForwardRefRenderFunction } from 'react';
 
-export function createComponent<P, Ref extends unknown = unknown>(
+export function createComponent<P = {}, Ref extends unknown = any>(
   render: ForwardRefRenderFunction<
     Ref extends React.Component
       ? NonNullable<React.ClassAttributes<Ref>["ref"]> extends React.LegacyRef<

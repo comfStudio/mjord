@@ -1,7 +1,6 @@
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 
-import { IconProp, useOptionalIconElement } from "@app/misc/ui-hooks";
 import {
   composeStyles,
   createStyles,
@@ -18,16 +17,19 @@ import {
 } from "@app/styles/variants";
 
 import { createComponent } from "./";
+import Icon from "./Icon";
 import StyleText from "./StyleText";
 
-declare module "./interface" {
+declare module "@app/styles/interface" {
   export interface ComponentStyles {
     button: defineComponentStyles<
       | "icon"
+      | "primaryIcon"
+      | "secondaryIcon"
       | keyof Variant
       | Size
       | PickKeys<ToggleVariant, "disabled" | "outline">,
-      "text"
+      "text" | "icon"
     >;
   }
 }
@@ -35,10 +37,9 @@ declare module "./interface" {
 type ButtonProps = {
   value?: string;
   textStyle?: ComponentStyleProp<typeof Text>;
-  icon?: IconProp;
 } & React.ComponentProps<typeof TouchableOpacity> &
   ThemeStyleProps<typeof TouchableOpacity, "button"> &
-  ThemeProps<"variant" | "size" | "outline" | "disabled">;
+  ThemeProps<"variant" | "icon" | "size" | "outline" | "disabled">;
 
 const Button = createComponent<ButtonProps, TouchableOpacity>(function Button(
   {
@@ -50,7 +51,8 @@ const Button = createComponent<ButtonProps, TouchableOpacity>(function Button(
     primary,
     secondary,
     tertiary,
-    icon,
+    iconName,
+    iconProps,
     children,
     size = "medium",
     ...props
@@ -68,16 +70,19 @@ const Button = createComponent<ButtonProps, TouchableOpacity>(function Button(
       tertiary,
       disabled,
       outline,
-      icon: !!icon,
+      icon: !!iconName || !!iconProps,
       ...sizeFromUnion(size),
     },
     style
   );
 
-  const iconEl = useOptionalIconElement({
-    icon,
-    // style: compStyles.buttonIcon,
+  // primary && console.log(compStyles);
+
+  const iconStyles = composeStyles(stl, {
+    primaryIcon: primary,
+    secondaryIcon: secondary,
   });
+
   return (
     <TouchableOpacity {...props} ref={ref} style={compStyles}>
       {!!value && (
@@ -93,7 +98,13 @@ const Button = createComponent<ButtonProps, TouchableOpacity>(function Button(
           {value}
         </StyleText>
       )}
-      {!!iconEl && iconEl}
+      <Icon
+        name={iconName}
+        {...iconProps}
+        size={size}
+        style={iconStyles as any}
+        overrideStyle={stl.overrides?.icon}
+      />
       {children}
     </TouchableOpacity>
   );
@@ -107,7 +118,7 @@ const styles = createStyles<"button">((t) => ({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    borderColor: t.colors.borderColor,
+    borderColor: t.colors.border,
     borderWidth: 1,
   },
 
@@ -135,38 +146,44 @@ const styles = createStyles<"button">((t) => ({
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
-  // icon: {
-  //   fontSize: 18,
-  // },
+
+  primaryIcon: {
+    color: t.colors.primaryAlternate,
+  },
+
+  secondaryIcon: {
+    color: t.colors.secondaryAlternate,
+  },
 
   secondary: {
-    backgroundColor: t.colors.secondaryColor,
+    backgroundColor: t.colors.secondary,
     borderWidth: 0,
   },
 
   primary: {
-    backgroundColor: t.colors.primaryColor,
+    backgroundColor: t.colors.primary,
     borderWidth: 0,
   },
 
   disabled: {
     backgroundColor: "#EFEFEF",
-    borderColor: t.colors.disabledBorderColor,
+    borderColor: t.colors.disabledBorder,
   },
 
   overrides: {
     text: {
       base: {
+        color: t.colors.input,
         fontSize: 14,
         textAlign: "center",
       },
 
       primary: {
-        color: "white",
+        color: t.colors.primaryAlternate,
       },
 
       secondary: {
-        color: "white",
+        color: t.colors.secondaryAlternate,
       },
 
       large: {
@@ -175,6 +192,12 @@ const styles = createStyles<"button">((t) => ({
 
       small: {
         fontSize: 12,
+      },
+    },
+
+    icon: {
+      medium: {
+        fontSize: 18,
       },
     },
   },

@@ -98,7 +98,7 @@ export default function Login1Screen() {
         <Button
           primary
           disabled={!isValid}
-          icon="arrow-forward"
+          iconName="arrow-forward"
           style={styles.loginButton}
           onPress={onSubmit}
         />

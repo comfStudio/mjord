@@ -64,7 +64,7 @@ export default function OnboardScreen() {
           onPress={onSubmit}
           primary
           disabled={!isValid}
-          icon="arrow-forward"
+          iconName="arrow-forward"
           style={styles.loginButton}
         />
       </View>

@@ -1,14 +1,16 @@
 export type ColorValue = string;
 
 export interface Colors {
-  primaryColor: ColorValue;
-  secondaryColor: ColorValue;
+  primary: ColorValue;
+  secondary: ColorValue;
+  primaryAlternate: ColorValue;
+  secondaryAlternate: ColorValue;
 
-  lightPrimaryColor: ColorValue;
-  lightSecondaryColor: ColorValue;
+  lightPrimary: ColorValue;
+  lightSecondary: ColorValue;
 
   pageBackground: ColorValue;
-  textColor: ColorValue;
+  text: ColorValue;
 
   /*-------------------
       Paragraph
@@ -21,7 +23,7 @@ export interface Colors {
        Links
 --------------------*/
 
-  linkColor: ColorValue;
+  link: ColorValue;
   linkUnderline: ColorValue;
 
   red: ColorValue;
@@ -74,53 +76,53 @@ export interface Colors {
   brownBackground: ColorValue;
 
   /*--- Colored Headers ---*/
-  redHeaderColor: ColorValue;
-  oliveHeaderColor: ColorValue;
-  greenHeaderColor: ColorValue;
-  yellowHeaderColor: ColorValue;
-  blueHeaderColor: ColorValue;
-  tealHeaderColor: ColorValue;
-  pinkHeaderColor: ColorValue;
-  violetHeaderColor: ColorValue;
-  purpleHeaderColor: ColorValue;
-  orangeHeaderColor: ColorValue;
-  brownHeaderColor: ColorValue;
+  redHeader: ColorValue;
+  oliveHeader: ColorValue;
+  greenHeader: ColorValue;
+  yellowHeader: ColorValue;
+  blueHeader: ColorValue;
+  tealHeader: ColorValue;
+  pinkHeader: ColorValue;
+  violetHeader: ColorValue;
+  purpleHeader: ColorValue;
+  orangeHeader: ColorValue;
+  brownHeader: ColorValue;
 
   /*--- Colored Text ---*/
-  redTextColor: ColorValue;
-  orangeTextColor: ColorValue;
-  yellowTextColor: ColorValue; // Yellow text is difficult to read
-  oliveTextColor: ColorValue; // Olive is difficult to read
-  greenTextColor: ColorValue; // Green is difficult to read
-  tealTextColor: ColorValue; // Teal text is difficult to read
-  blueTextColor: ColorValue;
-  violetTextColor: ColorValue;
-  purpleTextColor: ColorValue;
-  pinkTextColor: ColorValue;
-  brownTextColor: ColorValue;
+  redText: ColorValue;
+  orangeText: ColorValue;
+  yellowText: ColorValue; // Yellow text is difficult to read
+  oliveText: ColorValue; // Olive is difficult to read
+  greenText: ColorValue; // Green is difficult to read
+  tealText: ColorValue; // Teal text is difficult to read
+  blueText: ColorValue;
+  violetText: ColorValue;
+  purpleText: ColorValue;
+  pinkText: ColorValue;
+  brownText: ColorValue;
 
   /*--- Colored Border ---*/
-  redBorderColor: ColorValue;
-  orangeBorderColor: ColorValue;
-  yellowBorderColor: ColorValue;
-  oliveBorderColor: ColorValue;
-  greenBorderColor: ColorValue;
-  tealBorderColor: ColorValue;
-  blueBorderColor: ColorValue;
-  violetBorderColor: ColorValue;
-  purpleBorderColor: ColorValue;
-  pinkBorderColor: ColorValue;
-  brownBorderColor: ColorValue;
+  redBorder: ColorValue;
+  orangeBorder: ColorValue;
+  yellowBorder: ColorValue;
+  oliveBorder: ColorValue;
+  greenBorder: ColorValue;
+  tealBorder: ColorValue;
+  blueBorder: ColorValue;
+  violetBorder: ColorValue;
+  purpleBorder: ColorValue;
+  pinkBorder: ColorValue;
+  brownBorder: ColorValue;
 
   /*-------------------
   Highlighted Text
 --------------------*/
 
   highlightBackground: ColorValue;
-  highlightColor: ColorValue;
+  highlight: ColorValue;
 
   inputHighlightBackground: ColorValue;
-  inputHighlightColor: ColorValue;
+  inputHighlight: ColorValue;
 
   /*--------------
    Form Input
@@ -130,9 +132,9 @@ export interface Colors {
   inputBackground: ColorValue;
 
   /* Input Text Color */
-  inputColor: ColorValue;
-  inputPlaceholderColor: ColorValue;
-  inputPlaceholderFocusColor: ColorValue;
+  input: ColorValue;
+  inputPlaceholder: ColorValue;
+  inputPlaceholderFocus: ColorValue;
 
   /* Line Height Default For Inputs in Browser (Descenders are 17px at 14px base em) */
   inputLineHeight: ColorValue;
@@ -142,10 +144,10 @@ export interface Colors {
 --------------------*/
 
   /* Used on inputs, textarea etc */
-  focusedFormBorderColor: ColorValue;
+  focusedFormBorder: ColorValue;
 
   /* Used on dropdowns, other larger blocks */
-  focusedFormMutedBorderColor: ColorValue;
+  focusedFormMutedBorder: ColorValue;
 
   /*-------------------
         Alpha Colors
@@ -180,85 +182,85 @@ export interface Colors {
     --------------------*/
 
   /* Positive */
-  positiveColor: ColorValue;
-  positiveBackgroundColor: ColorValue;
-  positiveBorderColor: ColorValue;
-  positiveHeaderColor: ColorValue;
-  positiveTextColor: ColorValue;
+  positive: ColorValue;
+  positiveBackground: ColorValue;
+  positiveBorder: ColorValue;
+  positiveHeader: ColorValue;
+  positiveText: ColorValue;
 
   /* Negative */
-  negativeColor: ColorValue;
-  negativeBackgroundColor: ColorValue;
-  negativeBorderColor: ColorValue;
-  negativeHeaderColor: ColorValue;
-  negativeTextColor: ColorValue;
+  negative: ColorValue;
+  negativeBackground: ColorValue;
+  negativeBorder: ColorValue;
+  negativeHeader: ColorValue;
+  negativeText: ColorValue;
 
   /* Info */
-  infoColor: ColorValue;
-  infoBackgroundColor: ColorValue;
-  infoBorderColor: ColorValue;
-  infoHeaderColor: ColorValue;
-  infoTextColor: ColorValue;
+  info: ColorValue;
+  infoBackground: ColorValue;
+  infoBorder: ColorValue;
+  infoHeader: ColorValue;
+  infoText: ColorValue;
 
   /* Warning */
-  warningColor: ColorValue;
-  warningBorderColor: ColorValue;
-  warningBackgroundColor: ColorValue;
-  warningHeaderColor: ColorValue;
-  warningTextColor: ColorValue;
+  warning: ColorValue;
+  warningBorder: ColorValue;
+  warningBackground: ColorValue;
+  warningHeader: ColorValue;
+  warningText: ColorValue;
 
   /*-------------------
      Neutral Text
 --------------------*/
 
-  darkTextColor: ColorValue;
-  mutedTextColor: ColorValue;
-  lightTextColor: ColorValue;
+  darkText: ColorValue;
+  mutedText: ColorValue;
+  lightText: ColorValue;
 
-  unselectedTextColor: ColorValue;
-  hoveredTextColor: ColorValue;
-  pressedTextColor: ColorValue;
-  selectedTextColor: ColorValue;
-  disabledTextColor: ColorValue;
+  unselectedText: ColorValue;
+  hoveredText: ColorValue;
+  pressedText: ColorValue;
+  selectedText: ColorValue;
+  disabledText: ColorValue;
 
-  invertedTextColor: ColorValue;
-  invertedMutedTextColor: ColorValue;
-  invertedLightTextColor: ColorValue;
-  invertedUnselectedTextColor: ColorValue;
-  invertedHoveredTextColor: ColorValue;
-  invertedPressedTextColor: ColorValue;
-  invertedSelectedTextColor: ColorValue;
-  invertedDisabledTextColor: ColorValue;
+  invertedText: ColorValue;
+  invertedMutedText: ColorValue;
+  invertedLightText: ColorValue;
+  invertedUnselectedText: ColorValue;
+  invertedHoveredText: ColorValue;
+  invertedPressedText: ColorValue;
+  invertedSelectedText: ColorValue;
+  invertedDisabledText: ColorValue;
 
-  borderColor: ColorValue;
-  strongBorderColor: ColorValue;
-  internalBorderColor: ColorValue;
-  selectedBorderColor: ColorValue;
-  strongSelectedBorderColor: ColorValue;
-  disabledBorderColor: ColorValue;
+  border: ColorValue;
+  strongBorder: ColorValue;
+  internalBorder: ColorValue;
+  selectedBorder: ColorValue;
+  strongSelectedBorder: ColorValue;
+  disabledBorder: ColorValue;
 
-  solidInternalBorderColor: ColorValue;
-  solidBorderColor: ColorValue;
-  solidSelectedBorderColor: ColorValue;
+  solidInternalBorder: ColorValue;
+  solidBorder: ColorValue;
+  solidSelectedBorder: ColorValue;
 
-  whiteBorderColor: ColorValue;
-  selectedWhiteBorderColor: ColorValue;
+  whiteBorder: ColorValue;
+  selectedWhiteBorder: ColorValue;
 
-  solidWhiteBorderColor: ColorValue;
-  selectedSolidWhiteBorderColor: ColorValue;
+  solidWhiteBorder: ColorValue;
+  selectedSolidWhiteBorder: ColorValue;
 
   /* Positive / Negative Dupes */
-  successBackgroundColor: ColorValue;
-  successColor: ColorValue;
-  successBorderColor: ColorValue;
-  successHeaderColor: ColorValue;
-  successTextColor: ColorValue;
+  successBackground: ColorValue;
+  success: ColorValue;
+  successBorder: ColorValue;
+  successHeader: ColorValue;
+  successText: ColorValue;
 
-  errorBackgroundColor: ColorValue;
-  errorColor: ColorValue;
-  errorBorderColor: ColorValue;
-  errorHeaderColor: ColorValue;
-  errorTextColor: ColorValue;
+  errorBackground: ColorValue;
+  error: ColorValue;
+  errorBorder: ColorValue;
+  errorHeader: ColorValue;
+  errorText: ColorValue;
 
   /*******************************
              States
@@ -268,10 +270,10 @@ export interface Colors {
         Focus
 --------------------*/
 
-  primaryColorFocus: ColorValue;
-  secondaryColorFocus: ColorValue;
-  lightPrimaryColorFocus: ColorValue;
-  lightSecondaryColorFocus: ColorValue;
+  primaryFocus: ColorValue;
+  secondaryFocus: ColorValue;
+  lightPrimaryFocus: ColorValue;
+  lightSecondaryFocus: ColorValue;
 
   redFocus: ColorValue;
   orangeFocus: ColorValue;
@@ -300,8 +302,8 @@ export interface Colors {
   lightBlackFocus: ColorValue;
 
   /*---  Emotive  ---*/
-  positiveColorFocus: ColorValue;
-  negativeColorFocus: ColorValue;
+  positiveFocus: ColorValue;
+  negativeFocus: ColorValue;
 
   /*---  Dark Tones  ---*/
   fullBlackFocus: ColorValue;
@@ -318,10 +320,10 @@ export interface Colors {
 --------------------*/
 
   /*---  Colors  ---*/
-  primaryColorDown: ColorValue;
-  secondaryColorDown: ColorValue;
-  lightPrimaryColorDown: ColorValue;
-  lightSecondaryColorDown: ColorValue;
+  primaryDown: ColorValue;
+  secondaryDown: ColorValue;
+  lightPrimaryDown: ColorValue;
+  lightSecondaryDown: ColorValue;
 
   redDown: ColorValue;
   orangeDown: ColorValue;
@@ -350,8 +352,8 @@ export interface Colors {
   lightBlackDown: ColorValue;
 
   /*---  Emotive  ---*/
-  positiveColorDown: ColorValue;
-  negativeColorDown: ColorValue;
+  positiveDown: ColorValue;
+  negativeDown: ColorValue;
 
   /*---  Dark Tones  ---*/
   fullBlackDown: ColorValue;
@@ -368,10 +370,10 @@ export interface Colors {
 --------------------*/
 
   /*---  Colors  ---*/
-  primaryColorActive: ColorValue;
-  secondaryColorActive: ColorValue;
-  lightPrimaryColorActive: ColorValue;
-  lightSecondaryColorActive: ColorValue;
+  primaryActive: ColorValue;
+  secondaryActive: ColorValue;
+  lightPrimaryActive: ColorValue;
+  lightSecondaryActive: ColorValue;
 
   redActive: ColorValue;
   orangeActive: ColorValue;
@@ -400,8 +402,8 @@ export interface Colors {
   lightBlackActive: ColorValue;
 
   /*---  Emotive  ---*/
-  positiveColorActive: ColorValue;
-  negativeColorActive: ColorValue;
+  positiveActive: ColorValue;
+  negativeActive: ColorValue;
 
   /*---  Dark Tones  ---*/
   fullBlackActive: ColorValue;
@@ -412,4 +414,9 @@ export interface Colors {
   whiteActive: ColorValue;
   offWhiteActive: ColorValue;
   darkWhiteActive: ColorValue;
+}
+
+
+export default function colors(): Colors {
+  return {} as Colors;
 }

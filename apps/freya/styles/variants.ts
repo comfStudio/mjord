@@ -1,4 +1,4 @@
-import { trueFromUnion } from "@app/misc/utils";
+import { trueFromUnion } from '@app/misc/utils';
 
 const size = ["small", "medium", "large"] as const;
 
@@ -12,17 +12,7 @@ export function sizeFromUnion(s: Size) {
   );
 }
 
-export interface VariantTypes {}
-
-export interface VariantTypeGroups {}
-
-// -----------------------
-
 export type Size = (typeof size)[number];
-
-export interface VariantTypes {
-  size: Size;
-}
 
 // -----------------------
 
@@ -32,18 +22,27 @@ export type Variant = {
   tertiary: boolean;
 };
 
-export interface VariantTypes extends Variant {}
-
-export interface VariantTypeGroups {
-  variant: Variant;
-}
-
 // -----------------------
 
 export type ToggleVariant = {
   disabled: boolean;
   visible: boolean;
+  hidden: boolean;
   outline: boolean;
 };
 
-export interface VariantTypes extends ToggleVariant {}
+// -----------------------
+
+declare module "@app/styles/interface" {
+  export interface VariantTypes {
+    size: Size;
+  }
+
+  export interface VariantTypes extends Variant {}
+
+  export interface VariantTypeGroups {
+    variant: Variant;
+  }
+
+  export interface VariantTypes extends ToggleVariant {}
+}
