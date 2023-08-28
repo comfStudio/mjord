@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { formatDate } from "@app/misc/utils";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import { formatDate } from '../misc/utils';
 import Label from './Label';
 
 export default function DateLabel({

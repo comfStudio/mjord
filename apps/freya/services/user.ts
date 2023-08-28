@@ -3,10 +3,10 @@ import { useRouter } from 'expo-router';
 import { useCallback, useEffect } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
+import { UserState } from '@/state';
+import constant, { ROUTES, ServiceType } from '@app/constants';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import constant, { ROUTES, ServiceType } from '../constants';
-import { UserState } from '../state';
 import { Service } from './base';
 import { ProfileData } from './types';
 

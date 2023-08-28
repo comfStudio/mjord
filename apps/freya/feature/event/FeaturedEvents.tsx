@@ -1,18 +1,18 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import { VerticalLoadMoreList } from "@/components/VerticalList";
+import { useFeaturedEvents } from "@/services/event";
 import { t } from "@mjord/common";
 
-import { VerticalLoadMoreList } from "../../components/VerticalList";
-import { useFeaturedEvents } from "../../services/event";
 import EventListItem from "./EventList";
 
 export default function FeaturedEvents({ groupId }: { groupId: number }) {
   const { data, error } = useFeaturedEvents(groupId);
 
-  function renderItemFuture(item: typeof data["future"][0]) {
+  function renderItemFuture(item: (typeof data)["future"][0]) {
     return <EventListItem data={item} />;
   }
-  function renderItemPast(item: typeof data["future"][0]) {
+  function renderItemPast(item: (typeof data)["future"][0]) {
     return <EventListItem data={item} muted />;
   }
 

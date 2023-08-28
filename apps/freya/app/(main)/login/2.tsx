@@ -3,16 +3,15 @@ import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useRecoilValue } from "recoil";
 
+import Button from "@/components/Button";
+import { ButtonInput } from "@/components/Input";
+import { userRequireOnboarding } from "@/services/user";
+import { UserState } from "@/state";
+import constant, { ROUTES, ServiceType } from "@app/constants";
+import { useInputData } from "@app/misc/form";
+import { useToggle } from "@app/misc/hooks";
+import { loginSchema2 } from "@app/schemas/login";
 import { t } from "@mjord/common";
-
-import Button from "../../../components/Button";
-import { ButtonInput } from "../../../components/Input";
-import constant, { ROUTES, ServiceType } from "../../../constants";
-import { useInputData } from "../../../misc/form";
-import { useToggle } from "../../../misc/hooks";
-import { loginSchema2 } from "../../../schemas/login";
-import { userRequireOnboarding } from "../../../services/user";
-import { UserState } from "../../../state";
 
 export default function Login2Screen() {
   const router = useRouter();

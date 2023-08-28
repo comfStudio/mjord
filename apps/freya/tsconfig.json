@@ -1,26 +1,31 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "baseUrl": ".",
     "strict": true,
     "noImplicitAny": false,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@app/*": ["./*"],
+      "@/feature/*": ["./feature/*"],
+      "@/components/*": ["./components/*"],
+      "@/services": ["./services/index"],
+      "@/services/*": ["./services/*"],
+      "@/state": ["./state/index"],
+      "@/state/*": ["./state/*"],
+      "@/styles": ["./styles/index"],
+      "@/styles/*": ["./styles/*"],
+      "@mjord/common": ["../../packages/common/lib"],
+      "@mjord/logger": ["../../packages/logger/dist"]
+    }
   },
-  "references": [{ "path": "../../packages/common" }],
   "include": [
     "**/*.ts",
     "**/*.json",
     "**/*.tsx",
+    "./types.d.ts",
     "../../packages/common/types.d.ts"
   ],
-  "exclude": ["dist", "build", "node_modules", "lib", ".expo"],
-  "paths": {
-    "@/feature/*": ["./feature/*"],
-    "@/components/*": ["./components/*"],
-    "@/services": ["./services/index"],
-    "@/services/*": ["./services/*"],
-    "@/state": ["./state/index"],
-    "@/state/*": ["./state/*"],
-    "constants": ["./constants"]
-  }
+  "exclude": ["dist", "build", "node_modules", "lib", ".expo"]
 }

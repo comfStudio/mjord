@@ -1,13 +1,13 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import DateLabel from "@/components/DateLabel";
+import ListItem from "@/components/ListItem";
+import Separator from "@/components/Separator";
+import VerticalList from "@/components/VerticalList";
+import { EventWithtExtraData } from "@/services/event";
+import { BasicGroupWithMediaData } from "@/services/group";
 import { MaterialIcons } from '@expo/vector-icons';
 
-import DateLabel from '../../components/DateLabel';
-import ListItem from '../../components/ListItem';
-import Separator from '../../components/Separator';
-import VerticalList from '../../components/VerticalList';
-import { EventWithtExtraData } from '../../services/event';
-import { BasicGroupWithMediaData } from '../../services/group';
 import LocationLabel from '../location/LocationLabel';
 
 export default function EventListItem({

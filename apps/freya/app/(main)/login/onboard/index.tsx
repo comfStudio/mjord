@@ -1,14 +1,13 @@
 import { Tabs, useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
+import Button from "@/components/Button";
+import { Input } from "@/components/Input";
+import constant, { ROUTES, ServiceType } from "@app/constants";
+import { useInputData } from "@app/misc/form";
+import { useToggle } from "@app/misc/hooks";
+import { onboardSchema } from "@app/schemas/login";
 import { t } from "@mjord/common";
-
-import Button from "../../../../components/Button";
-import { Input } from "../../../../components/Input";
-import constant, { ROUTES, ServiceType } from "../../../../constants";
-import { useInputData } from "../../../../misc/form";
-import { useToggle } from "../../../../misc/hooks";
-import { onboardSchema } from "../../../../schemas/login";
 
 export default function OnboardScreen() {
   const router = useRouter();

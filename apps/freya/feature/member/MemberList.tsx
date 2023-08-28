@@ -1,8 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 
-import ListItem from '../../components/ListItem';
-import { VerticalLoadMoreList } from '../../components/VerticalList';
-import { GroupMemberWithProfileData } from '../../services/group';
+import ListItem from "@/components/ListItem";
+import { VerticalLoadMoreList } from "@/components/VerticalList";
+import { GroupMemberWithProfileData } from "@/services/group";
 
 export function MemberItem({ data }: { data: GroupMemberWithProfileData }) {
   return <ListItem title={data?.profile?.name} description="hello world" />;

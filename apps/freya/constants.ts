@@ -4,7 +4,7 @@ import { Database } from '@mjord/database-types';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { QueryClient } from '@tanstack/react-query';
 
-import type { ServiceLocator } from './services/base';
+import type { ServiceLocator } from '@/services/base';
 
 export enum ServiceType {
     Database,

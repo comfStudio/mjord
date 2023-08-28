@@ -3,17 +3,16 @@ import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useRecoilState } from "recoil";
 
+import Button from "@/components/Button";
+import { IconInput } from "@/components/Input";
+import Segment from "@/components/Segment";
+import { UserHelpers } from "@/services/user";
+import { UserState } from "@/state";
+import constant, { ROUTES, ServiceType } from "@app/constants";
+import { useInputData } from "@app/misc/form";
+import { useToggle } from "@app/misc/hooks";
+import { loginSchema1 } from "@app/schemas/login";
 import { t } from "@mjord/common";
-
-import Button from "../../../components/Button";
-import { IconInput } from "../../../components/Input";
-import Segment from "../../../components/Segment";
-import constant, { ROUTES, ServiceType } from "../../../constants";
-import { useInputData } from "../../../misc/form";
-import { useToggle } from "../../../misc/hooks";
-import { loginSchema1 } from "../../../schemas/login";
-import { UserHelpers } from "../../../services/user";
-import { UserState } from "../../../state";
 
 function AcceptedDomainsSegment() {
   return (

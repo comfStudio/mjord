@@ -1,9 +1,9 @@
 import { StyleSheet, TextInput, View } from "react-native";
 
+import { InputControl, useInputController } from "@app/misc/form";
+import { IconProp, useOptionalIconElement } from "@app/misc/ui-hooks";
 import { MaterialIcons } from "@expo/vector-icons";
 
-import { InputControl, useInputController } from "../misc/form";
-import { IconProp, useOptionalIconElement } from "../misc/ui-hooks";
 import Button from "./Button";
 
 export function Input({

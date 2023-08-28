@@ -1,7 +1,7 @@
 import { Redirect, useFocusEffect } from "expo-router";
 
-import { ROUTES } from "../../constants";
-import { useAuthListener, useAuthUser } from "../../services/user";
+import { useAuthListener, useAuthUser } from "@/services/user";
+import { ROUTES } from "@app/constants";
 
 export function AuthListener({ redirect }: { redirect?: string }) {
   const refresh = useAuthListener();

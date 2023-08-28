@@ -23,6 +23,8 @@ declare type Flatten<T> = T extends Record<string, any>
     ? { [k in keyof T]: T[k] }
     : never;
 
+
+
 // unwrap generic
 declare type Unwrap<T> = T extends Array<infer U>
     ? U
@@ -49,11 +51,25 @@ declare type RecordFromUnion<T extends Record<K, string>, K extends keyof T> = {
     [V in T[K]]: DiscriminateUnion<T, K, V>;
 };
 
-declare type PrettifyObject<T> = T extends Record<string, any>
-    ? { [k in keyof T]: PrettifyObject<T[k]> }
-    : T;
+declare type Expand<T> = T extends infer U ? { [K in keyof U]: U[K] } : never;
+
+declare type Merge<X, Y> = {
+  [K in keyof X | keyof Y]:
+    | (K extends keyof X ? X[K] : never)
+    | (K extends keyof Y ? Y[K] : never);
+};
+
+// https://github.com/ts-essentials/ts-essentials/tree/master/lib/union-to-intersection
+declare type UnionToIntersection<Union> = (
+  Union extends any ? (arg: Union) => void : never
+) extends (arg: infer Intersection) => void
+  ? Intersection
+  : never;
+
+declare type PrettifyObject<T> = { [KeyType in keyof T]: T[KeyType] } & {};
 
 declare type DeepPartial<T> = T extends object ? {
     [P in keyof T]?: DeepPartial<T[P]>;
 } : T;
 
+declare type PickKeys<T, K extends keyof T> = keyof Pick<T, K>;

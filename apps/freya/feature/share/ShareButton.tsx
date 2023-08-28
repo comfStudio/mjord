@@ -2,10 +2,9 @@ import * as Sharing from 'expo-sharing';
 import React from 'react';
 import { StyleSheet } from 'react-native';
 
+import Button from "@/components/Button";
+import constant from "@app/constants";
 import { t } from '@mjord/common';
-
-import Button from '../../components/Button';
-import constant from "../../constants";
 
 export default function ShareButton({
   url,

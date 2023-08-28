@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
+import { UserHelpers } from '@/services/user';
 import { t } from '@mjord/common';
-
-import { UserHelpers } from '../services/user';
 
 export const zStudentEmail = z.string().min(3, t`Email must contain at least 3 characters`).email(t`Invalid email.`).superRefine((val, ctx) => {
     const domain = val.split('@')[1];

@@ -2,14 +2,13 @@ import { useRouter } from 'expo-router';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useRecoilState } from 'recoil';
 
+import Button from "@/components/Button";
+import { ImageSkeleton } from "@/components/Skeleton";
+import { GroupState } from "@/state";
+import BottomSheet from "@app/components/BottomSheet";
+import { ROUTES } from "@app/constants";
 import { Ionicons } from '@expo/vector-icons';
 import { t } from '@mjord/common';
-
-import Button from '../../components/Button';
-import DrawerSheet from '../../components/DrawerSheet';
-import { ImageSkeleton } from '../../components/Skeleton';
-import { ROUTES } from "../../constants";
-import { GroupState } from '../../state';
 
 export default function GroupDetailDrawer() {
   const [group, setGroup] = useRecoilState(GroupState.currentGroupDetail);
@@ -43,7 +42,7 @@ export default function GroupDetailDrawer() {
   };
 
   return (
-    <DrawerSheet isVisible={!!group} onClose={handleCloseDrawer}>
+    <BottomSheet isVisible={!!group} onClose={handleCloseDrawer}>
       <TouchableOpacity style={styles.header} onPress={handleHeaderPress}>
         <ImageSkeleton width={48} height={48} style={styles.image}>
           <Image
@@ -62,7 +61,7 @@ export default function GroupDetailDrawer() {
         <Text style={styles.description}>{group?.description} hello world</Text>
         <Button value={t`More details`} onPress={handleMoreDetailsPress} />
       </View>
-    </DrawerSheet>
+    </BottomSheet>
   );
 }
 

@@ -1,10 +1,10 @@
 import { TouchableOpacity } from "react-native";
 import { useSetRecoilState } from "recoil";
 
-import ListItem from "../../components/ListItem";
-import VerticalList from "../../components/VerticalList";
-import { BasicGroupWithMediaData } from "../../services/group";
-import { GroupState } from "../../state";
+import ListItem from "@/components/ListItem";
+import VerticalList from "@/components/VerticalList";
+import { BasicGroupWithMediaData } from "@/services/group";
+import { GroupState } from "@/state";
 
 export default function GroupList({
   data,

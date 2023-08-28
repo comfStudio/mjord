@@ -1,7 +1,7 @@
 import { Slot } from "expo-router";
 
-import { Auth } from "../../feature/auth/Auth";
-import { Onboard } from "../../feature/auth/Onboard";
+import { Auth } from "@/feature/auth/Auth";
+import { Onboard } from "@/feature/auth/Onboard";
 
 export default function UserLayout() {
   return (

@@ -1,4 +1,4 @@
-import type { } from '../services/user';
+import type { } from '@/services/user';
 import { User as AuthUser } from '@supabase/supabase-js';
 
 import StateBlock, { defineAtom } from './base';

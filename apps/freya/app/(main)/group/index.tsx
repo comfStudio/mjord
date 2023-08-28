@@ -3,19 +3,18 @@ import { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import Button from "@/components/Button";
+import { AnimatedHeaderScrollView } from "@/components/Header";
+import Segment from "@/components/Segment";
+import Separator from "@/components/Separator";
+import { ImageSkeleton, LineSkeleton } from "@/components/Skeleton";
+import FeaturedEvents from "@/feature/event/FeaturedEvents";
+import LocationLabel from "@/feature/location/LocationLabel";
+import MembersModal from "@/feature/member/MembersModal";
+import ShareButton from "@/feature/share/ShareButton";
+import { useGroup } from "@/services/group";
 import { MaterialIcons } from "@expo/vector-icons";
-import FeaturedEvents from "@feature/event/FeaturedEvents";
 import { t } from "@mjord/common";
-
-import Button from "../../../components/Button";
-import { AnimatedHeaderScrollView } from "../../../components/Header";
-import Segment from "../../../components/Segment";
-import Separator from "../../../components/Separator";
-import { ImageSkeleton, LineSkeleton } from "../../../components/Skeleton";
-import LocationLabel from "../../../feature/location/LocationLabel";
-import MembersModal from "../../../feature/member/MembersModal";
-import ShareButton from "../../../feature/share/ShareButton";
-import { useGroup } from "../../../services/group";
 
 type IconNames = React.ComponentProps<typeof MaterialIcons>["name"];
 

@@ -1,8 +1,8 @@
 import { Redirect } from "expo-router";
 import { useRecoilValue } from "recoil";
 
-import { ROUTES } from "../../../constants";
-import { UserState } from "../../../state";
+import { UserState } from "@/state";
+import { ROUTES } from "@app/constants";
 
 export default function LoginScreen() {
   let el = <Redirect href={ROUTES.LOGIN_1} />;

@@ -1,6 +1,5 @@
+import { ServiceType } from '@app/constants';
 import { GenericError } from '@mjord/common';
-
-import { ServiceType } from '../constants';
 
 import type DatabaseService from './database';
 import type GroupService from './group';

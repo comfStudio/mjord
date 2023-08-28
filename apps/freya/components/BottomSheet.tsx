@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function DrawerSheet({
+export default function BottomSheet({
   isVisible: controlledIsVisible,
   children,
   onClose,

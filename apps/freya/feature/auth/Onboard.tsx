@@ -2,12 +2,12 @@ import { Redirect, usePathname } from 'expo-router';
 import { ReactElement } from 'react';
 import { Text, View } from 'react-native';
 
-import constant, { ROUTES } from '../../constants';
 import {
   useAuthUser,
   useProfile,
   userRequireOnboarding,
-} from '../../services/user';
+} from "@/services/user";
+import constant, { ROUTES } from "@app/constants";
 
 function OnboardUser({ children }: { children: React.ReactNode }) {
   const { data, isFetching } = useProfile();
@@ -27,7 +27,7 @@ function OnboardUser({ children }: { children: React.ReactNode }) {
     userRequireOnboarding(data) &&
     !path.startsWith(ROUTES.LOGIN_ONBOARDING)
   ) {
-    constant.log.d("User require onboarding")
+    constant.log.d("User require onboarding");
     return <Redirect href={ROUTES.LOGIN_ONBOARDING} />;
   }
 

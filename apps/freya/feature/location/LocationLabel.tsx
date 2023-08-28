@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 
-import Label from '../../components/Label';
+import Label from "@/components/Label";
+
 import MapModal from './MapModal';
 
 export default function LocationLabel({

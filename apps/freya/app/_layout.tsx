@@ -7,6 +7,13 @@ import { AppState as NativeAppState, Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { RecoilRoot, useSetRecoilState } from "recoil";
 
+import { AuthListener } from "@/feature/auth/Auth";
+import setupServices from "@/services";
+import { AppState, setupState } from "@/state";
+import { languages } from "@/state/_app";
+import constant, { ROUTES } from "@app/constants";
+import langDA from "@app/i18n/da.json";
+import { ThemeProvider } from "@app/styles/theme";
 import { Feather } from "@expo/vector-icons";
 import { addLocale, t, useLocale } from "@mjord/common";
 import getLogger from "@mjord/logger";
@@ -19,13 +26,6 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-
-import constant, { ROUTES } from "../constants";
-import { AuthListener } from "../feature/auth/Auth";
-import langDA from "../i18n/da.json";
-import setupServices from "../services";
-import { AppState, setupState } from "../state";
-import { languages } from "../state/_app";
 
 import type { AppStateStatus } from "react-native";
 async function main() {
@@ -152,39 +152,41 @@ export default function RootLayout() {
   return (
     <RecoilRoot>
       <QueryClientProvider client={constant.client}>
-        <AuthListener redirect={ROUTES.HOME} />
-        <Init />
-        <SafeAreaProvider>
-          <Tabs
-            backBehavior="history"
-            initialRouteName="(main)/home"
-            screenOptions={{
-              headerShown: true,
-              title: "",
-            }}
-          >
-            {HiddenTabs()}
+        <ThemeProvider>
+          <AuthListener redirect={ROUTES.HOME} />
+          <Init />
+          <SafeAreaProvider>
+            <Tabs
+              backBehavior="history"
+              initialRouteName="(main)/home"
+              screenOptions={{
+                headerShown: true,
+                title: "",
+              }}
+            >
+              {HiddenTabs()}
 
-            <Tabs.Screen
-              name="(main)/home"
-              options={{
-                title: t`Explore`,
-                tabBarIcon: ({ color }) => (
-                  <Feather name="navigation" color={color} size={26} />
-                ),
-              }}
-            />
-            <Tabs.Screen
-              name="user"
-              options={{
-                title: t`You`,
-                tabBarIcon: ({ color }) => (
-                  <Feather name="user" color={color} size={26} />
-                ),
-              }}
-            />
-          </Tabs>
-        </SafeAreaProvider>
+              <Tabs.Screen
+                name="(main)/home"
+                options={{
+                  title: t`Explore`,
+                  tabBarIcon: ({ color }) => (
+                    <Feather name="navigation" color={color} size={26} />
+                  ),
+                }}
+              />
+              <Tabs.Screen
+                name="user"
+                options={{
+                  title: t`You`,
+                  tabBarIcon: ({ color }) => (
+                    <Feather name="user" color={color} size={26} />
+                  ),
+                }}
+              />
+            </Tabs>
+          </SafeAreaProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </RecoilRoot>
   );

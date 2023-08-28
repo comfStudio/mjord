@@ -1,6 +1,6 @@
+import constant, { ServiceType } from '@app/constants';
 import { useQuery } from '@tanstack/react-query';
 
-import constant, { ServiceType } from '../constants';
 import { Service, ServiceLocator } from './base';
 import { GroupData, GroupMemberData, MediaData, ProfileData } from './types';
 
