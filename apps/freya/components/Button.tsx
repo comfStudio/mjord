@@ -1,6 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 
+import { ComponentStyles } from "@app/styles/interface";
 import {
   composeStyles,
   createStyles,
@@ -22,17 +23,19 @@ import StyleText from "./StyleText";
 
 declare module "@app/styles/interface" {
   export interface ComponentStyles {
-    button: defineComponentStyles<
-      | "icon"
-      | "primaryIcon"
-      | "secondaryIcon"
-      | keyof Variant
-      | Size
-      | PickKeys<ToggleVariant, "disabled" | "outline">,
-      "text" | "icon"
-    >;
+    button: defineComponentStyles<{
+      names:
+        | "icon"
+        | "primaryIcon"
+        | "secondaryIcon"
+        | keyof Variant
+        | Size
+        | PickKeys<ToggleVariant, "disabled" | "outline">;
+      overrides: "text" | "icon";
+    }>;
   }
 }
+type C = ComponentStyles["button"];
 
 type ButtonProps = {
   value?: string;

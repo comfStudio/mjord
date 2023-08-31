@@ -19,7 +19,9 @@ import { createComponent } from "./";
 
 declare module "@app/styles/interface" {
   export interface ComponentStyles {
-    icon: defineComponentStyles<Size>;
+    icon: defineComponentStyles<{
+    names: Size;
+    }>;
   }
 }
 

@@ -30,19 +30,50 @@ import sizing, { Sizing } from "./sizing";
 import spacing, { Spacing } from "./spacing";
 import lightTheme from "./themes/light";
 
-type NativeStyle =
-  | ViewStyle
-  | TextStyle
-  | ImageStyle
-  | StyleProp<ViewStyle | TextStyle | ImageStyle>;
+type NativeStyleValue = ViewStyle | TextStyle | ImageStyle | undefined;
 
-export type NamedStyles<S> = StyleSheet.NamedStyles<Omit<S, "overrides">> &
-  (S extends { overrides?: NamedStyles<unknown> }
-    ? { overrides?: S["overrides"] }
-    : {});
+type NativeStyle<V extends NativeStyleValue = NativeStyleValue> = V;
 
-export type StyleFactory<T = any> = {
-  factory: (theme: Theme) => NamedStyles<T>;
+type SpeficStyleTypes<S> = Partial<Record<keyof S, NativeStyleValue>>;
+
+export type GetStylesOverrides<C> = C extends {
+  overrides: Partial<NamedStyles<any, any>>;
+}
+  ? NonNullable<C["overrides"]>
+  : C extends {
+      overrides?: {
+        [P in string]?: Partial<NamedStyles<any>>;
+      };
+    }
+  ? NonNullable<C["overrides"]>
+  : never;
+
+type NamedNativeStyles<S, T extends SpeficStyleTypes<S>> = {
+  [P in keyof S]: T[P] extends NativeStyleValue
+    ? NativeStyle<T[P]>
+    : S[P] extends NativeStyleValue
+    ? NativeStyle<S[P]>
+    : never;
+};
+
+type NamedOverridesStyles<S, T extends SpeficStyleTypes<S>> = PrettifyObject<
+  {
+    overrides?: GetStylesOverrides<S>;
+  } & NamedNativeStyles<Omit<S, "overrides">, Omit<T, "overrides">>
+>;
+
+export type NamedStyles<
+  S,
+  T extends SpeficStyleTypes<S> = {}
+> = GetStylesOverrides<S> extends never
+  ? NamedNativeStyles<
+      Omit<S, "overrides">,
+      SpeficStyleTypes<Omit<S, "overrides">>
+    >
+  : NamedOverridesStyles<S, T>;
+
+export type StyleFactory<S = any, T extends SpeficStyleTypes<S> = any> = {
+  factory: (theme: Theme) => NamedStyles<S, T>;
 };
 
 export interface Theme {
@@ -200,27 +231,34 @@ export function useTheme() {
   return useThemeManager().theme;
 }
 
+type SCreateStyles<C> = C extends keyof ComponentStyles
+  ? ComponentStyles[Exclude<C, "">]
+  : C extends Record<string, any>
+  ? C
+  : never;
+
+type NCreateStyles<S = any> = NamedStyles<S, SpeficStyleTypes<S>>;
+
+type OCreateStyles<C extends keyof ComponentStyles | NCreateStyles> =
+  C extends keyof ComponentStyles
+    ? NamedStyles<SCreateStyles<C>, SpeficStyleTypes<SCreateStyles<C>>>
+    : C;
+
 export function createStyles<
-  C extends keyof ComponentStyles | "" = "",
-  K extends string = string,
-  O1 extends Record<K, NativeStyle> = Record<K, NativeStyle>,
-  O2 extends ComponentStyles[Exclude<C, "">] = ComponentStyles[Exclude<C, "">]
+  C extends keyof ComponentStyles | NamedStyles<any, any>
 >(
-  styles: C extends ""
-    ? (theme: Theme) => NamedStyles<O1>
-    : (theme: Theme) => NamedStyles<O2>
-): StyleFactory<C extends "" ? O1 : O2> {
+  styles: ((t: Theme) => OCreateStyles<C>) | OCreateStyles<C>
+): StyleFactory<OCreateStyles<C>, SpeficStyleTypes<OCreateStyles<C>>> {
+  const f = typeof styles === "function" ? styles : () => styles;
   return {
-    factory: styles as any,
+    factory: f as any,
   };
 }
-
-const t = createStyles<"">;
 
 export function useStyles<S extends unknown>(
   style: StyleFactory<S>,
   ...overrides: (Partial<S> | undefined | null)[]
-) {
+): NamedStyles<S, SpeficStyleTypes<S>> {
   const ctx = useThemeManager();
   return useMemo(() => {
     const s = style.factory(ctx.theme);
@@ -230,7 +268,7 @@ export function useStyles<S extends unknown>(
 }
 
 export function composeStyles<S extends unknown>(
-  styles: NamedStyles<S>,
+  styles: NamedStyles<S, SpeficStyleTypes<S>>,
   filter: { [P in keyof S]?: boolean | (() => boolean) },
   ...propStyles: (StyleProp<any> | undefined)[]
 ) {
@@ -250,7 +288,7 @@ export function composeStyles<S extends unknown>(
     return acc;
   }, [] as NativeStyle[]);
 
-  return [...s, ...propStyles.filter(Boolean)];
+  return [...s, ...propStyles.filter(Boolean)] as StyleProp<any>;
 }
 
 export interface ThemeStyleProps<
@@ -283,19 +321,21 @@ export type ThemeProps<
 > = Partial<PrettifyObject<OmitNever<_ThemeProps<props>>>>;
 
 export type defineComponentStyles<
-  T extends string,
-  O extends keyof ComponentStyles | "" = ""
+  T extends {
+    names?: string;
+    overrides?: keyof ComponentStyles;
+  }
 > = UnionToIntersection<
-  { base: NativeStyle } & (T extends ""
+  { base: NativeStyle } & (T["names"] extends undefined
     ? {}
     : {
-        [P in T]: NativeStyle;
+        [P in NonNullable<T["names"]>]: NativeStyle;
       }) &
-    (O extends ""
+    (T["overrides"] extends undefined
       ? {}
       : {
           overrides?: {
-            [P in Exclude<O, "">]?: Partial<ComponentStyles[P]>;
+            [P in NonNullable<T["overrides"]>]?: Partial<ComponentStyles[P]>;
           };
         })
 >;

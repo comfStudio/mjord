@@ -1,6 +1,6 @@
 import { Tabs, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
 
 import Button from "@/components/Button";
 import { AnimatedHeaderScrollView } from "@/components/Header";
@@ -11,77 +11,12 @@ import LocationLabel from "@/feature/location/LocationLabel";
 import MembersModal from "@/feature/member/MembersModal";
 import ShareButton from "@/feature/share/ShareButton";
 import { useGroup } from "@/services/group";
+import { AdvisoryLabel, AdvisorySegment } from "@app/components/Advisory";
 import Divider from "@app/components/Divider";
-import Icon from "@app/components/Icon";
 import StyleText from "@app/components/StyleText";
 import { createStyles, useStyles, useTheme } from "@app/styles/theme";
 import { MaterialIcons } from "@expo/vector-icons";
 import { t } from "@mjord/common";
-
-type IconNames = React.ComponentProps<typeof MaterialIcons>["name"];
-
-function AdvisoryLabel({
-  children,
-  icon = "info",
-}: {
-  children?: string;
-  icon?: React.ReactNode | IconNames;
-}) {
-  let iconEl: React.ReactNode;
-
-  if (typeof icon === "string") {
-    iconEl = (
-      <Icon style={[advisoryStyles.advisoryIcon]} name={icon as IconNames} />
-    );
-  } else {
-    iconEl = icon;
-  }
-
-  return (
-    <View style={advisoryStyles.label}>
-      <View>{iconEl}</View>
-      <StyleText style={advisoryStyles.advisoryText}>{children}</StyleText>
-    </View>
-  );
-}
-
-function AdvisorySegment({}: {}) {
-  return (
-    <Segment padded rounded secondary style={advisoryStyles.container}>
-      <AdvisoryLabel icon="money">
-        {t`This community might incur a fee to join.`}
-      </AdvisoryLabel>
-      <AdvisoryLabel icon="money">
-        {t`This community have activities that might incur a fee.`}
-      </AdvisoryLabel>
-      <AdvisoryLabel>
-        {t`This community is not moderated by the app's administrators.`}
-      </AdvisoryLabel>
-    </Segment>
-  );
-}
-
-const advisoryStyles = StyleSheet.create({
-  container: {
-    marginHorizontal: 30,
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  label: {
-    flexDirection: "row",
-    alignContent: "center",
-    alignItems: "center",
-    marginVertical: 5,
-  },
-  advisoryText: {
-    paddingHorizontal: 10,
-    color: "#666",
-  },
-  advisoryIcon: {
-    color: "#666",
-    fontSize: 25,
-  },
-});
 
 export default function DetailScreen() {
   const [membersVisible, setMembersVisible] = useState(false);
@@ -168,7 +103,17 @@ export default function DetailScreen() {
           onPress={handleApplyToJoin}
         />
 
-        <AdvisorySegment />
+        <AdvisorySegment>
+          <AdvisoryLabel icon="money">
+            {t`This community might incur a fee to join.`}
+          </AdvisoryLabel>
+          <AdvisoryLabel icon="money">
+            {t`This community have activities that might incur a fee.`}
+          </AdvisoryLabel>
+          <AdvisoryLabel>
+            {t`This community is not moderated by the app's administrators.`}
+          </AdvisoryLabel>
+        </AdvisorySegment>
 
         <StyleText style={stl.sectionTitle}>{t`Activity`}</StyleText>
         <FeaturedEvents groupId={groupId} />
