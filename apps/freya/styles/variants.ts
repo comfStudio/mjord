@@ -1,18 +1,26 @@
-import { trueFromUnion } from '@app/misc/utils';
+import { trueFromUnionArray } from "@app/misc/utils";
 
-const size = ["small", "medium", "large"] as const;
+export const ExtraSize = ["xs", "xl"] as const;
 
-export function sizeFromUnion(s: Size) {
-  return trueFromUnion(
-    size.reduce((acc, v) => {
-      acc[v] = false;
-      return acc;
-    }, {} as Record<Size, boolean>),
-    s
-  );
+export const Size = ["sm", "md", "lg"] as const;
+
+export const AllSize = [...ExtraSize, ...Size] as const;
+
+export function sizeFromUnion<T extends AllSize>(s?: T) {
+  return trueFromUnionArray(AllSize, s);
 }
 
-export type Size = (typeof size)[number];
+export type Size = (typeof Size)[number];
+export type ExtraSize = (typeof ExtraSize)[number];
+export type AllSize = (typeof AllSize)[number];
+
+export type ExtraSizeVariant = {
+  size: Size | ExtraSize;
+};
+
+export type AllSizeVariant = {
+  size: AllSize;
+};
 
 // -----------------------
 
@@ -29,6 +37,12 @@ export type ToggleVariant = {
   visible: boolean;
   hidden: boolean;
   outline: boolean;
+  muted: boolean;
+  edge: boolean;
+  transparent: boolean;
+  rounded: boolean | Size;
+  padded: boolean | Size;
+  margin: boolean | Size;
 };
 
 // -----------------------
@@ -42,6 +56,8 @@ declare module "@app/styles/interface" {
 
   export interface VariantTypeGroups {
     variant: Variant;
+    allSize: AllSizeVariant;
+    extraSize: ExtraSizeVariant;
   }
 
   export interface VariantTypes extends ToggleVariant {}
