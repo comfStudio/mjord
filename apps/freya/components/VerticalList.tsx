@@ -9,6 +9,7 @@ import {
 import { FlashList, ListRenderItem } from '@shopify/flash-list';
 
 import Button from './Button';
+import Segment from "./Segment";
 
 export function VirtualizedVerticalList<
   T extends Record<string, any> = { id: any }
@@ -83,7 +84,7 @@ export function VerticalLoadMoreList<
   const displayedItems = data.slice(0, itemsToShow);
 
   return (
-    <View style={[style]}>
+    <Segment transparent style={[style]}>
       {displayedItems.map((item) => (
         <VerticalLoadMoreListRenderItem
           key={keyExtractor?.(item)}
@@ -97,11 +98,11 @@ export function VerticalLoadMoreList<
             value="Show more"
             onPress={handleLoadMore}
             secondary
-            size="small"
+            size="sm"
           />
         </View>
       )}
-    </View>
+    </Segment>
   );
 }
 

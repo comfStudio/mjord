@@ -4,7 +4,7 @@ import { Image, TouchableOpacity, View } from "react-native";
 
 import Button from "@/components/Button";
 import { AnimatedHeaderScrollView } from "@/components/Header";
-import Segment from "@/components/Segment";
+import Segment, { EdgeSegment } from "@/components/Segment";
 import { ImageSkeleton, LineSkeleton } from "@/components/Skeleton";
 import FeaturedEvents from "@/feature/event/FeaturedEvents";
 import LocationLabel from "@/feature/location/LocationLabel";
@@ -13,6 +13,7 @@ import ShareButton from "@/feature/share/ShareButton";
 import { useGroup } from "@/services/group";
 import { AdvisoryLabel, AdvisorySegment } from "@app/components/Advisory";
 import Divider from "@app/components/Divider";
+import Heading from "@app/components/Heading";
 import StyleText from "@app/components/StyleText";
 import { createStyles, useStyles, useTheme } from "@app/styles/theme";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -67,57 +68,60 @@ export default function DetailScreen() {
             style={stl.image}
           />
         </ImageSkeleton>
-        <LineSkeleton style={stl.title} loading={!group?.title}>
-          <StyleText style={stl.title}>{group?.title}</StyleText>
-        </LineSkeleton>
+        <EdgeSegment>
+          <LineSkeleton style={stl.title} loading={!group?.title}>
+            <Heading h1 style={stl.title}>
+              {group?.title}
+            </Heading>
+          </LineSkeleton>
 
-        <View style={stl.tagLine}>
-          <TouchableOpacity
-            style={stl.members}
-            onPress={(e) => {
-              e.preventDefault();
-              setMembersVisible(true);
-            }}
+          <Segment style={stl.tagLine}>
+            <TouchableOpacity
+              style={stl.members}
+              onPress={(e) => {
+                e.preventDefault();
+                setMembersVisible(true);
+              }}
+            >
+              <MaterialIcons name="group" size={24} />
+              <StyleText style={stl.membersText}>
+                {group?.members?.count || 0}
+              </StyleText>
+            </TouchableOpacity>
+            <Divider />
+            <LocationLabel data={group} style={stl.locationLabel} />
+            <Divider />
+          </Segment>
+
+          <LineSkeleton
+            lines={3}
+            style={stl.description}
+            loading={!group?.description}
           >
-            <MaterialIcons name="group" size={24} />
-            <StyleText style={stl.membersText}>
-              {group?.members?.count || 0}
-            </StyleText>
-          </TouchableOpacity>
-          <Divider />
-          <LocationLabel data={group} style={stl.locationLabel} />
-          <Divider />
-        </View>
+            <StyleText style={stl.description}>{group?.description}</StyleText>
+          </LineSkeleton>
+          <Button
+            primary
+            style={stl.applyButton}
+            value={t`Apply to join`}
+            onPress={handleApplyToJoin}
+          />
 
-        <LineSkeleton
-          lines={3}
-          style={stl.description}
-          loading={!group?.description}
-        >
-          <StyleText style={stl.description}>{group?.description}</StyleText>
-        </LineSkeleton>
-        <Button
-          primary
-          style={stl.applyButton}
-          value={t`Apply to join`}
-          onPress={handleApplyToJoin}
-        />
-
-        <AdvisorySegment>
-          <AdvisoryLabel icon="money">
-            {t`This community might incur a fee to join.`}
-          </AdvisoryLabel>
-          <AdvisoryLabel icon="money">
-            {t`This community have activities that might incur a fee.`}
-          </AdvisoryLabel>
-          <AdvisoryLabel>
-            {t`This community is not moderated by the app's administrators.`}
-          </AdvisoryLabel>
-        </AdvisorySegment>
-
-        <StyleText style={stl.sectionTitle}>{t`Activity`}</StyleText>
+          <AdvisorySegment>
+            <AdvisoryLabel icon="money">
+              {t`This community might incur a fee to join.`}
+            </AdvisoryLabel>
+            <AdvisoryLabel icon="money">
+              {t`This community have activities that might incur a fee.`}
+            </AdvisoryLabel>
+            <AdvisoryLabel>
+              {t`This community is not moderated by the app's administrators.`}
+            </AdvisoryLabel>
+          </AdvisorySegment>
+        </EdgeSegment>
+        <Heading h3 style={stl.sectionTitle}>{t`Activity`}</Heading>
         <FeaturedEvents groupId={groupId} />
-        <StyleText style={stl.sectionTitle}>{t`Discussions`}</StyleText>
+        <Heading h3 style={stl.sectionTitle}>{t`Discussions`}</Heading>
 
         {[].map(({ item }) => (
           <View style={stl.discussion}>
@@ -135,8 +139,9 @@ export default function DetailScreen() {
           </View>
         ))}
 
-        <StyleText style={stl.sectionSubTitle}>{t`Tags`}</StyleText>
-        <Segment secondary padded rounded margin="large">
+        <Heading h4 style={stl.sectionSubTitle}>{t`Tags`}</Heading>
+
+        <Segment secondary padded rounded margin="lg">
           <StyleText>Tag 1</StyleText>
         </Segment>
       </AnimatedHeaderScrollView>
@@ -153,20 +158,14 @@ const styles = createStyles((t) => ({
     height: t.sizing.image.hero.height,
   },
   title: {
-    fontSize: t.sizing.text.heading.h1,
-    fontWeight: "bold",
-    marginHorizontal: t.spacing.edge.default,
-    marginVertical: t.spacing.edge.default,
     marginBottom: t.spacing.edge.sm,
   },
   description: {
-    margin: t.spacing.edge.default,
     marginTop: t.spacing.edge.sm,
   },
   tagLine: {
     flexDirection: "row",
     alignItems: "center",
-    marginHorizontal: t.spacing.edge.default,
   },
   locationLabel: {
     flexGrow: 2,
@@ -178,10 +177,8 @@ const styles = createStyles((t) => ({
     marginLeft: t.spacing.edge.xs,
   },
   sectionTitle: {
-    fontSize: t.sizing.text.heading.h3,
-    fontWeight: "bold",
-    marginHorizontal: 16,
-    marginVertical: 16,
+    marginHorizontal: t.spacing.edge.default,
+    marginVertical: t.spacing.edge.default,
   },
   sectionSubTitle: {
     fontSize: t.sizing.text.heading.h4,

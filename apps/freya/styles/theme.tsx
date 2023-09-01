@@ -320,10 +320,15 @@ export type ThemeProps<
   props extends keyof VariantTypes | keyof VariantTypeGroups
 > = Partial<PrettifyObject<OmitNever<_ThemeProps<props>>>>;
 
+export type ThemePropsNames<
+  props extends keyof VariantTypes | keyof VariantTypeGroups
+> = keyof OmitNever<_ThemeProps<props>>;
+
 export type defineComponentStyles<
   T extends {
     names?: string;
     overrides?: keyof ComponentStyles;
+    customOverrides?: string;
   }
 > = UnionToIntersection<
   { base: NativeStyle } & (T["names"] extends undefined
@@ -336,6 +341,13 @@ export type defineComponentStyles<
       : {
           overrides?: {
             [P in NonNullable<T["overrides"]>]?: Partial<ComponentStyles[P]>;
+          };
+        }) &
+    (T["customOverrides"] extends undefined
+      ? {}
+      : {
+          overrides?: {
+            [P in NonNullable<T["customOverrides"]>]: NativeStyle;
           };
         })
 >;

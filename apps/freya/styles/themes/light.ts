@@ -53,6 +53,14 @@ export default function lightTheme(): CustomTheme {
 
       lightPrimary: v.lightBlue,
       lightSecondary: v.lightBlack,
+      text: v.black,
+      pageBackground: v.white,
+    }),
+
+    (v) => ({
+      primaryBackground: v.pageBackground,
+      secondaryBackground: "#ecebeb",
+      tertiaryBackground: "#f4f4f4",
     }),
 
     (v) => ({
@@ -84,22 +92,6 @@ export default function lightTheme(): CustomTheme {
       pinkText: v.pink,
       brownText: v.brown,
     }),
-
-    (v) => ({
-      /*--- Colored Backgrounds ---*/
-      redBackground: "#FFE8E6",
-      orangeBackground: "#FFEDDE",
-      yellowBackground: "#FFF8DB",
-      oliveBackground: "#FBFDEF",
-      greenBackground: "#E5F9E7",
-      tealBackground: "#E1F7F7",
-      blueBackground: "#DFF0FF",
-      violetBackground: "#EAE7FF",
-      purpleBackground: "#F6E7FF",
-      pinkBackground: "#FFE3FB",
-      brownBackground: "#F1E2D3",
-    }),
-
     (v) => ({
       /*--- Colored Border ---*/
       redBorder: v.redText,

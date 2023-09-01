@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 
 import { VerticalLoadMoreList } from "@/components/VerticalList";
 import { useFeaturedEvents } from "@/services/event";
+import Segment from "@app/components/Segment";
 import { t } from "@mjord/common";
 
 import EventListItem from "./EventList";
@@ -17,7 +18,7 @@ export default function FeaturedEvents({ groupId }: { groupId: number }) {
   }
 
   return (
-    <View>
+    <Segment transparent>
       <VerticalLoadMoreList
         pageSize={5}
         data={data?.future ?? []}
@@ -32,7 +33,7 @@ export default function FeaturedEvents({ groupId }: { groupId: number }) {
         data={data?.past ?? []}
         renderItem={renderItemPast}
       />
-    </View>
+    </Segment>
   );
 }
 

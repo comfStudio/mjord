@@ -1,21 +1,16 @@
 import React from "react";
 import { Text, TouchableOpacity } from "react-native";
 
-import { ComponentStyles } from "@app/styles/interface";
 import {
   composeStyles,
   createStyles,
   defineComponentStyles,
   ThemeProps,
+  ThemePropsNames,
   ThemeStyleProps,
   useStyles,
 } from "@app/styles/theme";
-import {
-  Size,
-  sizeFromUnion,
-  ToggleVariant,
-  Variant,
-} from "@app/styles/variants";
+import { Size, sizeFromUnion } from "@app/styles/variants";
 
 import { createComponent } from "./";
 import Icon from "./Icon";
@@ -28,15 +23,12 @@ declare module "@app/styles/interface" {
         | "icon"
         | "primaryIcon"
         | "secondaryIcon"
-        | keyof Variant
         | Size
-        | PickKeys<ToggleVariant, "disabled" | "outline">;
+        | ThemePropsNames<"variant" | "disabled" | "outline">;
       overrides: "text" | "icon";
     }>;
   }
 }
-type C = ComponentStyles["button"];
-
 type ButtonProps = {
   value?: string;
   textStyle?: ComponentStyleProp<typeof Text>;
@@ -57,9 +49,9 @@ const Button = createComponent<ButtonProps, TouchableOpacity>(function Button(
     iconName,
     iconProps,
     children,
-    size = "medium",
+    size = "md",
     ...props
-  }: ButtonProps,
+  },
   ref
 ) {
   const stl = useStyles(styles, overrideStyle);
@@ -125,17 +117,17 @@ const styles = createStyles<"button">((t) => ({
     borderWidth: 1,
   },
 
-  medium: {
+  md: {
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
 
-  large: {
+  lg: {
     paddingVertical: 16,
     paddingHorizontal: 24,
   },
 
-  small: {
+  sm: {
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
@@ -177,7 +169,6 @@ const styles = createStyles<"button">((t) => ({
     text: {
       base: {
         color: t.colors.input,
-        fontSize: 14,
         textAlign: "center",
       },
 
@@ -188,19 +179,11 @@ const styles = createStyles<"button">((t) => ({
       secondary: {
         color: t.colors.secondaryAlternate,
       },
-
-      large: {
-        fontSize: 16,
-      },
-
-      small: {
-        fontSize: 12,
-      },
     },
 
     icon: {
-      medium: {
-        fontSize: 18,
+      md: {
+        fontSize: t.sizing.icon.sm,
       },
     },
   },

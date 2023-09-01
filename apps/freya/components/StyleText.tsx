@@ -5,42 +5,43 @@ import {
   createStyles,
   defineComponentStyles,
   ThemeProps,
+  ThemePropsNames,
   ThemeStyleProps,
   useStyles,
 } from "@app/styles/theme";
-import { Size, ToggleVariant, Variant } from "@app/styles/variants";
+import { AllSize } from "@app/styles/variants";
 
 import { sizeFromUnion } from "../styles/variants";
 import { createComponent } from "./";
 
 declare module "@app/styles/interface" {
   export interface ComponentStyles {
-    text: defineComponentStyles<
-      keyof Variant | Size | PickKeys<ToggleVariant, "disabled">
-    >;
+    text: defineComponentStyles<{
+      names: ThemePropsNames<"variant" | "disabled" | "muted"> | AllSize;
+    }>;
   }
 }
 
 type TextProps = {} & React.ComponentProps<typeof Text> &
   ThemeStyleProps<typeof Text, "text"> &
-  ThemeProps<"variant" | "size" | "disabled">;
+  ThemeProps<"variant" | "size" | "disabled" | "muted">;
 
 const StyleText = createComponent<TextProps, Text>(function StyleText(
   {
     style,
     overrideStyle,
     disabled,
+    muted,
     primary,
     tertiary,
     secondary,
     children,
-    size = "medium",
+    size,
     ...props
   }: TextProps,
   ref
 ) {
   const stl = useStyles(styles, overrideStyle);
-
   const compStyles = composeStyles(
     stl,
     {
@@ -49,6 +50,7 @@ const StyleText = createComponent<TextProps, Text>(function StyleText(
       secondary,
       tertiary,
       disabled,
+      muted,
       ...sizeFromUnion(size),
     },
     style
@@ -70,7 +72,6 @@ const styles = createStyles<"text">((t) => ({
     fontSize: t.sizing.text.body,
   },
 
-  medium: {},
   outline: {},
   tertiary: {},
 
@@ -83,10 +84,30 @@ const styles = createStyles<"text">((t) => ({
   },
 
   disabled: {
-    backgroundColor: "#EFEFEF",
+    backgroundColor: t.colors.disabledText,
   },
 
-  large: {},
+  muted: {
+    color: t.colors.mutedText,
+  },
 
-  small: {},
+  xs: {
+    fontSize: t.sizing.text.xs,
+  },
+
+  sm: {
+    fontSize: t.sizing.text.sm,
+  },
+
+  md: {
+    fontSize: t.sizing.text.md,
+  },
+
+  lg: {
+    fontSize: t.sizing.text.lg,
+  },
+
+  xl: {
+    fontSize: t.sizing.text.xl,
+  },
 }));

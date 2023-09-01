@@ -44,22 +44,21 @@ export function AdvisorySegment({ children }: { children?: React.ReactNode }) {
 
 const styles = createStyles((t) => ({
   container: {
-    marginHorizontal: 30,
-    marginTop: 10,
-    marginBottom: 20,
+    marginHorizontal: t.spacing.edge.md,
+    marginVertical: t.spacing.edge.sm,
   },
   label: {
     flexDirection: "row",
     alignContent: "center",
     alignItems: "center",
-    marginVertical: 5,
+    marginVertical: t.spacing.edge.xs,
   },
   text: {
-    paddingHorizontal: 10,
-    color: "#666",
+    paddingHorizontal: t.spacing.edge.md,
+    color: t.colors.mutedText,
   },
   icon: {
-    color: "#666",
-    fontSize: 25,
+    color: t.colors.mutedText,
+    fontSize: t.sizing.icon.md,
   },
 }));

@@ -33,7 +33,7 @@ export default function Login1Screen() {
   const [loginState, setLoginState] = useRecoilState(UserState.loginState);
 
   const { control, handleSubmit, errors, isValid } = useInputData({
-    schema: loginSchema1.default({ email: loginState?.email ?? "" }),
+    schema: loginSchema1.default({ email: loginState?.email ?? "ok" }),
   });
 
   const [loginFailed, setLoginFailed] = useToggle();

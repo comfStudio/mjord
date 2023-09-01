@@ -73,3 +73,7 @@ declare type DeepPartial<T> = T extends object ? {
 } : T;
 
 declare type PickKeys<T, K extends keyof T> = keyof Pick<T, K>;
+
+declare type BooleanUnion<T> = {
+  [P in keyof T]: T[P] | boolean;
+};

@@ -40,10 +40,34 @@ export function formatDate<T extends Date | undefined = undefined>(
   }
 }
 
+export function booleanFromArray<O extends readonly string[]>(
+  o: O,
+  u: Partial<BooleanUnion<O>>
+) {
+  const a = o.reduce((acc, v, i) => {
+    acc[v] = !!u[i];
+    return acc;
+  }, {} as Record<O[number], boolean>);
+
+  return a;
+}
+
+export function trueFromUnionArray<
+  O extends readonly string[],
+  U extends O[number]
+>(o: O, u?: U) {
+  const a = o.reduce((acc, v) => {
+    acc[v] = false;
+    return acc;
+  }, {} as Record<O[number], boolean>);
+
+  return trueFromUnion(a, u);
+}
+
 export function trueFromUnion<
   O extends Record<string, boolean>,
   U extends keyof O
->(o: O, u: U) {
+>(o: O, u?: U) {
   return Object.keys(o).reduce((acc, key) => {
     acc[key] = false;
     if (key === u) {

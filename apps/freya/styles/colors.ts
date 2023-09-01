@@ -9,6 +9,10 @@ export interface Colors {
   lightPrimary: ColorValue;
   lightSecondary: ColorValue;
 
+  primaryBackground: ColorValue;
+  secondaryBackground: ColorValue;
+  tertiaryBackground: ColorValue;
+
   pageBackground: ColorValue;
   text: ColorValue;
 

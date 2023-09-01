@@ -8,7 +8,7 @@ import {
   ThemeStyleProps,
   useStyles,
 } from "@app/styles/theme";
-import { Size, sizeFromUnion } from "@app/styles/variants";
+import { AllSize, sizeFromUnion } from "@app/styles/variants";
 import { MaterialIcons } from "@expo/vector-icons";
 import {
   Icon as NativeIcon,
@@ -20,7 +20,7 @@ import { createComponent } from "./";
 declare module "@app/styles/interface" {
   export interface ComponentStyles {
     icon: defineComponentStyles<{
-    names: Size;
+      names: AllSize;
     }>;
   }
 }
@@ -45,7 +45,7 @@ type IconProps<G extends string = IconNames> = {
   name?: G;
 } & Omit<IconButtonProps<string>, "name" | "size"> &
   Omit<ThemeStyleProps<never, "icon">, "style"> &
-  ThemeProps<"hidden" | "size">;
+  ThemeProps<"hidden" | "allSize">;
 
 const Icon = createComponent(function Icon(
   {
@@ -54,7 +54,7 @@ const Icon = createComponent(function Icon(
     name,
     overrideStyle,
     style,
-    size = "medium",
+    size = "md",
     ...props
   }: IconProps,
   ref
@@ -91,15 +91,23 @@ export default Icon;
 const styles = createStyles<"icon">((t) => ({
   base: {},
 
-  medium: {
-    fontSize: 16,
+  xs: {
+    fontSize: t.sizing.icon.xs,
   },
 
-  large: {
-    fontSize: 18,
+  sm: {
+    fontSize: t.sizing.icon.sm,
   },
 
-  small: {
-    fontSize: 14,
+  md: {
+    fontSize: t.sizing.icon.md,
+  },
+
+  lg: {
+    fontSize: t.sizing.icon.lg,
+  },
+
+  xl: {
+    fontSize: t.sizing.icon.xl,
   },
 }));

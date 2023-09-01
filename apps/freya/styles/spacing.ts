@@ -56,15 +56,13 @@ const edge = {
   sm: size[2],
   md: size[4],
   lg: size[6],
+  xl: size[7],
 };
-
-const border = {};
 
 export interface Spacing {
   size: typeof size;
   sized: typeof sized;
   edge: typeof edge;
-  border: typeof border;
 }
 
 export default function spacing(): Spacing {
@@ -72,6 +70,5 @@ export default function spacing(): Spacing {
     size,
     sized,
     edge,
-    border,
   };
 }
