@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "sql"
+version = "0.1.0"
+description = ""
+authors = ["iSplasher <isplasher@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+sqlalchemy = "^2.0.20"
+faker = "^19.3.1"
+psycopg2 = "^2.9.7"
+typeid-python = "^0.2.1"
+httpx = "^0.24.1"
+
+[tool.poetry.scripts]
+tables = "sql.sql:main"
+seed = "sql.seed:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
