@@ -2,7 +2,7 @@
   "name": "@mjord/backend",
   "scripts": {
     "dev": "docker compose -p mjord-backend up -d && cd supabase/docker && docker compose -p mjord-supabase up -d",
-    "seed": "ts-node seed.ts",
+    "seed": "poetry run seed",
     "upgrade": "cd ../.. && git submodule update --remote --merge && cd services/backend/supabase/docker && docker compose -p mjord-supabase up -d"
   },
   "packageManager": "yarn@3.5.0",

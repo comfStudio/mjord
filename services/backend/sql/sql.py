@@ -7,6 +7,10 @@ import sqlalchemy.dialects.postgresql as pg
 import datetime
 from sqlalchemy import create_mock_engine
 
+import typeid
+
+from .typeid import typeid_sql
+
 class Visibility_Type(enum.Enum):
     PUBLIC = "public"
     PRIVATE = "private"
@@ -25,50 +29,84 @@ class Member_Role(enum.Enum):
     MEMBER = "member"
 
 
+ProfileID = sa.UUID
+ProfileIDT = uuid.UUID
+
 JSON = pg.JSONB
 TIMESTAMP = pg.TIMESTAMP(timezone=True)
 
 schema = "public"
 
-IDType = sa.UUID
-IDTypeT = uuid.UUID
-
 extensions = [
     """
-create extension if not exists postgis
-with
+CREATE EXTENSION IF NOT EXISTS postgis
+WITH
   schema extensions;
 """
-]
+] + typeid_sql
 
-policies = [
-]
+typeids = {}
+
+policies = []
 
 functions = {}
 triggers = {}
 
-public_read_policy = lambda table: f"""
-CREATE POLICY "Public {table} are viewable by everyone."
-  ON {table} for SELECT
-  USING ( true );
+class TypeID(sa.types.UserDefinedType):
+    cache_ok = True
 
-CREATE POLICY "Users can insert their own {table}."
-  ON {table} for INSERT
-  WITH CHECK ( auth.uid() = id );
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
 
-CREATE POLICY "Users can update own {table}."
-  ON {table} for UPDATE
-  USING ( auth.uid() = id );
-"""
+    def get_col_spec(self, **kw):
+        type_expression = kw.get("type_expression", None)
+        return f"{self.name}"
+
+    def bind_expression(self, bindvalue):
+        return sa.func.typeid_parse(bindvalue, type_=self)
+
+    def column_expression(self, col):
+        return sa.func.typeid_print(col, type_=self)
+    
+
+IDType = TypeID
+IDTypeT = str
 
 class IdMixin:
-    id: orm.Mapped[IDTypeT] = orm.mapped_column(IDType, primary_key=True, server_default=sa.func.uuid_generate_v4())
+
+    @classmethod
+    def typeid_name(cls):
+        return f"{cls.__tablename__}_id"
+    
+    @classmethod
+    def typeid_check_name(cls):
+        return cls.__tablename__.replace("_", "")
+
+    @orm.declared_attr
+    def id(cls) -> orm.Mapped[IDTypeT]:
+        check_name = cls.typeid_check_name()
+        type_name = cls.typeid_name()
+
+        table_type = f"CREATE DOMAIN {type_name} AS typeid CHECK (typeid_check(value, '{check_name}'));"
+        typeids[type_name] = table_type
+        return orm.mapped_column(IDType(type_name), primary_key=True, server_default=sa.func.typeid_generate(check_name))
+
+    @classmethod
+    def generate_id(cls):
+        return str(typeid.TypeID(prefix=cls.typeid_check_name()))
 
 class ExtraMixin:
     extra: orm.Mapped[dict] = orm.mapped_column(JSON, nullable=False, server_default=sa.text("'{}'"))
 
+
+
 class ShortString(sa.String):
     def __init__(self, length: int = 100, **kwargs):
+        super().__init__(length, **kwargs)
+
+class IDString(ShortString):
+    def __init__(self, length: int = 80, **kwargs):
         super().__init__(length, **kwargs)
 
 class DefaultString(ShortString):
@@ -84,6 +122,8 @@ class Enum(sa.Enum):
         super().__init__(enum,  values_callable=lambda x: [e.value for e in x], **kw)
 
 class Geometry(sa.types.UserDefinedType):
+    cache_ok = True
+    
     def get_col_spec(self):
         return "GEOMETRY"
 
@@ -92,6 +132,7 @@ class Geometry(sa.types.UserDefinedType):
 
     def column_expression(self, col):
         return sa.func.ST_AsText(col, type_=self)
+
 
 class Base(orm.DeclarativeBase):
     _table_args__ = dict(schema=schema)
@@ -121,7 +162,7 @@ def create_many_to_many(cls_name: str, table_name: str, left: str | tuple[str, s
 
     return cls
 
-def mutual_exclusive_check(table_name: str, *relations):
+def mutual_exclusive_check(table_name: str, *relations, allow_all_none=False):
     return sa.CheckConstraint(
         sa.or_(
             *[
@@ -131,10 +172,67 @@ def mutual_exclusive_check(table_name: str, *relations):
                     *[r2 == None for r2 in relations if r2 != r]
                 )
                 for r in relations
-            ]
+            ],
+            *([sa.and_(
+                *[r == None for r in relations]
+            )] if allow_all_none else [])
         ),
         name=f"{table_name}_mutually_exclusive_relations"
     )
+
+def create_user_policy(table: str | type[Base],
+                       col: str = "profile_id",
+                       viewable_by_everyone = True,
+                       user_insert_only = True,
+                       user_update_only = True,
+                       user_delete_only = True):
+    
+    table = table.__tablename__ if not isinstance(table, str) else table
+
+
+    p = []
+
+    if viewable_by_everyone:
+        p.append(f"""
+        CREATE POLICY "Public {table} are viewable by everyone."
+        ON {table} for SELECT
+        TO anon
+        USING ( true );
+        """)
+    
+    if user_insert_only:
+        p.append(f"""
+        CREATE POLICY "Users can insert their own {table}."
+        ON {table} for INSERT
+        TO authenticated
+        WITH CHECK ( auth.uid() = {col} );
+        """)
+
+    if user_update_only:
+        p.append(f"""
+        CREATE POLICY "Users can update their own {table}."
+        ON {table} for UPDATE
+        TO authenticated
+        USING ( auth.uid() = {col} );
+        """)
+
+    if user_delete_only:
+        p.append(f"""
+        CREATE POLICY "Users can delete their own {table}."
+        ON {table} for DELETE
+        TO authenticated
+        USING ( auth.uid() = {col} );
+        """)
+
+    if p:
+        policies.append(f"""
+                        ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;
+                        """)
+
+    policies.extend(p)
+    
+
+    
 
 functions["public.register_row_modified"] = """
 CREATE FUNCTION public.register_row_modified()
@@ -176,20 +274,24 @@ class Media(Base, IdMixin):
     url: orm.Mapped[str] = orm.mapped_column(DefaultString, nullable=False, index=True)
     thumbnail_url: orm.Mapped[str] = orm.mapped_column(DefaultString, nullable=True)
 
+    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="CASCADE"), index=True, nullable=True)
+    group_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("group.id", ondelete="CASCADE"), nullable=True)
+    event_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("event.id", ondelete="CASCADE"), nullable=True)
+
+    _table_args__ = (
+            mutual_exclusive_check(__tablename__, profile_id, group_id, event_id, allow_all_none=True),
+        )
+    
+create_user_policy(Media)
 
 class Profile(Base, ExtraMixin):
     __tablename__ = "profile"
-    id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("auth.users.id", ondelete="CASCADE"), primary_key=True)
+    id: orm.Mapped[ProfileID] = orm.mapped_column(sa.ForeignKey("auth.users.id", ondelete="CASCADE"), primary_key=True)
     name: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False, server_default=sa.text("''"))
     occupation: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False, server_default=sa.text("''"))
     description: orm.Mapped[str] = orm.mapped_column(LongString, nullable=False, server_default=sa.text("''"))
-    media_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("media.id", ondelete="SET NULL"), nullable=True)
 
-policies.append(f"""
-ALTER TABLE {Profile.__tablename__} ENABLE ROW LEVEL SECURITY;
-
-{public_read_policy(Profile.__tablename__)}
-""")
+create_user_policy(Profile, col="id", user_delete_only=False)
 
 # Inserts a row into public.profiles
 functions["public.handle_new_user"] = f"""
@@ -212,16 +314,6 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 """
-
-
-class Update(Base, IdMixin, ExtraMixin):
-    __tablename__ = "update"
-
-    profile_id: orm.Mapped[IDTypeT] = orm.mapped_column(IDType, nullable=True)
-    action: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False)
-    row_id: orm.Mapped[IDTypeT] = orm.mapped_column(IDType, nullable=False)
-    table_name: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False)
-    table_data: orm.Mapped[dict] = orm.mapped_column(JSON, nullable=False, server_default=sa.text("'{}'"))
 
 class Url(Base, IdMixin):
     __tablename__ = "url"
@@ -255,12 +347,14 @@ class groupMembers(Base, IdMixin):
     __tablename__ = "group_members"
 
     group_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("group.id", ondelete="CASCADE"), nullable=False)
-    profile_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="CASCADE"), nullable=False)
+    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="CASCADE"), index=True, nullable=False)
     role: orm.Mapped[Member_Role] = orm.mapped_column(Enum(Member_Role), nullable=False, server_default=sa.text(f"'{Member_Role.MEMBER.value}'"))
 
     __table_args__ = (
         sa.UniqueConstraint("group_id", "profile_id"),
     )
+
+create_user_policy(groupMembers)
 
 groupMedias = create_many_to_many("groupMedias", "group_medias", "group", "media")
 
@@ -275,7 +369,9 @@ class Discussion(Base, IdMixin):
 
     group_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("group.id", ondelete="CASCADE"), nullable=False)
     event_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("event.id", ondelete="CASCADE"), nullable=True)
-    profile_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), nullable=True)
+    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), nullable=True)
+
+create_user_policy(Discussion)
 
 discussionMedias = create_many_to_many("discussionMedias", "discussion_medias", "discussion", "media")
 
@@ -285,7 +381,9 @@ class Comment(Base, IdMixin):
     content: orm.Mapped[str] = orm.mapped_column(LongString, nullable=False)
 
     discussion_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("discussion.id", ondelete="CASCADE"), nullable=False)
-    profile_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), nullable=True)
+    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), index=True, nullable=True)
+
+create_user_policy(Comment)
 
 commentMedias = create_many_to_many("commentMedias", "comment_medias", "comment", "media")
 
@@ -294,7 +392,7 @@ class Reaction(Base, IdMixin):
 
     reaction: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False)
 
-    profile_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), nullable=True)
+    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), nullable=True)
     
     discussion_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("discussion.id", ondelete="CASCADE"), nullable=True)
     comment_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("comment.id", ondelete="CASCADE"), nullable=True)
@@ -302,6 +400,8 @@ class Reaction(Base, IdMixin):
     __table_args__ = (
         mutual_exclusive_check(__tablename__, discussion_id, comment_id),
     )
+
+create_user_policy(Reaction)
 
 class Event(Base, IdMixin):
     __tablename__ = "event"
@@ -330,19 +430,143 @@ commentTags = create_many_to_many("commentTags", "comment_tags", "comment", "tag
 
 discussionTags = create_many_to_many("discussionTags", "discussion_tags", "discussion", "tag")
 
+
+# Needs to be last so that all table names are captured
+class History(Base, IdMixin, ExtraMixin):
+    __tablename__ = "history"
+
+    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(ProfileID, nullable=True)
+    action: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False)
+    row_id: orm.Mapped[str] = orm.mapped_column(IDString, nullable=False)
+    table_name: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False)
+    table_data: orm.Mapped[dict] = orm.mapped_column(sa.JSON, nullable=False, server_default=sa.text("'{}'"))
+
+    @orm.declared_attr
+    def __table_args__(cls):
+        table_names = Base.metadata.tables.keys()
+        exclude = [cls.__tablename__]
+        tup = tuple([f"'{t}'" for t in table_names if t not in exclude])
+
+        return (
+            sa.CheckConstraint(
+                sa.text(f"table_name in ({','.join(tup)})"),
+                name=f"{cls.__tablename__}_table_name_check"
+            ),
+        )
+
+create_user_policy(History, col="profile_id", viewable_by_everyone=False, user_insert_only=True, user_update_only=False, user_delete_only=False)
+
+functions["public.record_db_update"] = f"""
+CREATE FUNCTION public.record_db_update()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = public
+
+AS $$
+  DECLARE
+    data jsonb;
+  BEGIN
+    IF (OLD is null) then
+        data = to_jsonb(NEW) - 'id';
+    ELSIF (NEW is null) then
+        data = to_jsonb(OLD) - 'id';
+    ELSE
+        data = (SELECT jsonb_object_agg(O.key, N.value)
+        FROM jsonb_each(to_jsonb(OLD)) O
+            CROSS JOIN jsonb_each(to_jsonb(NEW)) N
+        WHERE O.key = N.key AND O.value <> N.value);
+    END IF;  
+  
+    IF (TG_OP = 'DELETE') THEN
+        INSERT INTO {History.__tablename__}(profile_id, action, row_id, table_name, table_data)
+        VALUES (
+            auth.uid(),
+            TG_OP,
+            CASE WHEN (pg_typeof(OLD.id)::text LIKE 'uuid')
+                THEN OLD.id::text
+                ELSE typeid_print(OLD.id)
+            END,
+            TG_TABLE_NAME,
+            data
+            );
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO {History.__tablename__}(profile_id, action, row_id, table_name, table_data)
+        VALUES (
+            auth.uid(),
+            TG_OP,
+            CASE WHEN (pg_typeof(NEW.id)::text LIKE 'uuid')
+                THEN NEW.id::text
+                ELSE typeid_print(NEW.id)
+            END,
+            TG_TABLE_NAME,
+            data
+            );
+    ELSIF (TG_OP = 'INSERT') THEN
+        INSERT INTO {History.__tablename__}(profile_id, action, row_id, table_name, table_data)
+        VALUES (
+            auth.uid(),
+            TG_OP,
+            CASE WHEN (pg_typeof(NEW.id)::text LIKE 'uuid')
+                THEN NEW.id::text
+                ELSE typeid_print(NEW.id)
+            END,
+            TG_TABLE_NAME,
+            data
+            );
+    END IF;
+    RETURN NULL; -- result is ignored since this is an AFTER trigger
+  END;
+$$;
+"""
+
+triggers["on_db_update"] = f"""
+DO $$
+DECLARE
+    t text;
+BEGIN
+    FOR t IN 
+        SELECT table_name FROM information_schema.columns
+        WHERE table_schema = 'public' AND table_name != '{History.__tablename__}'
+        GROUP BY table_name
+    LOOP
+        EXECUTE format('CREATE TRIGGER on_db_update
+                        AFTER INSERT OR UPDATE OR DELETE ON public.%I
+                        FOR EACH ROW EXECUTE PROCEDURE public.record_db_update()',
+                        t);
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+"""
+
+
 def create_extensions(engine: sa.Engine):
 
     with engine.connect() as conn:
         for s in extensions:
-            conn.execute(sa.text(s))
-        conn.commit()
+            try:
+                conn.execute(sa.text(s))
+                conn.commit()
+            except Exception as e:
+                print(e)
+                breakpoint()
+                if "already exists" not in str(e):
+                    raise e
+                conn.rollback()
+            
+
+def create_typeids(engine: sa.Engine):
+
+    with engine.connect() as conn:
+        for p in typeids.values():
+            conn.execute(sa.text(p))
+            conn.commit()
 
 def create_policies(engine: sa.Engine):
 
     with engine.connect() as conn:
         for p in policies:
             conn.execute(sa.text(p))
-        conn.commit()
+            conn.commit()
 
 def create_functions_and_triggers(engine: sa.Engine):
 
@@ -406,12 +630,20 @@ def reset_db(engine: sa.Engine):
             conn.execute(sa.text(f"DROP FUNCTION IF EXISTS {f} CASCADE;"))
         conn.commit()
 
+    # Typeids
+
+    with engine.connect() as conn:
+        for f in typeids.keys():
+            conn.execute(sa.text(f"DROP DOMAIN IF EXISTS {f} CASCADE;"))
+        conn.commit()
+
     return True
 
 def dump_sql(metadata):
 
     stmts = []
 
+    # required for auth.users
     class Users(Base):
         __tablename__ = "users"
         __table_args__ = {"schema": "auth"}
@@ -430,6 +662,7 @@ def main():
 
     if reset_db(engine):
         create_extensions(engine)
+        create_typeids(engine)
         create_tables(engine)
         create_functions_and_triggers(engine)
         create_policies(engine)
