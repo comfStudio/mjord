@@ -11,9 +11,9 @@
     "isolatedModules": true,
     "resolveJsonModule": true,
     "incremental": true,
-    "jsx": "react-jsx",
     "strict": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "types": []
   },
   "include": ["./src/**/*", "types.d.ts"],
   "exclude": ["dist", "build", "node_modules", "lib"]

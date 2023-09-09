@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "outDir": "lib",
-    "strict": true,
-    "declarationMap": true,
-    "composite": true,
-    "declaration": true
-  }
-}

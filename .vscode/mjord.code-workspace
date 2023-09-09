@@ -37,9 +37,11 @@
       "🚀 @mjord/freya",
       "📦 @mjord/database-types",
       "🚀 @mjord/backend",
-      "@mjord/edge"
+      "@mjord/edge",
+      "🚀 @mjord/edge"
     ],
-    "deno.importMap": "../services/edge/import_map.json",
-    "monorepoWorkspace.folders.regex.apps": "^app|web|api|frontend|backend|services"
+    "monorepoWorkspace.folders.regex.apps": "^app|web|api|frontend|backend|services",
+    "deno.importMap": "./services/edge/src/deno.json",
+    "deno.unstable": true
   }
 }

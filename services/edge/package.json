@@ -1,11 +1,25 @@
 {
   "name": "@mjord/edge",
   "scripts": {
-    "restart": "restart:edge"
+    "gen:db": "yarn bin:supabase gen types typescript --db-url postgresql://postgres:your-super-secret-and-long-postgres-password@127.0.0.1:8482/postgres > src/types/db.gen.ts",
+    "gen": "yarn gen:db",
+    "build": "yarn gen && tsc",
+    "dev": "yarn gen && tsc -w",
+    "restart": "restart:edge",
+    "test": "deno test tests/**/*.test.ts --allow-all --unstable --parallel --import-map=./src/deno.json --trace-ops",
+    "test:watch": "deno test tests/**/*.test.ts --allow-all --unstable --watch --import-map=./src/deno.json --trace-ops",
+    "clean": "rimraf .turbo && rimraf lib && rimraf dist && rimraf *.tsbuildinfo"
   },
   "private": true,
-  "devDependencies": {
-  },
-  "dependencies": {
+  "types": "types/index.d.ts",
+  "files": [
+    "types"
+  ],
+  "typesVersions": {
+    "*": {
+      "*": [
+        "types/*"
+      ]
+    }
   }
 }

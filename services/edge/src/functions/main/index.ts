@@ -6,7 +6,7 @@ console.log("main function started");
 const JWT_SECRET = Deno.env.get("JWT_SECRET");
 const VERIFY_JWT = Deno.env.get("VERIFY_JWT") === "true";
 const IMPORT_MAP = Deno.env.get("IMPORT_MAP");
-const NO_MODULE_CACHE = Deno.env.get("NO_MODULE_CACHE") === "true";
+const LOCAL_DEV = Deno.env.get("LOCAL_DEV") === "true";
 
 const FUNCTIONS_DIR = `/home/deno/functions`;
 
@@ -35,6 +35,17 @@ async function verifyJWT(jwt: string): Promise<boolean> {
 }
 
 serve(async (req: Request) => {
+  const url = new URL(req.url);
+  const { pathname } = url;
+
+  // handle health checks
+  if (pathname === "/_internal/health") {
+    return new Response(JSON.stringify({ message: "ok" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   if (req.method !== "OPTIONS" && VERIFY_JWT) {
     try {
       const token = getAuthToken(req);
@@ -55,8 +66,6 @@ serve(async (req: Request) => {
     }
   }
 
-  const url = new URL(req.url);
-  const { pathname } = url;
   const path_parts = pathname.split("/");
   const service_name = path_parts[1];
 
@@ -72,11 +81,25 @@ serve(async (req: Request) => {
   console.error(`serving the request with ${servicePath}`);
 
   const memoryLimitMb = 150;
-  const workerTimeoutMs = 1 * 60 * 1000;
-  const noModuleCache = NO_MODULE_CACHE;
+  const workerTimeoutMs = LOCAL_DEV ? 5 * 60 * 1000 : 1 * 60 * 1000;
+  const noModuleCache = LOCAL_DEV;
   const importMapPath = IMPORT_MAP || null;
   const envVarsObj = Deno.env.toObject();
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]]);
+
+  let opts = {};
+
+  // local dev
+  if (LOCAL_DEV) {
+    opts = {
+      ...opts,
+      forceCreate: true,
+      customModuleRoot: "", // empty string to allow any local path
+      cpuTimeThresholdMs: 50,
+      cpuBurstIntervalMs: 100,
+      maxCpuBursts: 100,
+    };
+  }
 
   try {
     const worker = await EdgeRuntime.userWorkers.create({
@@ -86,6 +109,7 @@ serve(async (req: Request) => {
       noModuleCache,
       importMapPath,
       envVars,
+      ...opts,
     });
     return await worker.fetch(req);
   } catch (e) {

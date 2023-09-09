@@ -2519,20 +2519,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@mjord/database-types@workspace:packages/database-types":
-  version: 0.0.0-use.local
-  resolution: "@mjord/database-types@workspace:packages/database-types"
-  languageName: unknown
-  linkType: soft
-
 "@mjord/edge@workspace:services/edge":
   version: 0.0.0-use.local
   resolution: "@mjord/edge@workspace:services/edge"
-  dependencies:
-    "@faker-js/faker": ^7.6.0
-    "@supabase/supabase-js": ^2.12.1
-    pg-promise: ^11.4.3
-    ts-node: ^10.9.1
   languageName: unknown
   linkType: soft
 

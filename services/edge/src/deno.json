@@ -1,7 +1,24 @@
 {
   "imports": {
+    "types": "./types/index.ts",
+    "types/db": "./types/db.ts",
+
+    "constant": "./common/constant.ts",
     "common/cors": "./common/cors.ts",
+    "common/serve": "./common/serve.ts",
+    "common/supabase": "./common/supabase.ts",
+
+    "common/services/database": "./common/services/database.ts",
+    "common/services/user": "./common/services/user.ts",
+
+    "tests/common": "../tests/common/index.ts",
+    "tests/suite": "../tests/common/suite.ts",
+
     "std/server": "https://deno.land/std@0.177.0/http/server.ts",
+    "std/path": "https://deno.land/std@0.188.0/path/mod.ts",
+    "std/assert": "https://deno.land/std@0.201.0/assert/mod.ts",
+    "std/testing/bdd": "https://deno.land/std@0.201.0/testing/bdd.ts",
+
     "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.7.1",
     "xhr_polyfill": "https://deno.land/x/xhr@0.3.0/mod.ts"
   }

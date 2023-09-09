@@ -12,6 +12,5 @@
   },
   "files": [
     "lib/**"
-  ],
-  "packageManager": "yarn@3.5.0"
+  ]
 }

@@ -1,8 +1,13 @@
 import constant, { ServiceType } from '@app/constants';
+import {
+  GroupData,
+  GroupMemberData,
+  MediaData,
+  ProfileData,
+} from "@mjord/edge/db";
 import { useQuery } from '@tanstack/react-query';
 
-import { Service, ServiceLocator } from './base';
-import { GroupData, GroupMemberData, MediaData, ProfileData } from './types';
+import { Service, ServiceLocator } from "./base";
 
 export type GroupWithtExtraData = GroupData & {
     primary_media: MediaData | null;

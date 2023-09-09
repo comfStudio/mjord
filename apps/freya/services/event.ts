@@ -1,8 +1,8 @@
 import constant, { ServiceType } from '@app/constants';
+import { EventData } from "@mjord/edge/db";
 import { useQuery } from '@tanstack/react-query';
 
-import { Service, ServiceLocator } from './base';
-import { EventData } from './types';
+import { Service, ServiceLocator } from "./base";
 
 export type EventWithtExtraData = EventData & {
     members: {

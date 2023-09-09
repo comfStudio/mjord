@@ -6,6 +6,7 @@
     "noImplicitAny": false,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
+    "isolatedModules": true,
     "paths": {
       "@app/*": ["./*"],
       "@/feature/*": ["./feature/*"],
@@ -16,8 +17,7 @@
       "@/state/*": ["./state/*"],
       "@/styles": ["./styles/index"],
       "@/styles/*": ["./styles/*"],
-      "@mjord/common": ["../../packages/common/lib"],
-      "@mjord/logger": ["../../packages/logger/dist"]
+      "@mjord/common/*": ["../../packages/common/lib/*"]
     }
   },
   "include": [

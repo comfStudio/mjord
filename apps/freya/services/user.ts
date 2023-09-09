@@ -5,10 +5,10 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { UserState } from '@/state';
 import constant, { ROUTES, ServiceType } from '@app/constants';
+import { ProfileData } from "@mjord/edge/db";
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import { Service } from './base';
-import { ProfileData } from './types';
+import { Service } from "./base";
 
 export default class User extends Service {
 

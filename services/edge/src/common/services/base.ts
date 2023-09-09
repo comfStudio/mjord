@@ -1,25 +1,24 @@
-import constant, { ServiceType } from '@app/constants';
-import { GenericError } from '@mjord/common';
+import { ServiceType } from "constant";
 
-import type DatabaseService from "./database";
-import type GroupService from "./group";
-import type EventService from "./event";
-import type UserService from "./user";
+import type DatabaseService from "./database.ts";
+import type UserService from "./user.ts";
 export class Service {
   type: ServiceType;
+  // @ts-expect-error: .
+  locator: ServiceLocator;
 
   constructor(type: ServiceType) {
     this.type = type;
   }
 
-  async init(locator: ServiceLocator) {}
+  async init(_locator: ServiceLocator) {}
 }
 
 type ServiceTypeMap = {
   [ServiceType.Database]: DatabaseService;
-  [ServiceType.Group]: GroupService;
-  [ServiceType.Event]: EventService;
   [ServiceType.User]: UserService;
+  // [ServiceType.Group]: GroupService;
+  // [ServiceType.Event]: EventService;
   // [ServiceType.Character]: CharacterService;
   // [ServiceType.Template]: TemplateService;
   // [ServiceType.Tag]: TagService;
@@ -35,16 +34,18 @@ export class ServiceLocator {
   get<T extends ServiceType>(type: T) {
     const instance = this._instances[type];
     if (!instance) {
-      throw new GenericError("No service of type", type, "found");
+      throw new Deno.errors.NotFound(`No service of type ${type} found`);
     }
 
     return instance as ServiceTypeMap[T];
   }
 
   async init() {
+    console.log("Initializing services");
     for (const service of Object.values(this._instances)) {
-      constant.log.i(`Initializing service ${ServiceType[service.type]}`);
+      console.log(`Initializing service ${ServiceType[service.type]}`);
       await service.init(this);
+      service.locator = this;
     }
     return this;
   }

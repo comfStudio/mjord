@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "dist",
     "declarationMap": true,
-    "declaration": true
+    "declaration": true,
+    "types": []
   },
   "exclude": ["dist", "build", "node_modules"]
 }

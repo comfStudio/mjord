@@ -5,6 +5,7 @@
   "scripts": {
     "build": "turbo run build --no-daemon",
     "dev": "turbo run dev --no-cache --continue --no-daemon",
+    "test": "turbo run test --no-daemon",
     "clean": "turbo run clean  --no-daemon",
     "run:app": "yarn workspace @mjord/freya",
     "add:app": "yarn workspace @mjord/freya add",
@@ -14,6 +15,7 @@
     "add:backend": "yarn workspace @mjord/backend add",
     "remove:backend": "yarn workspace @mjord/backend remove",
     "start:backend": "yarn workspace @mjord/backend dev",
+    "run:edge": "yarn workspace @mjord/edge",
     "bin:supabase": "./node_modules/supabase/bin/supabase"
   },
   "workspaces": [

@@ -50,6 +50,5 @@
     "recoil": "^0.7.7",
     "ttag": "^1.7.24",
     "zod": "^3.22.2"
-  },
-  "packageManager": "yarn@3.5.0"
+  }
 }

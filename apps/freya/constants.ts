@@ -1,6 +1,5 @@
 
 import type { Logger } from '@mjord/logger';
-import { Database } from '@mjord/database-types';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { QueryClient } from '@tanstack/react-query';
 
@@ -37,7 +36,7 @@ export class Constant {
 
     static log: Logger;
 
-    static supabase: SupabaseClient<Database>
+    static supabase: SupabaseClient<never>
 
     static client: QueryClient
 

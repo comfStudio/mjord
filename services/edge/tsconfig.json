@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src/types",
+    "outDir": "dist",
+    "declarationDir": "types",
+    "strict": true,
+    "declarationMap": true,
+    "composite": true,
+    "declaration": true,
+    "isolatedModules": false,
+    "emitDeclarationOnly": true,
+    "allowImportingTsExtensions": true,
+    "types": []
+  },
+  "include": [
+    "./src/types/**/*.ts",
+    "./src/types/**/*.d.ts",
+    "../../packages/common/types.d.ts"
+  ],
+  "exclude": ["dist", "build", "node_modules", "lib", "types"]
+}
