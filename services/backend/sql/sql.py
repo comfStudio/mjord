@@ -47,7 +47,7 @@ WITH
 
 typeids = {}
 
-policies = []
+policies: set[str] = set()
 
 functions = {}
 triggers = {}
@@ -151,8 +151,8 @@ def create_many_to_many(cls_name: str, table_name: str, left: str | tuple[str, s
 
     kw = {
         "__tablename__": table_name,
-        left_key: orm.mapped_column(sa.ForeignKey(f"{left_tbl}.id", ondelete="CASCADE"), nullable=False),
-        right_key: orm.mapped_column(sa.ForeignKey(f"{right_tbl}.id", ondelete="CASCADE"), nullable=False),
+        left_key: orm.mapped_column(sa.ForeignKey(f"{left_tbl}.id", ondelete="CASCADE"), index=True, nullable=False),
+        right_key: orm.mapped_column(sa.ForeignKey(f"{right_tbl}.id", ondelete="CASCADE"), index=True, nullable=False),
         "__table_args__": (
             sa.UniqueConstraint(left_key, right_key),
         )
@@ -180,62 +180,61 @@ def mutual_exclusive_check(table_name: str, *relations, allow_all_none=False):
         name=f"{table_name}_mutually_exclusive_relations"
     )
 
-def create_user_policy(table: str | type[Base],
-                       col: str = "profile_id",
-                       viewable_by_everyone = True,
-                       user_insert_only = True,
-                       user_update_only = True,
-                       user_delete_only = True):
+def create_private_policy(table: str | type[Base],
+                       restrictive = False,
+                       ):
+    
+    table = table.__tablename__ if not isinstance(table, str) else table
+
+    as_ = 'RESTRICTIVE' if restrictive else 'PERMISSIVE'
+
+    p = []
+
+    p.append(f"""
+        CREATE POLICY "Only service can access {table}."
+        ON "{table}"
+        AS {as_}
+        FOR ALL
+        TO service_role
+        USING ( true )
+        WITH CHECK ( true );
+        """)
+
+    if p:
+        policies.add(f"""
+                        ALTER TABLE "{table}" ENABLE ROW LEVEL SECURITY;
+                        """)
+
+    policies.update(p)
+    
+
+def create_user_read_policy(table: str | type[Base],
+                              col: str = "id",
+                       extra: list[str] | None = None):
     
     table = table.__tablename__ if not isinstance(table, str) else table
 
 
-    p = []
+    p = [] + (extra or [])
 
-    if viewable_by_everyone:
-        p.append(f"""
-        CREATE POLICY "Public {table} are viewable by everyone."
-        ON {table} for SELECT
-        TO anon
-        USING ( true );
-        """)
-    
-    if user_insert_only:
-        p.append(f"""
-        CREATE POLICY "Users can insert their own {table}."
-        ON {table} for INSERT
-        TO authenticated
-        WITH CHECK ( auth.uid() = {col} );
-        """)
-
-    if user_update_only:
-        p.append(f"""
-        CREATE POLICY "Users can update their own {table}."
-        ON {table} for UPDATE
-        TO authenticated
-        USING ( auth.uid() = {col} );
-        """)
-
-    if user_delete_only:
-        p.append(f"""
-        CREATE POLICY "Users can delete their own {table}."
-        ON {table} for DELETE
-        TO authenticated
-        USING ( auth.uid() = {col} );
-        """)
+    p.append(f"""
+    CREATE POLICY "Users can view their own {table}."
+    ON "{table}"
+    FOR SELECT
+    TO authenticated
+    USING ( (select auth.uid()) = {col} );
+    """)
 
     if p:
-        policies.append(f"""
-                        ALTER TABLE {table} ENABLE ROW LEVEL SECURITY;
+        policies.add(f"""
+                        ALTER TABLE "{table}" ENABLE ROW LEVEL SECURITY;
                         """)
 
-    policies.extend(p)
+    policies.update(p)
     
 
-    
-
-functions["public.register_row_modified"] = """
-CREATE FUNCTION public.register_row_modified()
+functions["auth.register_row_modified"] = """
+CREATE FUNCTION auth.register_row_modified()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
@@ -259,7 +258,7 @@ BEGIN
     LOOP
         EXECUTE format('CREATE TRIGGER on_row_modified
                         BEFORE UPDATE ON public.%I
-                        FOR EACH ROW EXECUTE PROCEDURE public.register_row_modified()',
+                        FOR EACH ROW EXECUTE PROCEDURE auth.register_row_modified()',
                         t);
     END LOOP;
 END;
@@ -282,7 +281,6 @@ class Media(Base, IdMixin):
             mutual_exclusive_check(__tablename__, profile_id, group_id, event_id, allow_all_none=True),
         )
     
-create_user_policy(Media)
 
 class Profile(Base, ExtraMixin):
     __tablename__ = "profile"
@@ -291,11 +289,11 @@ class Profile(Base, ExtraMixin):
     occupation: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False, server_default=sa.text("''"))
     description: orm.Mapped[str] = orm.mapped_column(LongString, nullable=False, server_default=sa.text("''"))
 
-create_user_policy(Profile, col="id", user_delete_only=False)
+create_user_read_policy(Profile)
 
 # Inserts a row into public.profiles
-functions["public.handle_new_user"] = f"""
-CREATE FUNCTION public.handle_new_user()
+functions["auth.handle_new_user"] = f"""
+CREATE FUNCTION auth.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
@@ -312,13 +310,14 @@ $$;
 triggers["on_auth_user_created"] = """
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+  FOR EACH ROW EXECUTE PROCEDURE auth.handle_new_user();
 """
 
 class Url(Base, IdMixin):
     __tablename__ = "url"
 
     name: orm.Mapped[str] = orm.mapped_column(DefaultString, nullable=False)
+
 
 class Location(Base, IdMixin):
     __tablename__ = "location"
@@ -334,6 +333,7 @@ class Location(Base, IdMixin):
         mutual_exclusive_check(__tablename__, group_id, event_id),
     )
 
+
 class Group(Base, IdMixin):
     __tablename__ = "group"
 
@@ -343,18 +343,19 @@ class Group(Base, IdMixin):
 
     media_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("media.id", ondelete="SET NULL"), nullable=True)
 
+
+
 class groupMembers(Base, IdMixin):
     __tablename__ = "group_members"
 
-    group_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("group.id", ondelete="CASCADE"), nullable=False)
-    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="CASCADE"), index=True, nullable=False)
+    group_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("group.id", ondelete="CASCADE"), index=True, nullable=False)
+    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="CASCADE"), index=True, nullable=False, server_default=sa.text("auth.uid()"))
     role: orm.Mapped[Member_Role] = orm.mapped_column(Enum(Member_Role), nullable=False, server_default=sa.text(f"'{Member_Role.MEMBER.value}'"))
 
     __table_args__ = (
         sa.UniqueConstraint("group_id", "profile_id"),
     )
 
-create_user_policy(groupMembers)
 
 groupMedias = create_many_to_many("groupMedias", "group_medias", "group", "media")
 
@@ -371,8 +372,6 @@ class Discussion(Base, IdMixin):
     event_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("event.id", ondelete="CASCADE"), nullable=True)
     profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), nullable=True)
 
-create_user_policy(Discussion)
-
 discussionMedias = create_many_to_many("discussionMedias", "discussion_medias", "discussion", "media")
 
 class Comment(Base, IdMixin):
@@ -381,9 +380,7 @@ class Comment(Base, IdMixin):
     content: orm.Mapped[str] = orm.mapped_column(LongString, nullable=False)
 
     discussion_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("discussion.id", ondelete="CASCADE"), nullable=False)
-    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), index=True, nullable=True)
-
-create_user_policy(Comment)
+    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), index=True, nullable=True, server_default=sa.text("auth.uid()"))
 
 commentMedias = create_many_to_many("commentMedias", "comment_medias", "comment", "media")
 
@@ -392,7 +389,7 @@ class Reaction(Base, IdMixin):
 
     reaction: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False)
 
-    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), nullable=True)
+    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), nullable=True, server_default=sa.text("auth.uid()"))
     
     discussion_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("discussion.id", ondelete="CASCADE"), nullable=True)
     comment_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("comment.id", ondelete="CASCADE"), nullable=True)
@@ -400,8 +397,6 @@ class Reaction(Base, IdMixin):
     __table_args__ = (
         mutual_exclusive_check(__tablename__, discussion_id, comment_id),
     )
-
-create_user_policy(Reaction)
 
 class Event(Base, IdMixin):
     __tablename__ = "event"
@@ -412,6 +407,8 @@ class Event(Base, IdMixin):
     start_time: orm.Mapped[datetime.datetime] = orm.mapped_column(TIMESTAMP, nullable=True)
     end_time: orm.Mapped[datetime.datetime] = orm.mapped_column(TIMESTAMP, nullable=True)
 
+    group_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("group.id", ondelete="CASCADE"), nullable=False)
+
 eventMembers = create_many_to_many("eventMembers", "event_members", "event", "profile")
 
 eventMedias = create_many_to_many("eventMedias", "event_medias", "event", "media")
@@ -420,7 +417,9 @@ eventMedias = create_many_to_many("eventMedias", "event_medias", "event", "media
 class Tag(Base, IdMixin, ExtraMixin):
     __tablename__ = "tag"
 
-    name: orm.Mapped[str] = orm.mapped_column(DefaultString, nullable=False, unique=True)
+    name: orm.Mapped[str] = orm.mapped_column(DefaultString, nullable=False, index=True, unique=True)
+
+profileTags = create_many_to_many("profileTags", "profile_tags", "profile", "tag")
 
 groupTags = create_many_to_many("groupTags", "group_tags", "group", "tag")
 
@@ -435,7 +434,7 @@ discussionTags = create_many_to_many("discussionTags", "discussion_tags", "discu
 class History(Base, IdMixin, ExtraMixin):
     __tablename__ = "history"
 
-    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(ProfileID, nullable=True)
+    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(ProfileID, nullable=True, server_default=sa.text("auth.uid()"))
     action: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False)
     row_id: orm.Mapped[str] = orm.mapped_column(IDString, nullable=False)
     table_name: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False)
@@ -454,10 +453,8 @@ class History(Base, IdMixin, ExtraMixin):
             ),
         )
 
-create_user_policy(History, col="profile_id", viewable_by_everyone=False, user_insert_only=True, user_update_only=False, user_delete_only=False)
-
-functions["public.record_db_update"] = f"""
-CREATE FUNCTION public.record_db_update()
+functions["auth.record_db_update"] = f"""
+CREATE FUNCTION auth.record_db_update()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
@@ -480,7 +477,7 @@ AS $$
     IF (TG_OP = 'DELETE') THEN
         INSERT INTO {History.__tablename__}(profile_id, action, row_id, table_name, table_data)
         VALUES (
-            auth.uid(),
+            (select auth.uid()),
             TG_OP,
             CASE WHEN (pg_typeof(OLD.id)::text LIKE 'uuid')
                 THEN OLD.id::text
@@ -492,7 +489,7 @@ AS $$
     ELSIF (TG_OP = 'UPDATE') THEN
         INSERT INTO {History.__tablename__}(profile_id, action, row_id, table_name, table_data)
         VALUES (
-            auth.uid(),
+            (select auth.uid()),
             TG_OP,
             CASE WHEN (pg_typeof(NEW.id)::text LIKE 'uuid')
                 THEN NEW.id::text
@@ -504,7 +501,7 @@ AS $$
     ELSIF (TG_OP = 'INSERT') THEN
         INSERT INTO {History.__tablename__}(profile_id, action, row_id, table_name, table_data)
         VALUES (
-            auth.uid(),
+            (select auth.uid()),
             TG_OP,
             CASE WHEN (pg_typeof(NEW.id)::text LIKE 'uuid')
                 THEN NEW.id::text
@@ -531,7 +528,7 @@ BEGIN
     LOOP
         EXECUTE format('CREATE TRIGGER on_db_update
                         AFTER INSERT OR UPDATE OR DELETE ON public.%I
-                        FOR EACH ROW EXECUTE PROCEDURE public.record_db_update()',
+                        FOR EACH ROW EXECUTE PROCEDURE auth.record_db_update()',
                         t);
     END LOOP;
 END;
@@ -581,9 +578,36 @@ def create_functions_and_triggers(engine: sa.Engine):
         conn.commit()
 
 def create_tables(engine: sa.Engine):
+    # add default policy on all tables
+    for t in Base.metadata.tables.values():
+        create_private_policy(t.name)
+
     Base.metadata.reflect(engine, schema="auth", only=["users"])
 
     Base.metadata.create_all(engine)
+
+def set_privileges(engine: sa.Engine):
+    "See https://github.com/orgs/supabase/discussions/4547"
+
+    dbname = "postgres"
+    role = "anon"
+
+    sql = f"""
+    REVOKE ALL PRIVILEGES ON DATABASE "{dbname}" FROM "{role}";
+    REVOKE ALL PRIVILEGES ON SCHEMA "public" FROM "{role}";
+    REVOKE ALL PRIVILEGES ON SCHEMA "storage" FROM "{role}";
+    REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "public" FROM "{role}";
+    REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "storage" FROM "{role}";
+
+    -- REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "public" FROM "{role}";
+    REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "storage" FROM "{role}";
+    REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "public" FROM "{role}";
+    REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "storage" FROM "{role}";
+    """
+
+    with engine.connect() as conn:
+        conn.execute(sa.text(sql))
+        conn.commit()
 
 def get_engine():
     port = 8482
@@ -666,6 +690,7 @@ def main():
         create_tables(engine)
         create_functions_and_triggers(engine)
         create_policies(engine)
+        set_privileges(engine)
 
 
 if __name__ == '__main__':

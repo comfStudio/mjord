@@ -12,7 +12,7 @@ export type GroupWithtExtraData = GroupData & {
 }
 
 export type BasicGroupWithMediaData = Pick<GroupData, 'id' | 'description' | 'title' | 'visibility'> & {
-    primary_media: Pick<MediaData, 'url' | 'media_type'> | null;
+    media: Pick<MediaData, 'url' | 'media_type'> | null;
 }
 
 export type GroupMemberWithProfileData = GroupMemberData & {

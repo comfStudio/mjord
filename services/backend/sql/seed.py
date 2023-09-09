@@ -418,8 +418,8 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
 
 def main():
     sql.main()
-    # generate_test_data(250, 1000, 5000, 10000, 100, 100)
-    generate_test_data(5, 10, 50, 10, 10, 10)
+    generate_test_data(250, 500, 500, 1000, 50, 50)
+    # generate_test_data(5, 10, 50, 10, 10, 10)
 
 if __name__ == '__main__':
     main()

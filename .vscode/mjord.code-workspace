@@ -23,6 +23,10 @@
     {
       "name": "🚀 @mjord/backend",
       "path": "../services/backend"
+    },
+    {
+      "name": "🚀 @mjord/edge",
+      "path": "../services/edge"
     }
   ],
   "settings": {
@@ -32,7 +36,10 @@
       "✨ mjord",
       "🚀 @mjord/freya",
       "📦 @mjord/database-types",
-      "🚀 @mjord/backend"
-    ]
+      "🚀 @mjord/backend",
+      "@mjord/edge"
+    ],
+    "deno.importMap": "../services/edge/import_map.json",
+    "monorepoWorkspace.folders.regex.apps": "^app|web|api|frontend|backend|services"
   }
 }

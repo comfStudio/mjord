@@ -1,0 +1,11 @@
+{
+  "name": "@mjord/edge",
+  "scripts": {
+    "restart": "restart:edge"
+  },
+  "private": true,
+  "devDependencies": {
+  },
+  "dependencies": {
+  }
+}
