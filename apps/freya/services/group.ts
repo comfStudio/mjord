@@ -8,6 +8,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 
 import { Service, ServiceLocator } from "./base";
+import { useFunction } from "./function";
 
 export type GroupWithtExtraData = GroupData & {
     primary_media: MediaData | null;
@@ -93,16 +94,12 @@ export default class Group extends Service {
 }
 
 export function useFeaturedGroups() {
-    const service = constant.service.get(ServiceType.Group);
-
-    const q = useQuery(
-        ['featuredGroups'],
-        async () => {
-            const groups = await service.getFeaturedGroups();
-            return groups;
-        }
-    );
-    return q
+  return useFunction("featured", {
+    body: {
+      type: "get",
+      entity: "group",
+    },
+  });
 }
 
 export function useGroup(id: number) {

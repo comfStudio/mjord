@@ -1,9 +1,19 @@
-import { corsHeaders } from "common/cors";
-import constant from "constant";
-import { ConnInfo, Handler, serve as denoServe, ServeInit } from "std/server";
+import { corsHeaders } from 'common/cors';
+import constant from 'constant';
+import { ConnInfo, Handler, serve as denoServe, ServeInit } from 'std/server';
+import { FunctionName } from 'types/functions';
+import {
+  anyResponseData,
+  functionDataOp,
+  FunctionDataOp,
+  RequestBody,
+  requestData,
+  ResponseData,
+} from 'types/schema';
+import { ZodError } from 'zod';
 
-import setupServices from "./services/index.ts";
-import { Client, getClient } from "./supabase.ts";
+import setupServices from './services/index.ts';
+import { Client, getClient } from './supabase.ts';
 
 export async function initialize() {
   console.log("Initializing...");
@@ -22,11 +32,41 @@ export async function requestInitialize(request: Request) {
   return req;
 }
 
-export async function serve(
-  name: string,
-  handler: (request: Req, connInfo: ConnInfo) => Promise<Response> | Response,
-  options?: ServeInit
-) {
+async function validateRequest(name: string, req: Req) {
+  let data: Partial<RequestBody>;
+  try {
+    data = await req.json();
+  } catch (error) {
+    throw new Deno.errors.InvalidData("Invalid request body");
+  }
+
+  try {
+    requestData.parse(data);
+
+    const op = data.type;
+    const key = `${name}_${op}`;
+    // @ts-expect-error: .
+    if (functionDataOp[key]) {
+      // @ts-expect-error: .
+      functionDataOp[key].parse(data);
+    }
+  } catch (error) {
+    throw new Deno.errors.InvalidData(
+      `Validation failed: ${(error as ZodError).message}`
+    );
+  }
+
+  return data as RequestBody;
+}
+
+export async function serve<
+  N extends FunctionName,
+  H extends (
+    body: RequestBody,
+    request: Req,
+    connInfo: ConnInfo
+  ) => Promise<Resp<any>> | Resp<any>
+>(name: N, handler: H, options?: ServeInit) {
   console.log(`Loaded ${name} edge function`);
   await initialize();
 
@@ -41,28 +81,42 @@ export async function serve(
     let res: Response;
 
     try {
-      res = await handler(req, connInfo);
+      const data = await validateRequest(name, req);
+      res = await handler(data as FunctionDataOp<>, req, connInfo);
     } catch (error) {
-      res = new Response(JSON.stringify({ error: error.message }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
-      });
+      console.debug(error);
+
+      let status = 400;
+
+      if (error instanceof Deno.errors.NotFound) {
+        status = 404;
+      } else if (error instanceof Deno.errors.InvalidData) {
+        status = 422;
+      }
+
+      res = new Resp(
+        {
+          error: {
+            message: error?.message || "Unknown error",
+          },
+        },
+        status
+      );
     }
 
     return res;
   };
+  await denoServe(func, options);
 
-  //@ts-expect-error: .
-  func.name = name;
-
-  return denoServe(func, options);
+  return undefined as any as ReturnType<H>;
 }
 
-export class Resp<T> extends Response {
-  constructor(public data: T | null, public error?: never, status?: number) {
-    super(JSON.stringify({ data, error }), {
+export class Resp<T extends ResponseData<any>> extends Response {
+  constructor(data: T, status?: number) {
+    anyResponseData.parse(data);
+    super(JSON.stringify(data), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: status ?? (error ? 400 : 200),
+      status: status ?? (data?.error ? 400 : 200),
     });
   }
 }

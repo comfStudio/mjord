@@ -3,20 +3,20 @@ import { edgeSuite, UnwrapSuite } from "tests/suite";
 
 import { Service, ServiceLocator } from "../../src/common/services/base.ts";
 
-export const servicSuite = describe({
+export const serviceSuite = describe({
   name: "Service",
   suite: edgeSuite,
   async beforeAll() {},
   afterAll: async () => {},
 });
 
-type ThisService<T> = { service: T } & UnwrapSuite<typeof servicSuite>;
+type ThisService<T> = { service: T } & UnwrapSuite<typeof serviceSuite>;
 
 export function describeService<T extends Service>(service: {
   new (): T;
 }): TestSuite<ThisService<T>> {
   return describe({
-    suite: servicSuite,
+    suite: serviceSuite,
     name: service.constructor.name,
     async beforeEach(this: ThisService<T>) {
       this.service = new service();

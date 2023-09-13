@@ -19,21 +19,3 @@ export const onboardSchema = z.object({
     .max(35, t`Name must not contain more than 35 characters`),
 });
 
-const schema = z.object({
-  key: z.string(),
-  key2: z.number().optional(),
-});
-
-const defs1 = schema.default({ key: "test" });
-
-const d1 = defs1.parse({ key: "test" });
-
-const defs2 = schema.default({ key: "test", key2: 1 });
-
-const d2 = defs2.parse({ key: "test" });
-const d3 = defs2.parse({});
-
-console.debug({
-  d1,
-  d2,
-});

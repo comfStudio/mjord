@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
-import * as jose from "https://deno.land/x/jose@v4.14.4/index.ts";
+import { serve } from 'https://deno.land/std@0.131.0/http/server.ts';
+import * as jose from 'https://deno.land/x/jose@v4.14.4/index.ts';
 
 console.log("main function started");
 
@@ -102,6 +102,7 @@ serve(async (req: Request) => {
   }
 
   try {
+    // @ts-expect-error: .
     const worker = await EdgeRuntime.userWorkers.create({
       servicePath,
       memoryLimitMb,

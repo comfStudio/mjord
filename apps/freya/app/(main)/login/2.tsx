@@ -46,6 +46,10 @@ export default function Login2Screen() {
       constant.log.e(error);
     } else {
       const profile = await service.getProfile();
+      if (!profile) {
+        constant.log.e("Failed to get profile after login");
+        throw new Error("Failed to get profile after login");
+      }
       userRequireOnboarding(profile)
         ? router.push(ROUTES.LOGIN_ONBOARDING)
         : router.push(ROUTES.USER);

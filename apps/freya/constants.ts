@@ -6,13 +6,14 @@ import { QueryClient } from '@tanstack/react-query';
 import type { ServiceLocator } from '@/services/base';
 
 export enum ServiceType {
-    Database,
-    User,
-    Group,
-    Event,
-    // Character,
-    // Template,
-    // Tag,
+  Database,
+  Function,
+  User,
+  Group,
+  Event,
+  // Character,
+  // Template,
+  // Tag,
 }
 
 

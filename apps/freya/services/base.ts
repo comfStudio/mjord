@@ -5,6 +5,7 @@ import type DatabaseService from "./database";
 import type GroupService from "./group";
 import type EventService from "./event";
 import type UserService from "./user";
+import type FunctionService from "./function";
 export class Service {
   type: ServiceType;
 
@@ -20,6 +21,7 @@ type ServiceTypeMap = {
   [ServiceType.Group]: GroupService;
   [ServiceType.Event]: EventService;
   [ServiceType.User]: UserService;
+  [ServiceType.Function]: FunctionService;
   // [ServiceType.Character]: CharacterService;
   // [ServiceType.Template]: TemplateService;
   // [ServiceType.Tag]: TagService;

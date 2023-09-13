@@ -2,6 +2,8 @@
   "imports": {
     "types": "./types/index.ts",
     "types/db": "./types/db.ts",
+    "types/schema": "./types/schema.ts",
+    "types/functions": "./types/functions.ts",
 
     "constant": "./common/constant.ts",
     "common/cors": "./common/cors.ts",
@@ -19,7 +21,9 @@
     "std/assert": "https://deno.land/std@0.201.0/assert/mod.ts",
     "std/testing/bdd": "https://deno.land/std@0.201.0/testing/bdd.ts",
 
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.7.1",
-    "xhr_polyfill": "https://deno.land/x/xhr@0.3.0/mod.ts"
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.33.1",
+    "@supabase/functions-js": "https://esm.sh/@supabase/functions-js@2.1.4",
+    "xhr_polyfill": "https://deno.land/x/xhr@0.3.0/mod.ts",
+    "zod": "https://deno.land/x/zod@v3.22.2/mod.ts"
   }
 }

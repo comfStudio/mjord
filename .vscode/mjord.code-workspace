@@ -13,10 +13,6 @@
       "path": "../packages/common"
     },
     {
-      "name": "📦 @mjord/database-types",
-      "path": "../packages/database-types"
-    },
-    {
       "name": "📦 @mjord/logger",
       "path": "../packages/logger"
     },
@@ -35,7 +31,6 @@
       "📦 @mjord/logger",
       "✨ mjord",
       "🚀 @mjord/freya",
-      "📦 @mjord/database-types",
       "🚀 @mjord/backend",
       "@mjord/edge",
       "🚀 @mjord/edge"

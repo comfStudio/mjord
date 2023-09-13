@@ -9,4 +9,7 @@ export type GroupData = Row<"group">;
 export type MediaData = Row<"media">;
 export type EventData = Row<"event">;
 export type GroupMemberData = Row<"group_members">;
+export type GroupWithMediaData = GroupData & {
+    media: Pick<MediaData, "url" | "type"> | null;
+};
 //# sourceMappingURL=db.d.ts.map
