@@ -1,4 +1,0 @@
-[submodule "services/backend/supabase"]
-	path = services/backend/supabase
-	url = https://github.com/supabase/supabase
-	branch = master
