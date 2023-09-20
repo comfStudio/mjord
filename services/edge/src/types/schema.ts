@@ -16,28 +16,36 @@ export const error = z.object({
   message: z.string(),
 });
 
+export type ErrorData = z.infer<typeof error>;
+
+export function responseSuccessData<T extends z.ZodUnknown>(dataSchema: T) {
+  return z.object({
+    data: dataSchema,
+    error: z.undefined().optional(),
+  });
+}
+
+export function responseFailData<T extends z.ZodUnknown>() {
+  return z.object({
+    data: z.undefined().optional(),
+    error,
+  });
+}
+
 export function responseData<T extends z.ZodUnknown>(dataSchema: T) {
-  return z
-    .object({
-      data: dataSchema.optional(),
-      error: error.optional(),
-    })
-    .and(
-      z.union([
-        z.object({ data: z.undefined(), error }),
-        z.object({ data: dataSchema, error: z.undefined() }),
-      ])
-    );
+  return z.union([responseSuccessData(dataSchema), responseFailData()]);
 }
 
 export const anyResponseData = responseData(z.unknown());
 
+export type ResponseSuccessData<T> = { data: T; error?: undefined };
+export type ResponseFailData<E = unknown> = {
+  data?: undefined;
+  error: z.infer<typeof error>;
+};
+
 export type ResponseData<T> = PrettifyObject<
-  | (Omit<z.infer<typeof anyResponseData>, "data"> & {
-      data: T;
-      error?: undefined;
-    })
-  | NonOptional<z.infer<typeof anyResponseData>, "error">
+  ResponseSuccessData<T> | ResponseFailData
 >;
 
 export const requestData = z.object({
@@ -52,19 +60,48 @@ export const requestDataOp = requestData.extend({
 
 export type RequestDataOp = z.infer<typeof requestDataOp>;
 
-export type FunctionResponse =
-  | ({ data: any } & {
+export type FunctionResponse<T = any> =
+  | ({ data: T } & {
       error: null;
     })
   | ({ error: FunctionsHttpError } & {
       data: null;
     });
 
+type RemoveOpSuffix<T> = T extends `${infer U}_${RequestType}` ? U : T;
+export type GetDataOpKeys<
+  T extends string,
+  K extends `${T}_${RequestType}` = `${T}_${RequestType}`
+> = K extends keyof FunctionDataOp ? K : never;
+
+export type FunctionNameDataOpMap<
+  T extends RemoveOpSuffix<keyof FunctionDataOp>
+> = FunctionDataOp[GetDataOpKeys<T>];
+
 // -----------------------------------------------------------
 
+const dataOpMap = DataOpType.reduce(
+  (acc, op) => {
+    // @ts-ignore: .
+    acc[op] = z.literal(op);
+    return acc;
+  },
+  {} as {
+    [K in DataOpType]: z.ZodLiteral<K>;
+  }
+);
+
+export type FunctionName = "profile" | "group" | "featured";
+
 export const functionDataOp = {
+  profile_get: requestDataOp.extend({
+    type: dataOpMap.get,
+  }),
+  group_get: requestDataOp.extend({
+    type: dataOpMap.get,
+  }),
   featured_get: requestDataOp.extend({
-    type: z.literal("get"),
+    type: dataOpMap.get,
     entity: z.enum(["group", "event"]),
   }),
 };

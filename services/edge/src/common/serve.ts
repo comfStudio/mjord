@@ -1,15 +1,15 @@
 import { corsHeaders } from 'common/cors';
 import constant from 'constant';
-import { ConnInfo, Handler, serve as denoServe, ServeInit } from 'std/server';
-import { FunctionName } from 'types/functions';
+import { ConnInfo, Handler, serve as denoServe, ServeInit } from "std/server";
 import {
   anyResponseData,
   functionDataOp,
-  FunctionDataOp,
+  FunctionName,
+  FunctionNameDataOpMap,
   RequestBody,
   requestData,
   ResponseData,
-} from 'types/schema';
+} from "types/schema";
 import { ZodError } from 'zod';
 
 import setupServices from './services/index.ts';
@@ -62,7 +62,7 @@ async function validateRequest(name: string, req: Req) {
 export async function serve<
   N extends FunctionName,
   H extends (
-    body: RequestBody,
+    body: FunctionNameDataOpMap<N>,
     request: Req,
     connInfo: ConnInfo
   ) => Promise<Resp<any>> | Resp<any>
@@ -81,8 +81,11 @@ export async function serve<
     let res: Response;
 
     try {
-      const data = await validateRequest(name, req);
-      res = await handler(data as FunctionDataOp<>, req, connInfo);
+      const data = (await validateRequest(
+        name,
+        req
+      )) as FunctionNameDataOpMap<N>;
+      res = await handler(data, req, connInfo);
     } catch (error) {
       console.debug(error);
 
@@ -96,6 +99,7 @@ export async function serve<
 
       res = new Resp(
         {
+          data: undefined,
           error: {
             message: error?.message || "Unknown error",
           },

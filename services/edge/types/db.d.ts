@@ -6,10 +6,14 @@ export type InsertDto<T extends keyof Database["public"]["Tables"]> = Database["
 export type UpdateDto<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];
 export type ProfileData = Row<"profile">;
 export type GroupData = Row<"group">;
-export type MediaData = Row<"media">;
+export type MediaData = Pick<Row<"media">, "id" | "thumbnail_url" | "type" | "url">;
 export type EventData = Row<"event">;
 export type GroupMemberData = Row<"group_members">;
-export type GroupWithMediaData = GroupData & {
-    media: Pick<MediaData, "url" | "type"> | null;
-};
+interface MediaMixin {
+    media: MediaData | null;
+}
+export interface ProfileWithMediaData extends ProfileData, MediaMixin {
+}
+export interface GroupWithMediaData extends GroupData, MediaMixin {
+}
 //# sourceMappingURL=db.d.ts.map

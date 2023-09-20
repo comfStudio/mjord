@@ -2,6 +2,7 @@ import { ServiceType } from "constant";
 
 import type DatabaseService from "./database.ts";
 import type UserService from "./user.ts";
+import type GroupService from "./group.ts";
 export class Service {
   type: ServiceType;
   // @ts-expect-error: .
@@ -17,7 +18,7 @@ export class Service {
 type ServiceTypeMap = {
   [ServiceType.Database]: DatabaseService;
   [ServiceType.User]: UserService;
-  // [ServiceType.Group]: GroupService;
+  [ServiceType.Group]: GroupService;
   // [ServiceType.Event]: EventService;
   // [ServiceType.Character]: CharacterService;
   // [ServiceType.Template]: TemplateService;

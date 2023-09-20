@@ -2515,6 +2515,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@mjord/common@workspace:packages/common"
   dependencies:
+    ts-error: ^1.0.6
     ttag: ^1.7.24
   languageName: unknown
   linkType: soft
@@ -11444,6 +11445,13 @@ __metadata:
   bin:
     tree-kill: cli.js
   checksum: 49117f5f410d19c84b0464d29afb9642c863bc5ba40fcb9a245d474c6d5cc64d1b177a6e6713129eb346b40aebb9d4631d967517f9fbe8251c35b21b13cd96c7
+  languageName: node
+  linkType: hard
+
+"ts-error@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "ts-error@npm:1.0.6"
+  checksum: 043d15c155bf3aeeb146523f24650a773a4aa607587252692640eb233f9d832b73e207c4f076c2e7bc68e9897979eec0586cf631a919f3a3c542fb981d35a5d7
   languageName: node
   linkType: hard
 

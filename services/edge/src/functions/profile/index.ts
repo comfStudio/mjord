@@ -9,11 +9,5 @@ export const handler = await serve("profile", async (body, req) => {
       const data = await service.getProfile(req.client);
       return new Resp({ data });
     }
-    default:
-      return new Resp({
-        error: {
-          message: "Invalid type",
-        },
-      });
   }
 });

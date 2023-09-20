@@ -3,12 +3,11 @@ import { Client } from 'common/supabase';
 import { expect } from 'https://deno.land/x/expect/mod.ts';
 import { beforeAll, describe, TestSuite } from 'std/testing/bdd';
 import { getClient } from 'tests/common';
-import { FunctionResponse, RequestBody, ResponseData } from 'types';
+import { FunctionResponse, ResponseData } from "types";
+import { InvokeOptions, InvokeReturn } from "types/functions";
+import { FunctionName, RequestType } from "types/schema";
 
-import {
-  FunctionInvokeOptions,
-  FunctionsHttpError,
-} from '@supabase/functions-js';
+import { FunctionsHttpError } from "@supabase/functions-js";
 
 import { setupRequest, testClients } from './index.ts';
 
@@ -26,14 +25,27 @@ export const suite = describe({
   },
 });
 
-export interface InvokeOptions extends FunctionInvokeOptions {
-  body: RequestBody;
-}
+export type FunctionReturn<
+  T extends FunctionName,
+  Opt extends InvokeOptions<T, RequestType> | undefined
+> =
+  | {
+      data: Opt extends InvokeOptions<T, any>
+        ? NonNullable<InvokeReturn<T, Opt["body"]>["data"]>
+        : unknown;
+      error: undefined;
+    }
+  | {
+      data: undefined;
+      error: Opt extends InvokeOptions<T, any>
+        ? NonNullable<InvokeReturn<T, Opt["body"]>["error"]>
+        : never;
+    };
 
-type Invoke = (
-  name: string,
-  options?: InvokeOptions
-) => Promise<ResponseData<any>>;
+type Invoke<
+  T extends FunctionName,
+  Opt extends InvokeOptions<T, RequestType> = never
+> = (name: string, options?: Opt) => Promise<FunctionReturn<T, Opt>>;
 
 async function getResponse<T>(res: FunctionResponse): Promise<ResponseData<T>> {
   if (res.error && res.error instanceof FunctionsHttpError) {
@@ -55,8 +67,8 @@ export const clientSuite = describe({
     this: {
       client: Client;
       guestClient: Client;
-      invoke: Invoke;
-      guestInvoke: Invoke;
+      invoke: Invoke<any, any>;
+      guestInvoke: Invoke<any, any>;
     } & UnwrapSuite<typeof suite>
   ) {
     this.client = await getClient(true);

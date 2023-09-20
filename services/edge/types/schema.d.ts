@@ -3,7 +3,6 @@ import { FunctionsHttpError } from "@supabase/functions-js";
 type PrettifyObject<T> = {
     [KeyType in keyof T]: T[KeyType];
 } & {};
-type NonOptional<T, K extends keyof T> = Required<Pick<T, K>> & T;
 declare const DataOpType: readonly ["get", "update"];
 export type DataOpType = (typeof DataOpType)[number];
 declare const RequestType: readonly ["get", "update"];
@@ -15,107 +14,25 @@ export declare const error: z.ZodObject<{
 }, {
     message: string;
 }>;
-export declare function responseData<T extends z.ZodUnknown>(dataSchema: T): z.ZodIntersection<z.ZodObject<{
-    data: z.ZodOptional<T>;
-    error: z.ZodOptional<z.ZodObject<{
-        message: z.ZodString;
-    }, "strip", z.ZodTypeAny, {
-        message: string;
-    }, {
-        message: string;
-    }>>;
+export type ErrorData = z.infer<typeof error>;
+export declare function responseSuccessData<T extends z.ZodUnknown>(dataSchema: T): z.ZodObject<{
+    data: T;
+    error: z.ZodOptional<z.ZodUndefined>;
 }, "strip", z.ZodTypeAny, { [k_1 in keyof z.objectUtil.addQuestionMarks<z.baseObjectOutputType<{
-    data: z.ZodOptional<T>;
-    error: z.ZodOptional<z.ZodObject<{
-        message: z.ZodString;
-    }, "strip", z.ZodTypeAny, {
-        message: string;
-    }, {
-        message: string;
-    }>>;
-}>, undefined extends T["_output"] | undefined ? never : "data">]: z.objectUtil.addQuestionMarks<z.baseObjectOutputType<{
-    data: z.ZodOptional<T>;
-    error: z.ZodOptional<z.ZodObject<{
-        message: z.ZodString;
-    }, "strip", z.ZodTypeAny, {
-        message: string;
-    }, {
-        message: string;
-    }>>;
-}>, undefined extends T["_output"] | undefined ? never : "data">[k_1]; }, { [k_2 in keyof z.baseObjectInputType<{
-    data: z.ZodOptional<T>;
-    error: z.ZodOptional<z.ZodObject<{
-        message: z.ZodString;
-    }, "strip", z.ZodTypeAny, {
-        message: string;
-    }, {
-        message: string;
-    }>>;
-}>]: z.baseObjectInputType<{
-    data: z.ZodOptional<T>;
-    error: z.ZodOptional<z.ZodObject<{
-        message: z.ZodString;
-    }, "strip", z.ZodTypeAny, {
-        message: string;
-    }, {
-        message: string;
-    }>>;
-}>[k_2]; }>, z.ZodUnion<[z.ZodObject<{
-    data: z.ZodUndefined;
-    error: z.ZodObject<{
-        message: z.ZodString;
-    }, "strip", z.ZodTypeAny, {
-        message: string;
-    }, {
-        message: string;
-    }>;
-}, "strip", z.ZodTypeAny, {
-    error: {
-        message: string;
-    };
-    data?: undefined;
-}, {
-    error: {
-        message: string;
-    };
-    data?: undefined;
-}>, z.ZodObject<{
     data: T;
-    error: z.ZodUndefined;
-}, "strip", z.ZodTypeAny, { [k_1_1 in keyof z.objectUtil.addQuestionMarks<z.baseObjectOutputType<{
-    data: T;
-    error: z.ZodUndefined;
+    error: z.ZodOptional<z.ZodUndefined>;
 }>, undefined extends T["_output"] ? never : "data">]: z.objectUtil.addQuestionMarks<z.baseObjectOutputType<{
     data: T;
-    error: z.ZodUndefined;
-}>, undefined extends T["_output"] ? never : "data">[k_1_1]; }, { [k_2_1 in keyof z.baseObjectInputType<{
+    error: z.ZodOptional<z.ZodUndefined>;
+}>, undefined extends T["_output"] ? never : "data">[k_1]; }, { [k_2 in keyof z.baseObjectInputType<{
     data: T;
-    error: z.ZodUndefined;
+    error: z.ZodOptional<z.ZodUndefined>;
 }>]: z.baseObjectInputType<{
     data: T;
-    error: z.ZodUndefined;
-}>[k_2_1]; }>]>>;
-export declare const anyResponseData: z.ZodIntersection<z.ZodObject<{
-    data: z.ZodOptional<z.ZodUnknown>;
-    error: z.ZodOptional<z.ZodObject<{
-        message: z.ZodString;
-    }, "strip", z.ZodTypeAny, {
-        message: string;
-    }, {
-        message: string;
-    }>>;
-}, "strip", z.ZodTypeAny, {
-    data?: unknown;
-    error?: {
-        message: string;
-    } | undefined;
-}, {
-    data?: unknown;
-    error?: {
-        message: string;
-    } | undefined;
-}>, z.ZodUnion<[z.ZodObject<{
-    data: z.ZodUndefined;
+    error: z.ZodOptional<z.ZodUndefined>;
+}>[k_2]; }>;
+export declare function responseFailData<T extends z.ZodUnknown>(): z.ZodObject<{
+    data: z.ZodOptional<z.ZodUndefined>;
     error: z.ZodObject<{
         message: z.ZodString;
     }, "strip", z.ZodTypeAny, {
@@ -133,20 +50,80 @@ export declare const anyResponseData: z.ZodIntersection<z.ZodObject<{
         message: string;
     };
     data?: undefined;
-}>, z.ZodObject<{
+}>;
+export declare function responseData<T extends z.ZodUnknown>(dataSchema: T): z.ZodUnion<[z.ZodObject<{
+    data: T;
+    error: z.ZodOptional<z.ZodUndefined>;
+}, "strip", z.ZodTypeAny, { [k_1 in keyof z.objectUtil.addQuestionMarks<z.baseObjectOutputType<{
+    data: T;
+    error: z.ZodOptional<z.ZodUndefined>;
+}>, undefined extends T["_output"] ? never : "data">]: z.objectUtil.addQuestionMarks<z.baseObjectOutputType<{
+    data: T;
+    error: z.ZodOptional<z.ZodUndefined>;
+}>, undefined extends T["_output"] ? never : "data">[k_1]; }, { [k_2 in keyof z.baseObjectInputType<{
+    data: T;
+    error: z.ZodOptional<z.ZodUndefined>;
+}>]: z.baseObjectInputType<{
+    data: T;
+    error: z.ZodOptional<z.ZodUndefined>;
+}>[k_2]; }>, z.ZodObject<{
+    data: z.ZodOptional<z.ZodUndefined>;
+    error: z.ZodObject<{
+        message: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        message: string;
+    }, {
+        message: string;
+    }>;
+}, "strip", z.ZodTypeAny, {
+    error: {
+        message: string;
+    };
+    data?: undefined;
+}, {
+    error: {
+        message: string;
+    };
+    data?: undefined;
+}>]>;
+export declare const anyResponseData: z.ZodUnion<[z.ZodObject<{
     data: z.ZodUnknown;
-    error: z.ZodUndefined;
+    error: z.ZodOptional<z.ZodUndefined>;
 }, "strip", z.ZodTypeAny, {
     data?: unknown;
     error?: undefined;
 }, {
     data?: unknown;
     error?: undefined;
-}>]>>;
-export type ResponseData<T> = PrettifyObject<(Omit<z.infer<typeof anyResponseData>, "data"> & {
+}>, z.ZodObject<{
+    data: z.ZodOptional<z.ZodUndefined>;
+    error: z.ZodObject<{
+        message: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        message: string;
+    }, {
+        message: string;
+    }>;
+}, "strip", z.ZodTypeAny, {
+    error: {
+        message: string;
+    };
+    data?: undefined;
+}, {
+    error: {
+        message: string;
+    };
+    data?: undefined;
+}>]>;
+export type ResponseSuccessData<T> = {
     data: T;
     error?: undefined;
-}) | NonOptional<z.infer<typeof anyResponseData>, "error">>;
+};
+export type ResponseFailData<E = unknown> = {
+    data?: undefined;
+    error: z.infer<typeof error>;
+};
+export type ResponseData<T> = PrettifyObject<ResponseSuccessData<T> | ResponseFailData>;
 export declare const requestData: z.ZodObject<{
     type: z.ZodEnum<["get", "update"]>;
 }, "strip", z.ZodTypeAny, {
@@ -163,8 +140,8 @@ export declare const requestDataOp: z.ZodObject<{
     type: "get" | "update";
 }>;
 export type RequestDataOp = z.infer<typeof requestDataOp>;
-export type FunctionResponse = ({
-    data: any;
+export type FunctionResponse<T = any> = ({
+    data: T;
 } & {
     error: null;
 }) | ({
@@ -172,7 +149,25 @@ export type FunctionResponse = ({
 } & {
     data: null;
 });
+type RemoveOpSuffix<T> = T extends `${infer U}_${RequestType}` ? U : T;
+export type GetDataOpKeys<T extends string, K extends `${T}_${RequestType}` = `${T}_${RequestType}`> = K extends keyof FunctionDataOp ? K : never;
+export type FunctionNameDataOpMap<T extends RemoveOpSuffix<keyof FunctionDataOp>> = FunctionDataOp[GetDataOpKeys<T>];
+export type FunctionName = "profile" | "group" | "featured";
 export declare const functionDataOp: {
+    profile_get: z.ZodObject<{
+        type: z.ZodLiteral<"get">;
+    }, "strip", z.ZodTypeAny, {
+        type: "get";
+    }, {
+        type: "get";
+    }>;
+    group_get: z.ZodObject<{
+        type: z.ZodLiteral<"get">;
+    }, "strip", z.ZodTypeAny, {
+        type: "get";
+    }, {
+        type: "get";
+    }>;
     featured_get: z.ZodObject<{
         type: z.ZodLiteral<"get">;
         entity: z.ZodEnum<["group", "event"]>;

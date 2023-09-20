@@ -17,89 +17,69 @@ export type GroupWithtExtraData = GroupData & {
     };
 }
 
-export type BasicGroupWithMediaData = Pick<GroupData, 'id' | 'description' | 'title' | 'visibility'> & {
-    media: Pick<MediaData, 'url' | 'media_type'> | null;
-}
 
 export type GroupMemberWithProfileData = GroupMemberData & {
-    profile: ProfileData;
-}
+  profile: ProfileData;
+};
 
 export default class Group extends Service {
+  constructor() {
+    super(ServiceType.Group);
+  }
 
-    constructor() {
-        super(ServiceType.Group);
+  async init(locator: ServiceLocator) {}
 
-    }
-
-    async init(locator: ServiceLocator) {
-    }
-
-    async getFeaturedGroups() {
-        const { data, error } = await constant.supabase
-            .from("groups")
-            .select(`
-                id,
-                title,
-                description,
-                visibility,
-                primary_media:primary_media_id (
-                    media_type,
-                    url
-                )
-            `).limit(10);
-
-        if (error) {
-            throw error;
-        }
-        return data as BasicGroupWithMediaData[];
-    }
-
-    async getGroup(id: number) {
-        const { data, error } = await constant.supabase
-            .from("groups")
-            .select(`
+  async getGroup(id: number) {
+    const { data, error } = await constant.supabase
+      .from("groups")
+      .select(
+        `
                 members:group_members (count),
                 *,
                 primary_media:primary_media_id (
                     media_type,
                     url
                 )
-            `)
-            .eq('id', id)
-            .single()
-        if (error) {
-            throw error;
-        }
-
-
-        return { ...data, members: data?.members?.[0] ?? { count: 0 } } as GroupWithtExtraData;
+            `
+      )
+      .eq("id", id)
+      .single();
+    if (error) {
+      throw error;
     }
 
-    async getGroupMembers(id: number, from: number = 0, to: number = 30) {
-        const { data, error } = await constant.supabase
-            .from("group_members")
-            .select(`
+    return {
+      ...data,
+      members: data?.members?.[0] ?? { count: 0 },
+    } as GroupWithtExtraData;
+  }
+
+  async getGroupMembers(id: number, from: number = 0, to: number = 30) {
+    const { data, error } = await constant.supabase
+      .from("group_members")
+      .select(
+        `
                 *,
                 profile:profile_id(*)
-            `)
-            .eq('group_id', id)
-            .range(from, to)
-        if (error) {
-            throw error;
-        }
-        return data as GroupMemberWithProfileData[];
+            `
+      )
+      .eq("group_id", id)
+      .range(from, to);
+    if (error) {
+      throw error;
     }
-
+    return data as GroupMemberWithProfileData[];
+  }
 }
 
 export function useFeaturedGroups() {
-  return useFunction("featured", {
+  const r = useFunction("featured", {
     body: {
       type: "get",
       entity: "group",
     },
   });
+  return r;
 }
 
 export function useGroup(id: number) {

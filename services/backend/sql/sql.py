@@ -273,12 +273,13 @@ class Media(Base, IdMixin):
     url: orm.Mapped[str] = orm.mapped_column(DefaultString, nullable=False, index=True)
     thumbnail_url: orm.Mapped[str] = orm.mapped_column(DefaultString, nullable=True)
 
-    profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="CASCADE"), index=True, nullable=True)
     group_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("group.id", ondelete="CASCADE"), nullable=True)
     event_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("event.id", ondelete="CASCADE"), nullable=True)
+    discussion_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("discussion.id", ondelete="CASCADE"), nullable=True)
+    comment_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("comment.id", ondelete="CASCADE"), nullable=True)
 
     _table_args__ = (
-            mutual_exclusive_check(__tablename__, profile_id, group_id, event_id, allow_all_none=True),
+            mutual_exclusive_check(__tablename__, group_id, event_id, discussion_id, comment_id, allow_all_none=True),
         )
     
 
@@ -288,6 +289,8 @@ class Profile(Base, ExtraMixin):
     name: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False, server_default=sa.text("''"))
     occupation: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False, server_default=sa.text("''"))
     description: orm.Mapped[str] = orm.mapped_column(LongString, nullable=False, server_default=sa.text("''"))
+
+    media_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("media.id", ondelete="SET NULL"), nullable=True)
 
 create_user_read_policy(Profile)
 
@@ -357,8 +360,6 @@ class groupMembers(Base, IdMixin):
     )
 
 
-groupMedias = create_many_to_many("groupMedias", "group_medias", "group", "media")
-
 groupUrls = create_many_to_many("groupUrls", "group_urls", "group", "url")
 
 class Discussion(Base, IdMixin):
@@ -372,7 +373,6 @@ class Discussion(Base, IdMixin):
     event_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("event.id", ondelete="CASCADE"), nullable=True)
     profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), nullable=True)
 
-discussionMedias = create_many_to_many("discussionMedias", "discussion_medias", "discussion", "media")
 
 class Comment(Base, IdMixin):
     __tablename__ = "comment"
@@ -381,8 +381,6 @@ class Comment(Base, IdMixin):
 
     discussion_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("discussion.id", ondelete="CASCADE"), nullable=False)
     profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), index=True, nullable=True, server_default=sa.text("auth.uid()"))
-
-commentMedias = create_many_to_many("commentMedias", "comment_medias", "comment", "media")
 
 class Reaction(Base, IdMixin):
     __tablename__ = "reaction"
@@ -411,7 +409,6 @@ class Event(Base, IdMixin):
 
 eventMembers = create_many_to_many("eventMembers", "event_members", "event", "profile")
 
-eventMedias = create_many_to_many("eventMedias", "event_medias", "event", "media")
 
 
 class Tag(Base, IdMixin, ExtraMixin):

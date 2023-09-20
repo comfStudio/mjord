@@ -1,6 +1,6 @@
 import { Client, getUserId } from "common/supabase";
 import { ServiceType } from "constant";
-import { ProfileData } from "types/db";
+import { ProfileWithMediaData } from "types/db";
 
 import { Service } from "./base.ts";
 
@@ -18,7 +18,13 @@ export default class User extends Service {
       .from("profile")
       .select(
         `
-        *
+        *,
+        media:media_id (
+          id,
+          type,
+          thumbnail_url,
+          url
+        )
     `
       )
       .eq("id", uid)
@@ -28,6 +34,6 @@ export default class User extends Service {
       throw error;
     }
 
-    return data as ProfileData;
+    return data as ProfileWithMediaData;
   }
 }

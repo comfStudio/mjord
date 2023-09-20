@@ -44,43 +44,6 @@ export interface Database {
                     }
                 ];
             };
-            comment_medias: {
-                Row: {
-                    comment_id: Database["public"]["CompositeTypes"]["typeid"];
-                    created_at: string;
-                    id: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at: string;
-                };
-                Insert: {
-                    comment_id: Database["public"]["CompositeTypes"]["typeid"];
-                    created_at?: string;
-                    id?: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at?: string;
-                };
-                Update: {
-                    comment_id?: Database["public"]["CompositeTypes"]["typeid"];
-                    created_at?: string;
-                    id?: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id?: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at?: string;
-                };
-                Relationships: [
-                    {
-                        foreignKeyName: "comment_medias_comment_id_fkey";
-                        columns: ["comment_id"];
-                        referencedRelation: "comment";
-                        referencedColumns: ["id"];
-                    },
-                    {
-                        foreignKeyName: "comment_medias_media_id_fkey";
-                        columns: ["media_id"];
-                        referencedRelation: "media";
-                        referencedColumns: ["id"];
-                    }
-                ];
-            };
             comment_tags: {
                 Row: {
                     comment_id: Database["public"]["CompositeTypes"]["typeid"];
@@ -173,43 +136,6 @@ export interface Database {
                     }
                 ];
             };
-            discussion_medias: {
-                Row: {
-                    created_at: string;
-                    discussion_id: Database["public"]["CompositeTypes"]["typeid"];
-                    id: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at: string;
-                };
-                Insert: {
-                    created_at?: string;
-                    discussion_id: Database["public"]["CompositeTypes"]["typeid"];
-                    id?: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at?: string;
-                };
-                Update: {
-                    created_at?: string;
-                    discussion_id?: Database["public"]["CompositeTypes"]["typeid"];
-                    id?: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id?: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at?: string;
-                };
-                Relationships: [
-                    {
-                        foreignKeyName: "discussion_medias_discussion_id_fkey";
-                        columns: ["discussion_id"];
-                        referencedRelation: "discussion";
-                        referencedColumns: ["id"];
-                    },
-                    {
-                        foreignKeyName: "discussion_medias_media_id_fkey";
-                        columns: ["media_id"];
-                        referencedRelation: "media";
-                        referencedColumns: ["id"];
-                    }
-                ];
-            };
             discussion_tags: {
                 Row: {
                     created_at: string;
@@ -286,43 +212,6 @@ export interface Database {
                         foreignKeyName: "event_group_id_fkey";
                         columns: ["group_id"];
                         referencedRelation: "group";
-                        referencedColumns: ["id"];
-                    }
-                ];
-            };
-            event_medias: {
-                Row: {
-                    created_at: string;
-                    event_id: Database["public"]["CompositeTypes"]["typeid"];
-                    id: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at: string;
-                };
-                Insert: {
-                    created_at?: string;
-                    event_id: Database["public"]["CompositeTypes"]["typeid"];
-                    id?: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at?: string;
-                };
-                Update: {
-                    created_at?: string;
-                    event_id?: Database["public"]["CompositeTypes"]["typeid"];
-                    id?: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id?: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at?: string;
-                };
-                Relationships: [
-                    {
-                        foreignKeyName: "event_medias_event_id_fkey";
-                        columns: ["event_id"];
-                        referencedRelation: "event";
-                        referencedColumns: ["id"];
-                    },
-                    {
-                        foreignKeyName: "event_medias_media_id_fkey";
-                        columns: ["media_id"];
-                        referencedRelation: "media";
                         referencedColumns: ["id"];
                     }
                 ];
@@ -432,43 +321,6 @@ export interface Database {
                 Relationships: [
                     {
                         foreignKeyName: "group_media_id_fkey";
-                        columns: ["media_id"];
-                        referencedRelation: "media";
-                        referencedColumns: ["id"];
-                    }
-                ];
-            };
-            group_medias: {
-                Row: {
-                    created_at: string;
-                    group_id: Database["public"]["CompositeTypes"]["typeid"];
-                    id: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at: string;
-                };
-                Insert: {
-                    created_at?: string;
-                    group_id: Database["public"]["CompositeTypes"]["typeid"];
-                    id?: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at?: string;
-                };
-                Update: {
-                    created_at?: string;
-                    group_id?: Database["public"]["CompositeTypes"]["typeid"];
-                    id?: Database["public"]["CompositeTypes"]["typeid"];
-                    media_id?: Database["public"]["CompositeTypes"]["typeid"];
-                    modified_at?: string;
-                };
-                Relationships: [
-                    {
-                        foreignKeyName: "group_medias_group_id_fkey";
-                        columns: ["group_id"];
-                        referencedRelation: "group";
-                        referencedColumns: ["id"];
-                    },
-                    {
-                        foreignKeyName: "group_medias_media_id_fkey";
                         columns: ["media_id"];
                         referencedRelation: "media";
                         referencedColumns: ["id"];
@@ -673,39 +525,54 @@ export interface Database {
             };
             media: {
                 Row: {
+                    comment_id: Database["public"]["CompositeTypes"]["typeid"] | null;
                     created_at: string;
+                    discussion_id: Database["public"]["CompositeTypes"]["typeid"] | null;
                     event_id: Database["public"]["CompositeTypes"]["typeid"] | null;
                     group_id: Database["public"]["CompositeTypes"]["typeid"] | null;
                     id: Database["public"]["CompositeTypes"]["typeid"];
                     modified_at: string;
-                    profile_id: string | null;
                     thumbnail_url: string | null;
                     type: Database["public"]["Enums"]["media_type"];
                     url: string;
                 };
                 Insert: {
+                    comment_id?: Database["public"]["CompositeTypes"]["typeid"] | null;
                     created_at?: string;
+                    discussion_id?: Database["public"]["CompositeTypes"]["typeid"] | null;
                     event_id?: Database["public"]["CompositeTypes"]["typeid"] | null;
                     group_id?: Database["public"]["CompositeTypes"]["typeid"] | null;
                     id?: Database["public"]["CompositeTypes"]["typeid"];
                     modified_at?: string;
-                    profile_id?: string | null;
                     thumbnail_url?: string | null;
                     type: Database["public"]["Enums"]["media_type"];
                     url: string;
                 };
                 Update: {
+                    comment_id?: Database["public"]["CompositeTypes"]["typeid"] | null;
                     created_at?: string;
+                    discussion_id?: Database["public"]["CompositeTypes"]["typeid"] | null;
                     event_id?: Database["public"]["CompositeTypes"]["typeid"] | null;
                     group_id?: Database["public"]["CompositeTypes"]["typeid"] | null;
                     id?: Database["public"]["CompositeTypes"]["typeid"];
                     modified_at?: string;
-                    profile_id?: string | null;
                     thumbnail_url?: string | null;
                     type?: Database["public"]["Enums"]["media_type"];
                     url?: string;
                 };
                 Relationships: [
+                    {
+                        foreignKeyName: "media_comment_id_fkey";
+                        columns: ["comment_id"];
+                        referencedRelation: "comment";
+                        referencedColumns: ["id"];
+                    },
+                    {
+                        foreignKeyName: "media_discussion_id_fkey";
+                        columns: ["discussion_id"];
+                        referencedRelation: "discussion";
+                        referencedColumns: ["id"];
+                    },
                     {
                         foreignKeyName: "media_event_id_fkey";
                         columns: ["event_id"];
@@ -717,12 +584,6 @@ export interface Database {
                         columns: ["group_id"];
                         referencedRelation: "group";
                         referencedColumns: ["id"];
-                    },
-                    {
-                        foreignKeyName: "media_profile_id_fkey";
-                        columns: ["profile_id"];
-                        referencedRelation: "profile";
-                        referencedColumns: ["id"];
                     }
                 ];
             };
@@ -732,6 +593,7 @@ export interface Database {
                     description: string;
                     extra: Json;
                     id: string;
+                    media_id: Database["public"]["CompositeTypes"]["typeid"] | null;
                     modified_at: string;
                     name: string;
                     occupation: string;
@@ -741,6 +603,7 @@ export interface Database {
                     description?: string;
                     extra?: Json;
                     id: string;
+                    media_id?: Database["public"]["CompositeTypes"]["typeid"] | null;
                     modified_at?: string;
                     name?: string;
                     occupation?: string;
@@ -750,6 +613,7 @@ export interface Database {
                     description?: string;
                     extra?: Json;
                     id?: string;
+                    media_id?: Database["public"]["CompositeTypes"]["typeid"] | null;
                     modified_at?: string;
                     name?: string;
                     occupation?: string;
@@ -759,6 +623,12 @@ export interface Database {
                         foreignKeyName: "profile_id_fkey";
                         columns: ["id"];
                         referencedRelation: "users";
+                        referencedColumns: ["id"];
+                    },
+                    {
+                        foreignKeyName: "profile_media_id_fkey";
+                        columns: ["media_id"];
+                        referencedRelation: "media";
                         referencedColumns: ["id"];
                     }
                 ];
@@ -939,12 +809,12 @@ export interface Database {
             };
             typeid_print: {
                 Args: {
-                    tid: string;
+                    tid: Database["public"]["CompositeTypes"]["typeid"];
                 };
                 Returns: string;
             } | {
                 Args: {
-                    tid: Database["public"]["CompositeTypes"]["typeid"];
+                    tid: string;
                 };
                 Returns: string;
             };

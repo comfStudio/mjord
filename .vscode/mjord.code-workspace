@@ -36,7 +36,7 @@
       "🚀 @mjord/edge"
     ],
     "monorepoWorkspace.folders.regex.apps": "^app|web|api|frontend|backend|services",
-    "deno.importMap": "./services/edge/src/deno.json",
+    "deno.importMap": "./services/edge/src/import_map.json",
     "deno.unstable": true
   }
 }

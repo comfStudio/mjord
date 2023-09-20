@@ -8,6 +8,7 @@
     "clean": "rimraf .turbo && rimraf lib && rimraf dist && rimraf *.tsbuildinfo"
   },
   "dependencies": {
+    "ts-error": "^1.0.6",
     "ttag": "^1.7.24"
   },
   "files": [

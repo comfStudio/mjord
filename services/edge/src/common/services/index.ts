@@ -1,5 +1,6 @@
 import { ServiceLocator } from './base.ts';
 import DatabaseService from './database.ts';
+import GroupService from "./group.ts";
 import UserService from './user.ts';
 
 export default async function setupServices() {
@@ -7,7 +8,7 @@ export default async function setupServices() {
   const locator = new ServiceLocator();
   locator.set(new DatabaseService());
   locator.set(new UserService());
-  // locator.set(new GroupService());
+  locator.set(new GroupService());
   // locator.set(new EventService());
 
   await locator.init();

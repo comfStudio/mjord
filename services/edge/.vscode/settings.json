@@ -2,5 +2,5 @@
   "deno.enable": true,
   "deno.codeLens.testArgs": ["--allow-all"],
   "deno.unstable": true,
-  "deno.importMap": "../src/deno.json"
+  "deno.importMap": "../src/import_map.json"
 }

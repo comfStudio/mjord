@@ -4,7 +4,7 @@ import type { ServiceLocator } from "./services/base.ts";
 export enum ServiceType {
   Database,
   User,
-  //   Group,
+  Group,
   //   Event,
   // Character,
   // Template,

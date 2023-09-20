@@ -61,29 +61,13 @@ def create_user(email: str, password: str):
     return p
     
 
-def generate_test_data(num_users, num_groups, num_discussions, num_reactions, num_tags, num_media):
+def generate_test_data(num_users, num_groups, num_discussions, num_reactions, num_tags):
     media_types = [x.value for x in Media_Type]
     visibility_types = [x.value for x in Visibility_Type]
     member_roles = [x.value for x in Member_Role]
 
     with Session(get_engine()) as session:
         session.autoflush = False
-
-        print("Generating test data for Media...")
-        # Generate test data for Media
-        media_ids = []
-        for _ in range(num_media):
-            media = Media(
-                id=Media.generate_id(),
-                type=random.choice(media_types),
-                url=fake.url()
-            )
-            session.add(media)
-            media_ids.append(media.id)
-
-        session.commit()
-
-        print(f"Generated {num_media} Media entries.")
 
         print("Generating test data for Users and Profiles...")
         # Generate test data for Users and Profiles
@@ -95,12 +79,14 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
             profile.description = get_paragraphs()
 
             media = Media(
+                id=Media.generate_id(),
                 type=random.choice(media_types),
                 url=fake.url(),
-                profile_id=profile.id
             )
 
             session.add(media)
+
+            profile.media_id = media.id
 
             session.add(profile)
             user_ids.append(profile.id)
@@ -128,21 +114,34 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
         # Generate test data for Groups
         group_ids = []
         for _ in range(num_groups):
+            media = Media(
+                id=Media.generate_id(),
+                type=random.choice(media_types),
+                url=fake.url(),
+            )
+
+            session.add(media)
+            session.flush()
+
             group = Group(
                 id=Group.generate_id(),
                 title=fake.sentence(),
                 content=get_paragraphs(),
                 visibility=random.choice(visibility_types),
-                media_id=random.choice(media_ids + [None])
             )
+
+            group.media_id = media.id
+
             session.add(group)
 
-            media = Media(
-                type=random.choice(media_types),
-                url=fake.url(),
-                group_id=group.id
-            )
-            session.add(media)
+            for _ in range(random.randint(0, 5)):
+                m = Media(
+                    id=Media.generate_id(),
+                    type=random.choice(media_types),
+                    url=fake.url(),
+                    group_id=group.id
+                )
+                session.add(m)
 
             group_ids.append(group.id)
 
@@ -167,13 +166,15 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
                 event_ids.append(event.id)
                 event.group_id = group_id
 
-                media = Media(
-                    type=random.choice(media_types),
-                    url=fake.url(),
-                    event_id=event.id
-                )
+                for _ in range(random.randint(0, 5)):
+                    media = Media(
+                        id=Media.generate_id(),
+                        type=random.choice(media_types),
+                        url=fake.url(),
+                        event_id=event.id
+                    )
 
-                session.add(media)
+                    session.add(media)
 
         session.commit()
         print(f"Generated {num_events} Events.")
@@ -215,6 +216,18 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
             session.add(discussion)
             discussion_ids.append(discussion.id)
 
+            for _ in range(random.randint(0, 3)):
+                    if random.random() < 0.5:
+                        continue
+                    media = Media(
+                        id=Media.generate_id(),
+                        type=random.choice(media_types),
+                        url=fake.url(),
+                        discussion_id=discussion.id
+                    )
+
+                    session.add(media) 
+
         session.commit()
         print(f"Generated {num_discussions} Discussions.")
 
@@ -230,6 +243,19 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
                 )
                 session.add(comment)
                 comment_ids.append(comment.id)
+
+                for _ in range(random.randint(0, 3)):
+                    if random.random() < 0.5:
+                        continue
+                    media = Media(
+                        id=Media.generate_id(),
+                        type=random.choice(media_types),
+                        url=fake.url(),
+                        comment_id=comment.id
+                    )
+
+                    session.add(media) 
+
 
         session.commit()
         print(f"Generated Comments.")
@@ -279,18 +305,6 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
 
         session.commit()
 
-        # Generate test data for CommentMedia
-        for comment_id in comment_ids:
-            if random.random() < 0.5:
-                continue
-            comment_media = commentMedias(
-                comment_id=comment_id,
-                media_id=random.choice(media_ids)
-            )
-            session.add(comment_media)
-
-        session.commit()
-
         # Generate test data for DiscussionTags
         for discussion_id in discussion_ids:
             if random.random() < 0.5:
@@ -309,16 +323,6 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
 
         session.commit()
 
-        # Generate test data for DiscussionMedia
-        for discussion_id in discussion_ids:
-            discussion_media = discussionMedias(
-                discussion_id=discussion_id,
-                media_id=random.choice(media_ids)
-            )
-            session.add(discussion_media)
-
-        session.commit()
-
         # Generate test data for EventTags
         for event_id in [event.id for event in session.query(Event)]:
             num_event_tags = random.randint(1, 5)
@@ -332,26 +336,6 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
                     _event_tags.add(event_tag.tag_id)
                     session.add(event_tag)
                 
-
-        session.commit()
-
-        # Generate test data for EventMedia
-        for event_id in [event.id for event in session.query(Event)]:
-            event_media = eventMedias(
-                event_id=event_id,
-                media_id=random.choice(media_ids)
-            )
-            session.add(event_media)
-
-        session.commit()
-
-        # Generate test data for GroupMedia
-        for group_id in group_ids:
-            group_media = groupMedias(
-                group_id=group_id,
-                media_id=random.choice(media_ids)
-            )
-            session.add(group_media)
 
         session.commit()
 
@@ -418,8 +402,8 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
 
 def main():
     sql.main()
-    generate_test_data(250, 500, 500, 1000, 50, 50)
-    # generate_test_data(5, 10, 50, 10, 10, 10)
+    generate_test_data(250, 500, 500, 1000, 50)
+    # generate_test_data(5, 10, 50, 10, 10)
 
 if __name__ == '__main__':
     main()
