@@ -1,21 +1,21 @@
-import { it } from 'std/testing/bdd';
+import { it } from "std/testing/bdd";
 
-import { describeFunction } from './index.ts';
+import { describeFunction } from "./index.ts";
 
-const suite = describeFunction("profile");
+const profileSuite = describeFunction("profile");
 
-it(suite, "errs at invalid body", async function () {
-  const { data, error } = await this.invoke("profile", {});
+it(profileSuite, "errs at invalid body", async function () {
+  const { data, error } = await this.invoke("profile", {} as any);
 
   this.expect(error).toBeTruthy();
   this.expect(error?.message).toContain("Invalid");
   this.expect(data).toBeFalsy();
 });
 
-it(suite, "validates", async function () {
+it(profileSuite, "validates", async function () {
   const { data, error } = await this.invoke("profile", {
     body: {
-      test: "test
+      test: "test",
     },
   });
 

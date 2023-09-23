@@ -1,4 +1,5 @@
 {
+  "extends": ["@mjord/tsconfig/base"],
   "compilerOptions": {
     "moduleResolution": "node",
     "outDir": "lib",

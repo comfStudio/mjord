@@ -2,15 +2,15 @@ import { beforeAll, describe, TestSuite } from "std/testing/bdd";
 import { clientSuite, UnwrapSuite } from "tests/suite";
 
 export const functionSuite = describe({
-  name: "Function",
+  name: "Functions",
   suite: clientSuite,
   async beforeAll() {},
   afterAll: async () => {},
 });
 
-type ThisFunction<T> = {} & UnwrapSuite<typeof functionSuite>;
+type ThisFunction<T> = T & UnwrapSuite<typeof functionSuite>;
 
-export function describeFunction<T = null>(
+export function describeFunction<T = {}>(
   name: string
 ): TestSuite<ThisFunction<T>> {
   return describe({

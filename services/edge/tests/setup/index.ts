@@ -23,24 +23,25 @@ export const supabaseServiceRoleKey =
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 export const supabaseJwtSecret = Deno.env.get("SUPABASE_JWT_SECRET") ?? "";
 
-const authStorage: Record<string, any> = {};
-
-export const supabaseOptions: SupabaseClientOptions<"public"> = {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: true,
-    detectSessionInUrl: true,
-    storage: {
-      getItem: (key) => authStorage[key],
-      setItem: (key, value) => {
-        authStorage[key] = value;
-      },
-      removeItem: (key) => {
-        delete authStorage[key];
+export function getDefaultOptions(): SupabaseClientOptions<"public"> {
+  const authStorage: Record<string, any> = {};
+  return {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: true,
+      detectSessionInUrl: true,
+      storage: {
+        getItem: (key) => authStorage[key],
+        setItem: (key, value) => {
+          authStorage[key] = value;
+        },
+        removeItem: (key) => {
+          delete authStorage[key];
+        },
       },
     },
-  },
-};
+  };
+}
 
 export const testClients = {
   user: null as Client | null,
@@ -57,7 +58,10 @@ export const testUser = {
   password: "test1234",
 };
 
-export async function getClient(user = true, options = supabaseOptions) {
+export async function getClient(
+  user = true,
+  options?: SupabaseClientOptions<"public">
+) {
   if (user && testClients.user) {
     return testClients.user;
   } else if (!user && testClients.anon) {
@@ -67,6 +71,8 @@ export async function getClient(user = true, options = supabaseOptions) {
   // Verify if the Supabase URL and key are provided
   if (!supabaseUrl) throw new Error("supabaseUrl is required.");
   if (!supabaseAnonKey) throw new Error("supabaseAnonKey is required.");
+
+  options = options ?? getDefaultOptions();
 
   const key = supabaseAnonKey;
 
@@ -147,23 +153,40 @@ export async function getClient(user = true, options = supabaseOptions) {
   return client;
 }
 
+export const requestTestToken = {
+  default: "",
+};
+
 export async function setupRequest(props?: { services?: boolean }) {
-  const client = await getClient(true);
+  let token = requestTestToken.default;
 
-  const {
-    data: { session },
-  } = await client.auth.getSession();
+  if (!token) {
+    const client = await getClient(true, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false,
+      },
+    });
 
-  if (!session) {
-    throw new Error("No session found");
+    const {
+      data: { session },
+    } = await client.auth.getSession();
+
+    if (!session) {
+      throw new Error("No session found");
+    }
+
+    token = session.access_token;
   }
 
   const req = new Request(supabaseUrl, {
     headers: {
-      Authorization: `Bearer ${session.access_token}`,
+      Authorization: `Bearer ${token}`,
     },
   });
 
+  constant.env.JWT_SECRET = "test";
   constant.env.SUPABASE_URL = supabaseUrl;
   constant.env.SUPABASE_ANON_KEY = supabaseAnonKey;
   constant.env.SUPABASE_SERVICE_ROLE_KEY = supabaseServiceRoleKey;

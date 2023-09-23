@@ -1,34 +1,42 @@
-import "react-native-url-polyfill/auto";
+import 'react-native-url-polyfill/auto';
 
-import { getLocales } from "expo-localization";
-import { Tabs, usePathname } from "expo-router";
-import { useEffect } from "react";
-import { AppState as NativeAppState, Platform } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { RecoilRoot, useSetRecoilState } from "recoil";
+import { getLocales } from 'expo-localization';
+import { SplashScreen, Tabs, useNavigation, usePathname } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  AppState as NativeAppState,
+  Platform,
+} from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { RecoilRoot, useSetRecoilState } from 'recoil';
 
-import { AuthListener } from "@/feature/auth/Auth";
-import setupServices from "@/services";
-import { AppState, setupState } from "@/state";
-import { languages } from "@/state/_app";
-import constant, { ROUTES } from "@app/constants";
-import langDA from "@app/i18n/da.json";
-import { ThemeProvider } from "@app/styles/theme";
-import { Feather } from "@expo/vector-icons";
-import { addLocale, t, useLocale } from "@mjord/common";
-import getLogger from "@mjord/logger";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import NetInfo from "@react-native-community/netinfo";
-import { createClient } from "@supabase/supabase-js";
+import { AuthListener } from '@/feature/auth/Auth';
+import setupServices from '@/services';
+import { AppState, setupState } from '@/state';
+import { languages } from '@/state/_app';
+import constant, { ROUTES } from '@app/constants';
+import langDA from '@app/i18n/da.json';
+import { ThemeProvider } from '@app/styles/theme';
+import { Feather } from '@expo/vector-icons';
+import { addLocale, t, useLocale } from '@mjord/common';
+import getLogger from '@mjord/logger';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import { createClient } from '@supabase/supabase-js';
 import {
   focusManager,
   onlineManager,
   QueryClient,
   QueryClientProvider,
-} from "@tanstack/react-query";
+} from '@tanstack/react-query';
 
 import type { AppStateStatus } from "react-native";
-async function main() {
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
+
+export async function main() {
   constant.log = getLogger();
 
   constant.log("initializing app");
@@ -58,10 +66,10 @@ async function main() {
 
   constant.initialized = true;
 
+  applyLocale();
+
   constant.log("initialized app");
 }
-
-main();
 
 function applyLocale() {
   const deviceLanguage = getLocales()[0].languageCode;
@@ -79,8 +87,6 @@ function applyLocale() {
     }
   });
 }
-
-applyLocale();
 
 function useRefetchOnFocus() {
   useEffect(() => {
@@ -143,11 +149,34 @@ function HiddenTabs() {
 }
 
 export default function RootLayout() {
+  const [appIsReady, setAppIsReady] = useState(false);
+
   const path = usePathname();
+
+  useEffect(() => {
+    main().then(() => setAppIsReady(true));
+  }, []);
 
   useEffect(() => {
     constant.log.d("Navigating to", path);
   }, [path]);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      // This tells the splash screen to hide immediately! If we call this after
+      // `setAppIsReady`, then we may see a blank screen while the app is
+      // loading its initial state and rendering its first pixels. So instead,
+      // we hide the splash screen once we know the root view has already
+      // performed layout.
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
+
+  const nav = useNavigation()
+
+  if (!appIsReady) {
+    return <ActivityIndicator />;
+  }
 
   return (
     <RecoilRoot>
@@ -159,6 +188,13 @@ export default function RootLayout() {
             <Tabs
               backBehavior="history"
               initialRouteName="(main)/home"
+              screenListeners={({ navigation, route}) => {
+                const nav: Navigation = navigation;
+                if (navigation) {
+
+                }
+                return {}
+              }}
               screenOptions={{
                 headerShown: true,
                 title: "",

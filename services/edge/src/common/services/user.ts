@@ -34,6 +34,7 @@ export default class User extends Service {
       throw error;
     }
 
+    // @ts-expect-error: .
     return data as ProfileWithMediaData;
   }
 }

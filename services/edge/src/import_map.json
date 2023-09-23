@@ -1,20 +1,23 @@
 {
   "imports": {
-    "types": "./types/index.ts",
     "types/db": "./types/db.ts",
     "types/schema": "./types/schema.ts",
     "types/functions": "./types/functions.ts",
 
     "constant": "./common/constant.ts",
+    "common/utils": "./common/utils.ts",
     "common/cors": "./common/cors.ts",
+    "common/jwt": "./common/jwt.ts",
     "common/serve": "./common/serve.ts",
     "common/supabase": "./common/supabase.ts",
 
+    "common/services/base": "./common/services/base.ts",
     "common/services/database": "./common/services/database.ts",
     "common/services/user": "./common/services/user.ts",
 
-    "tests/common": "../tests/common/index.ts",
-    "tests/suite": "../tests/common/suite.ts",
+    "tests/setup": "../tests/setup/index.ts",
+    "tests/suite": "../tests/setup/suite.ts",
+    "tests/setup/utils": "../tests/setup/utils.ts",
 
     "std/server": "https://deno.land/std@0.177.0/http/server.ts",
     "std/path": "https://deno.land/std@0.188.0/path/mod.ts",
@@ -24,6 +27,7 @@
     "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.33.1",
     "@supabase/functions-js": "https://esm.sh/@supabase/functions-js@2.1.4",
     "xhr_polyfill": "https://deno.land/x/xhr@0.3.0/mod.ts",
-    "zod": "https://deno.land/x/zod@v3.22.2/mod.ts"
+    "zod": "https://deno.land/x/zod@v3.22.2/mod.ts",
+    "jose": "https://deno.land/x/jose@v4.14.6/index.ts"
   }
 }

@@ -57,12 +57,12 @@ export default class Function extends Service {
     T extends FunctionName,
     Opt extends InvokeOptions<T, RequestType> | undefined = undefined
   >(name: T, options?: Opt): Promise<FunctionReturn<T, Opt>> {
-    const { data, error: e } = await constant.supabase.functions.invoke(
+    const { data: d, error: e } = await constant.supabase.functions.invoke(
       name,
       options
     );
 
-    let error: FunctionReturn<T, Opt>["error"];
+    let error: FunctionReturn<T, Opt>["error"] = d?.error;
 
     if (e instanceof FunctionsHttpError) {
       const err = (await e?.context?.json())?.error;
@@ -73,7 +73,7 @@ export default class Function extends Service {
     }
 
     return {
-      data,
+      data: d?.data,
       error,
     };
   }

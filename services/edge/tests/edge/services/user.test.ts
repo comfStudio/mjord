@@ -1,6 +1,6 @@
 import UserService from "common/services/user";
 import { it } from "std/testing/bdd";
-import { testProfile } from "tests/common";
+import { testProfile } from "tests/setup";
 
 import { describeService } from "./index.ts";
 

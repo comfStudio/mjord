@@ -1,7 +1,6 @@
+import { Service, ServiceLocator } from "common/services/base";
 import { beforeAll, describe, TestSuite } from "std/testing/bdd";
 import { edgeSuite, UnwrapSuite } from "tests/suite";
-
-import { Service, ServiceLocator } from "../../src/common/services/base.ts";
 
 export const serviceSuite = describe({
   name: "Service",

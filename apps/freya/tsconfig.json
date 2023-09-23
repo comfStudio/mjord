@@ -1,12 +1,8 @@
 {
-  "extends": "expo/tsconfig.base",
+  "extends": ["expo/tsconfig.base", "@mjord/tsconfig/base"],
   "compilerOptions": {
     "baseUrl": ".",
-    "strict": true,
-    "noImplicitAny": false,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+
     "paths": {
       "@app/*": ["./*"],
       "@/feature/*": ["./feature/*"],
@@ -17,7 +13,8 @@
       "@/state/*": ["./state/*"],
       "@/styles": ["./styles/index"],
       "@/styles/*": ["./styles/*"],
-      "@mjord/common/*": ["../../packages/common/lib/*"]
+      "@mjord/common/*": ["../../packages/common/lib/*"],
+      "@tests/*": ["./__tests__/*"]
     }
   },
   "include": [
@@ -25,7 +22,8 @@
     "**/*.json",
     "**/*.tsx",
     "./types.d.ts",
-    "../../packages/common/types.d.ts"
+    "../../packages/common/types.d.ts",
+    "jest.config.js"
   ],
   "exclude": ["dist", "build", "node_modules", "lib", ".expo"]
 }

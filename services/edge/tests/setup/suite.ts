@@ -1,15 +1,13 @@
-import { Req } from 'common/serve';
-import { Client } from 'common/supabase';
-import { expect } from 'https://deno.land/x/expect/mod.ts';
-import { beforeAll, describe, TestSuite } from 'std/testing/bdd';
-import { getClient } from 'tests/common';
-import { FunctionResponse, ResponseData } from "types";
+import { Client, Req } from "common/supabase";
+import { expect } from "https://deno.land/x/expect/mod.ts";
+import { describe, TestSuite } from "std/testing/bdd";
+import { getClient } from "tests/setup";
 import { InvokeOptions, InvokeReturn } from "types/functions";
-import { FunctionName, RequestType } from "types/schema";
+import { FunctionName, FunctionResponse, RequestType } from "types/schema";
 
 import { FunctionsHttpError } from "@supabase/functions-js";
 
-import { setupRequest, testClients } from './index.ts';
+import { setupRequest, testClients } from "./index.ts";
 
 export type UnwrapSuite<T> = T extends TestSuite<infer U> ? U : never;
 
@@ -42,53 +40,71 @@ export type FunctionReturn<
         : never;
     };
 
-type Invoke<
-  T extends FunctionName,
-  Opt extends InvokeOptions<T, RequestType> = never
-> = (name: string, options?: Opt) => Promise<FunctionReturn<T, Opt>>;
+interface InvokeFunction {
+  <T extends FunctionName, Opt extends InvokeOptions<T, RequestType> = any>(
+    name: T,
+    options?: Opt
+  ): Promise<FunctionReturn<T, Opt>>;
+}
 
-async function getResponse<T>(res: FunctionResponse): Promise<ResponseData<T>> {
-  if (res.error && res.error instanceof FunctionsHttpError) {
-    return {
-      data: res.data ?? undefined,
-      error: (await res.error?.context.json())?.error,
-    };
+export interface invokeFunctions<> {
+  invoke: InvokeFunction;
+  anonInvoke: InvokeFunction;
+}
+
+async function getResponse(res: FunctionResponse) {
+  const { data: d, error: e } = res;
+
+  let error: any = d?.error;
+
+  if (e instanceof FunctionsHttpError) {
+    error = (await res.error?.context.json())?.error;
+  } else if (e) {
+    throw new Error("Not implemented");
   }
+
   return {
-    data: res.data ?? undefined,
-    error: res.error ?? undefined,
+    data: d?.data,
+    error,
   };
 }
 
+/**
+ * For client side testing
+ */
 export const clientSuite = describe({
   name: "Client",
   suite: suite,
   async beforeAll(
     this: {
       client: Client;
-      guestClient: Client;
-      invoke: Invoke<any, any>;
-      guestInvoke: Invoke<any, any>;
-    } & UnwrapSuite<typeof suite>
+      anonClient: Client;
+    } & UnwrapSuite<typeof suite> &
+      invokeFunctions
   ) {
+    this.anonClient = await getClient(false);
+    this.anonClient = await getClient(false);
     this.client = await getClient(true);
-    this.guestClient = await getClient(false);
     this.invoke = (name, options) =>
       this.client.functions.invoke(name, options).then(getResponse);
-    this.guestInvoke = (name, options) =>
-      this.guestClient.functions.invoke(name, options).then(getResponse);
+    this.anonInvoke = (name, options) =>
+      this.anonClient.functions.invoke(name, options).then(getResponse);
   },
   async afterAll() {},
 });
 
+/**
+ * For edge side testing
+ */
 export const edgeSuite = describe({
   name: "Edge",
   suite: suite,
   async beforeAll(
-    this: { req: Req; client: Client } & UnwrapSuite<typeof suite>
+    this: { req: Req; client: Client } & UnwrapSuite<typeof suite> &
+      invokeFunctions
   ) {
     this.req = await setupRequest();
-    this.client = await getClient(true);
+    this.client = this.req.client;
   },
   afterAll: async () => {},
 });

@@ -13,7 +13,7 @@ import {
 import { ZodError } from 'zod';
 
 import setupServices from './services/index.ts';
-import { Client, getClient } from './supabase.ts';
+import { getClient, getUserId, Req } from "./supabase.ts";
 
 export async function initialize() {
   console.log("Initializing...");
@@ -22,13 +22,19 @@ export async function initialize() {
   console.log("Finished initializing");
 }
 
-export interface Req extends Request {
-  client: Client;
-}
 
 export async function requestInitialize(request: Request) {
   const req = request as Req;
-  req.client = getClient(request);
+  try {
+    req.userId = await getUserId(req);
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) {
+      throw error;
+    }
+  }
+
+  req.client = await getClient(request);
+
   return req;
 }
 
@@ -36,7 +42,7 @@ async function validateRequest(name: string, req: Req) {
   let data: Partial<RequestBody>;
   try {
     data = await req.json();
-  } catch (error) {
+  } catch (_error) {
     throw new Deno.errors.InvalidData("Invalid request body");
   }
 

@@ -9,6 +9,14 @@
       "path": "../apps/freya"
     },
     {
+      "name": "⚙️ @mjord/eslint-config-custom",
+      "path": "../config/eslint-config-custom"
+    },
+    {
+      "name": "⚙️ @mjord/tsconfig",
+      "path": "../config/tsconfig"
+    },
+    {
       "name": "📦 @mjord/common",
       "path": "../packages/common"
     },
@@ -27,13 +35,13 @@
   ],
   "settings": {
     "jest.disabledWorkspaceFolders": [
+      "✨ mjord",
       "📦 @mjord/common",
       "📦 @mjord/logger",
-      "✨ mjord",
-      "🚀 @mjord/freya",
+      "🚀 @mjord/edge",
       "🚀 @mjord/backend",
-      "@mjord/edge",
-      "🚀 @mjord/edge"
+      "⚙️ @mjord/tsconfig",
+      "⚙️ @mjord/eslint-config-custom"
     ],
     "monorepoWorkspace.folders.regex.apps": "^app|web|api|frontend|backend|services",
     "deno.importMap": "./services/edge/src/import_map.json",

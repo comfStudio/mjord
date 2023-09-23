@@ -17,7 +17,7 @@ export default class Group extends Service {
       .select(
         `
                 *,
-                media:media_id (
+                media!media_id (
                     id,
                     type,
                     thumbnail_url,
@@ -30,6 +30,8 @@ export default class Group extends Service {
     if (error) {
       throw error;
     }
+
+    // @ts-expect-error: .
     return data as GroupWithMediaData[];
   }
 }

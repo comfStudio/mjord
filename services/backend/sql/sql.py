@@ -11,6 +11,10 @@ import typeid
 
 from .typeid import typeid_sql
 
+class DATABASE_ROLES:
+    backend_authenticated = "backend_authenticated"
+    backend_anon = "backend_anon"
+
 class Visibility_Type(enum.Enum):
     PUBLIC = "public"
     PRIVATE = "private"
@@ -586,25 +590,49 @@ def create_tables(engine: sa.Engine):
 def set_privileges(engine: sa.Engine):
     "See https://github.com/orgs/supabase/discussions/4547"
 
+    stmts = []
+
     dbname = "postgres"
     role = "anon"
+    schemas = ["public", "storage"]
+    allow_public_functions_schemas = ["public"]
 
-    sql = f"""
+    stmts.append(f"""
     REVOKE ALL PRIVILEGES ON DATABASE "{dbname}" FROM "{role}";
-    REVOKE ALL PRIVILEGES ON SCHEMA "public" FROM "{role}";
-    REVOKE ALL PRIVILEGES ON SCHEMA "storage" FROM "{role}";
-    REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "public" FROM "{role}";
-    REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "storage" FROM "{role}";
+    {"\n".join([f'REVOKE ALL PRIVILEGES ON SCHEMA "{s}" FROM "{role}";' for s in schemas])}
+    {"\n".join([f'REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "{s}" FROM "{role}";' for s in schemas])}
 
-    -- REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "public" FROM "{role}";
-    REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "storage" FROM "{role}";
-    REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "public" FROM "{role}";
-    REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "storage" FROM "{role}";
-    """
+    -- REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "{schema}" FROM "{role}";
+    {"\n".join([f'REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "{s}" FROM "{role}";' for s in schemas if s not in allow_public_functions_schemas])}
+    {"\n".join([f'REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "{s}" FROM "{role}";' for s in schemas])}
+    """)
+
 
     with engine.connect() as conn:
-        conn.execute(sa.text(sql))
+        for s in stmts:
+            conn.execute(sa.text(s))
         conn.commit()
+
+    stmts = []
+
+    # Create new roles
+    authenticator = "authenticator"
+
+    stmts.append(f'''
+    CREATE ROLE "{DATABASE_ROLES.backend_authenticated}" INHERIT IN ROLE "authenticated" bypassrls;
+    GRANT "{DATABASE_ROLES.backend_authenticated}" to "{authenticator}";
+    ''')
+    stmts.append(f'''
+    CREATE ROLE "{DATABASE_ROLES.backend_anon}" INHERIT IN ROLE "anon" bypassrls;
+    GRANT "{DATABASE_ROLES.backend_anon}" to "{authenticator}";
+    ''')
+
+
+    with engine.connect() as conn:
+        for s in stmts:
+            conn.execute(sa.text(s))
+        conn.commit()
+
 
 def get_engine():
     port = 8482
@@ -686,8 +714,9 @@ def main():
         create_typeids(engine)
         create_tables(engine)
         create_functions_and_triggers(engine)
-        create_policies(engine)
         set_privileges(engine)
+
+        create_policies(engine)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,10 @@
+{
+  "name": "@mjord/eslint-config-custom",
+  "license": "MIT",
+  "version": "0.0.0",
+  "private": true,
+  "devDependencies": {
+    "eslint-config-turbo": "^1.10.12",
+    "eslint-config-universe": "^12.0.0"
+  }
+}

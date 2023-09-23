@@ -4,7 +4,7 @@ import StateBlock, { defineAtom } from './base';
 
 import type { ThemeVariant } from '@app/styles/theme';
 
-const deviceLanguage = getLocales()[0].languageCode;
+const deviceLanguage = getLocales()?.[0]?.languageCode ?? "en";
 export const languages = ['en', 'da'];
 
 export default class _AppState extends StateBlock {

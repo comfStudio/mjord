@@ -1,4 +1,5 @@
 {
+  "extends": "@mjord/tsconfig/base",
   "include": ["."],
   "compilerOptions": {
     "outDir": "dist",
