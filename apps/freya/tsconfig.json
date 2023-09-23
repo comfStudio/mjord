@@ -17,13 +17,6 @@
       "@tests/*": ["./__tests__/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.json",
-    "**/*.tsx",
-    "./types.d.ts",
-    "../../packages/common/types.d.ts",
-    "jest.config.js"
-  ],
+  "include": ["**/*.ts", "**/*.json", "**/*.tsx", "./types.d.ts", "../../packages/common/types.d.ts", "jest.config.js"],
   "exclude": ["dist", "build", "node_modules", "lib", ".expo"]
 }

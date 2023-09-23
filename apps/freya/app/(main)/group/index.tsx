@@ -53,20 +53,13 @@ export default function DetailScreen() {
         }}
         style={stl.container}
       >
-        <MembersModal
-          groupId={groupId}
-          visible={membersVisible}
-          onClose={() => setMembersVisible(false)}
-        />
+        <MembersModal groupId={groupId} visible={membersVisible} onClose={() => setMembersVisible(false)} />
         <ImageSkeleton
           width={1000}
           // loading={!group?.primary_media?.url}
           style={stl.image}
         >
-          <Image
-            source={{ uri: group?.primary_media?.url }}
-            style={stl.image}
-          />
+          <Image source={{ uri: group?.primary_media?.url }} style={stl.image} />
         </ImageSkeleton>
         <EdgeSegment>
           <LineSkeleton style={stl.title} loading={!group?.title}>
@@ -84,39 +77,22 @@ export default function DetailScreen() {
               }}
             >
               <MaterialIcons name="group" size={24} />
-              <StyleText style={stl.membersText}>
-                {group?.members?.count || 0}
-              </StyleText>
+              <StyleText style={stl.membersText}>{group?.members?.count || 0}</StyleText>
             </TouchableOpacity>
             <Divider />
             <LocationLabel data={group} style={stl.locationLabel} />
             <Divider />
           </Segment>
 
-          <LineSkeleton
-            lines={3}
-            style={stl.description}
-            loading={!group?.description}
-          >
+          <LineSkeleton lines={3} style={stl.description} loading={!group?.description}>
             <StyleText style={stl.description}>{group?.description}</StyleText>
           </LineSkeleton>
-          <Button
-            primary
-            style={stl.applyButton}
-            value={t`Apply to join`}
-            onPress={handleApplyToJoin}
-          />
+          <Button primary style={stl.applyButton} value={t`Apply to join`} onPress={handleApplyToJoin} />
 
           <AdvisorySegment>
-            <AdvisoryLabel icon="money">
-              {t`This community might incur a fee to join.`}
-            </AdvisoryLabel>
-            <AdvisoryLabel icon="money">
-              {t`This community have activities that might incur a fee.`}
-            </AdvisoryLabel>
-            <AdvisoryLabel>
-              {t`This community is not moderated by the app's administrators.`}
-            </AdvisoryLabel>
+            <AdvisoryLabel icon="money">{t`This community might incur a fee to join.`}</AdvisoryLabel>
+            <AdvisoryLabel icon="money">{t`This community have activities that might incur a fee.`}</AdvisoryLabel>
+            <AdvisoryLabel>{t`This community is not moderated by the app's administrators.`}</AdvisoryLabel>
           </AdvisorySegment>
         </EdgeSegment>
         <Heading h3 style={stl.sectionTitle}>{t`Activity`}</Heading>
@@ -126,9 +102,7 @@ export default function DetailScreen() {
         {[].map(({ item }) => (
           <View style={stl.discussion}>
             <StyleText style={stl.discussionTitle}>{item.title}</StyleText>
-            <StyleText style={stl.discussionContent}>
-              {item.content.substring(0, 100)}...
-            </StyleText>
+            <StyleText style={stl.discussionContent}>{item.content.substring(0, 100)}...</StyleText>
             <View style={stl.reactions}>
               {item.reactions.map((reaction) => (
                 <StyleText key={reaction.id} style={stl.reaction}>

@@ -41,12 +41,7 @@ export function VerticalGroupList({
   data: BasicGroupWithMediaData[];
   onPress?: React.ComponentProps<typeof GroupListItem>["onPress"];
 }) {
-  return (
-    <VerticalList
-      data={data}
-      renderItem={({ item }) => <GroupListItem data={item} onPress={onPress} />}
-    />
-  );
+  return <VerticalList data={data} renderItem={({ item }) => <GroupListItem data={item} onPress={onPress} />} />;
 }
 
 export function VerticalLoadMoreGroupList({
@@ -56,10 +51,7 @@ export function VerticalLoadMoreGroupList({
 }: {
   data: BasicGroupWithMediaData[];
   onPress?: React.ComponentProps<typeof GroupListItem>["onPress"];
-} & Omit<
-  React.ComponentProps<typeof VerticalLoadMoreList>,
-  "renderItem" | "data"
->) {
+} & Omit<React.ComponentProps<typeof VerticalLoadMoreList>, "renderItem" | "data">) {
   return (
     <VerticalLoadMoreList
       {...props}

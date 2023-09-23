@@ -10,7 +10,11 @@
     },
     {
       "name": "⚙️ @mjord/eslint-config-custom",
-      "path": "../config/eslint-config-custom"
+      "path": "../config/eslint"
+    },
+    {
+      "name": "⚙️ @mjord/prettier",
+      "path": "../config/prettier"
     },
     {
       "name": "⚙️ @mjord/tsconfig",
@@ -41,10 +45,19 @@
       "🚀 @mjord/edge",
       "🚀 @mjord/backend",
       "⚙️ @mjord/tsconfig",
+      "⚙️ @mjord/prettier",
       "⚙️ @mjord/eslint-config-custom"
     ],
     "monorepoWorkspace.folders.regex.apps": "^app|web|api|frontend|backend|services",
     "deno.importMap": "./services/edge/src/import_map.json",
-    "deno.unstable": true
+    "deno.unstable": true,
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.count": 120
   }
 }

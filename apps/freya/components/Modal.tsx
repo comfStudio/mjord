@@ -1,11 +1,5 @@
-import React, { useEffect } from 'react';
-import {
-  BackHandler,
-  Modal as ModalNative,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import React, { useEffect } from "react";
+import { BackHandler, Modal as ModalNative, StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 
 export default function Modal({
   visible,
@@ -20,13 +14,10 @@ export default function Modal({
 }) {
   useEffect(() => {
     if (!visible) return;
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        onClose();
-        return true;
-      }
-    );
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
+      onClose();
+      return true;
+    });
 
     return () => backHandler.remove();
   }, [onClose]);

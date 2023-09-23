@@ -13,10 +13,6 @@
     "allowImportingTsExtensions": true,
     "types": []
   },
-  "include": [
-    "./src/types/**/*.ts",
-    "./src/types/**/*.d.ts",
-    "../../packages/common/types.d.ts"
-  ],
+  "include": ["./src/types/**/*.ts", "./src/types/**/*.d.ts", "../../packages/common/types.d.ts"],
   "exclude": ["dist", "build", "node_modules", "lib", "types"]
 }

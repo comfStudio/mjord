@@ -23,21 +23,14 @@ export const suite = describe({
   },
 });
 
-export type FunctionReturn<
-  T extends FunctionName,
-  Opt extends InvokeOptions<T, RequestType> | undefined
-> =
+export type FunctionReturn<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> | undefined> =
   | {
-      data: Opt extends InvokeOptions<T, any>
-        ? NonNullable<InvokeReturn<T, Opt["body"]>["data"]>
-        : unknown;
+      data: Opt extends InvokeOptions<T, any> ? NonNullable<InvokeReturn<T, Opt["body"]>["data"]> : unknown;
       error: undefined;
     }
   | {
       data: undefined;
-      error: Opt extends InvokeOptions<T, any>
-        ? NonNullable<InvokeReturn<T, Opt["body"]>["error"]>
-        : never;
+      error: Opt extends InvokeOptions<T, any> ? NonNullable<InvokeReturn<T, Opt["body"]>["error"]> : never;
     };
 
 interface InvokeFunction {
@@ -85,10 +78,8 @@ export const clientSuite = describe({
     this.anonClient = await getClient(false);
     this.anonClient = await getClient(false);
     this.client = await getClient(true);
-    this.invoke = (name, options) =>
-      this.client.functions.invoke(name, options).then(getResponse);
-    this.anonInvoke = (name, options) =>
-      this.anonClient.functions.invoke(name, options).then(getResponse);
+    this.invoke = (name, options) => this.client.functions.invoke(name, options).then(getResponse);
+    this.anonInvoke = (name, options) => this.anonClient.functions.invoke(name, options).then(getResponse);
   },
   async afterAll() {},
 });
@@ -99,10 +90,7 @@ export const clientSuite = describe({
 export const edgeSuite = describe({
   name: "Edge",
   suite: suite,
-  async beforeAll(
-    this: { req: Req; client: Client } & UnwrapSuite<typeof suite> &
-      invokeFunctions
-  ) {
+  async beforeAll(this: { req: Req; client: Client } & UnwrapSuite<typeof suite> & invokeFunctions) {
     this.req = await setupRequest();
     this.client = this.req.client;
   },

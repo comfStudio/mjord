@@ -26,14 +26,9 @@ export function useAnimatedHeader({
   const heightOffset = useSharedValue(0);
 
   const style = useAnimatedStyle(() => {
-    const headerOpacity = interpolate(
-      heightOffset.value,
-      [startOffset, endOffset],
-      [0, 1],
-      {
-        extrapolateRight: "clamp",
-      }
-    );
+    const headerOpacity = interpolate(heightOffset.value, [startOffset, endOffset], [0, 1], {
+      extrapolateRight: "clamp",
+    });
     const style = {
       opacity: headerOpacity,
     };
@@ -79,11 +74,5 @@ export function AnimatedHeaderScrollView({
     },
   });
 
-  return (
-    <Animated.ScrollView
-      {...props}
-      onScroll={scrollHandler}
-      scrollEventThrottle={16}
-    />
-  );
+  return <Animated.ScrollView {...props} onScroll={scrollHandler} scrollEventThrottle={16} />;
 }

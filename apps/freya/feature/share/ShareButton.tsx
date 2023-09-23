@@ -1,4 +1,4 @@
-import * as Sharing from 'expo-sharing';
+import * as Sharing from "expo-sharing";
 import React from "react";
 
 import Button from "@/components/Button";
@@ -6,17 +6,10 @@ import { createComponent } from "@app/components";
 import { IconVariant } from "@app/components/Icon";
 import constant from "@app/constants";
 import { composeStyles, createStyles, useStyles } from "@app/styles/theme";
-import { t } from '@mjord/common';
+import { t } from "@mjord/common";
 
 const ShareButton = createComponent(function ShareButton(
-  {
-    url,
-    style,
-    ...props
-  }: { url: string } & Omit<
-    React.ComponentProps<typeof Button>,
-    "onPress" | keyof IconVariant
-  >,
+  { url, style, ...props }: { url: string } & Omit<React.ComponentProps<typeof Button>, "onPress" | keyof IconVariant>,
   ref
 ) {
   const stl = useStyles(styles);
@@ -43,15 +36,7 @@ const ShareButton = createComponent(function ShareButton(
     }
   };
 
-  return (
-    <Button
-      {...props}
-      ref={ref}
-      onPress={handleShare}
-      iconName="share"
-      style={compStyles}
-    />
-  );
+  return <Button {...props} ref={ref} onPress={handleShare} iconName="share" style={compStyles} />;
 });
 
 export default ShareButton;

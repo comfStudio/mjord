@@ -46,9 +46,7 @@ export default function OnboardScreen() {
 
       <View style={styles.container}>
         <Text style={styles.title}>{t`Welcome to HYG!`}</Text>
-        <Text
-          style={styles.subtitle}
-        >{t`Let's fill out a couple of details`}</Text>
+        <Text style={styles.subtitle}>{t`Let's fill out a couple of details`}</Text>
         <Text style={styles.header}>{t`Your profile name should be...`}</Text>
         <Input
           name="name"
@@ -57,16 +55,8 @@ export default function OnboardScreen() {
           keyboardType="default"
           placeholder={t`Profile name`}
         />
-        {failed && (
-          <Text style={styles.errorSegmentText}>{t`Failed to update`}</Text>
-        )}
-        <Button
-          onPress={onSubmit}
-          primary
-          disabled={!isValid}
-          iconName="arrow-forward"
-          style={styles.loginButton}
-        />
+        {failed && <Text style={styles.errorSegmentText}>{t`Failed to update`}</Text>}
+        <Button onPress={onSubmit} primary disabled={!isValid} iconName="arrow-forward" style={styles.loginButton} />
       </View>
     </>
   );

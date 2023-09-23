@@ -1,5 +1,5 @@
-import { TouchableOpacity } from 'react-native';
-import { useSetRecoilState } from 'recoil';
+import { TouchableOpacity } from "react-native";
+import { useSetRecoilState } from "recoil";
 
 import Card from "@/components/Card";
 import { HorizontalCardList } from "@/components/CardList";
@@ -38,10 +38,5 @@ export function HorizontalGroupCardList({
   data: BasicGroupWithMediaData[];
   onPress?: React.ComponentProps<typeof GroupCard>["onPress"];
 }) {
-  return (
-    <HorizontalCardList
-      data={data}
-      renderItem={({ item }) => <GroupCard data={item} onPress={onPress} />}
-    />
-  );
+  return <HorizontalCardList data={data} renderItem={({ item }) => <GroupCard data={item} onPress={onPress} />} />;
 }

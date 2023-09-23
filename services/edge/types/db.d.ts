@@ -10,10 +10,8 @@ export type MediaData = Pick<Row<"media">, "id" | "thumbnail_url" | "type" | "ur
 export type EventData = Row<"event">;
 export type GroupMemberData = Row<"group_members">;
 interface MediaMixin {
-    media: MediaData | null;
+  media: MediaData | null;
 }
-export interface ProfileWithMediaData extends ProfileData, MediaMixin {
-}
-export interface GroupWithMediaData extends GroupData, MediaMixin {
-}
+export interface ProfileWithMediaData extends ProfileData, MediaMixin {}
+export interface GroupWithMediaData extends GroupData, MediaMixin {}
 //# sourceMappingURL=db.d.ts.map

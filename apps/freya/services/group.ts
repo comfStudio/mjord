@@ -1,22 +1,16 @@
-import constant, { ServiceType } from '@app/constants';
-import {
-  GroupData,
-  GroupMemberData,
-  MediaData,
-  ProfileData,
-} from "@mjord/edge/db";
-import { useQuery } from '@tanstack/react-query';
+import constant, { ServiceType } from "@app/constants";
+import { GroupData, GroupMemberData, MediaData, ProfileData } from "@mjord/edge/db";
+import { useQuery } from "@tanstack/react-query";
 
 import { Service, ServiceLocator } from "./base";
 import { useFunction } from "./function";
 
 export type GroupWithtExtraData = GroupData & {
-    primary_media: MediaData | null;
-    members: {
-        count: number;
-    };
-}
-
+  primary_media: MediaData | null;
+  members: {
+    count: number;
+  };
+};
 
 export type GroupMemberWithProfileData = GroupMemberData & {
   profile: ProfileData;
@@ -37,6 +31,7 @@ export default class Group extends Service {
                 members:group_members (count),
                 *,
                 primary_media:primary_media_id (
+
                     media_type,
                     url
                 )
@@ -83,27 +78,21 @@ export function useFeaturedGroups() {
 }
 
 export function useGroup(id: number) {
-    const service = constant.service.get(ServiceType.Group);
+  const service = constant.service.get(ServiceType.Group);
 
-    const q = useQuery(
-        ['group', id],
-        async () => {
-            const group = await service.getGroup(id);
-            return group;
-        }
-    );
-    return q
+  const q = useQuery(["group", id], async () => {
+    const group = await service.getGroup(id);
+    return group;
+  });
+  return q;
 }
 
 export function useGroupMembers(id: number, from: number = 0, to: number = 30) {
-    const service = constant.service.get(ServiceType.Group);
+  const service = constant.service.get(ServiceType.Group);
 
-    const q = useQuery(
-        ['groupMembers', id],
-        async () => {
-            const members = await service.getGroupMembers(id, from, to);
-            return members;
-        }
-    );
-    return q
+  const q = useQuery(["groupMembers", id], async () => {
+    const members = await service.getGroupMembers(id, from, to);
+    return members;
+  });
+  return q;
 }

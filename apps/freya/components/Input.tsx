@@ -11,9 +11,7 @@ export function Input({
   control,
   name,
   ...props
-}: { control: InputControl<any>; name: string } & React.ComponentProps<
-  typeof TextInput
->) {
+}: { control: InputControl<any>; name: string } & React.ComponentProps<typeof TextInput>) {
   const { field } = useInputController({
     name,
     control,
@@ -103,12 +101,7 @@ export function ButtonInput({
   return (
     <View style={[buttonInputStyles.inputWrapper, viewStyle]}>
       <Input style={[buttonInputStyles.input, style]} {...props} />
-      <Button
-        value={buttonValue}
-        onPress={onPress}
-        icon={ButtonIcon}
-        style={[buttonInputStyles.button, buttonStyle]}
-      />
+      <Button value={buttonValue} onPress={onPress} icon={ButtonIcon} style={[buttonInputStyles.button, buttonStyle]} />
     </View>
   );
 }

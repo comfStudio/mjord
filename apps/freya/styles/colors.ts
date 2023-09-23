@@ -420,7 +420,6 @@ export interface Colors {
   darkWhiteActive: ColorValue;
 }
 
-
 export default function colors(): Colors {
   return {} as Colors;
 }

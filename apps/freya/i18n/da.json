@@ -1,1 +1,28 @@
-{"charset":"utf-8","headers":{"Project-Id-Version":"","POT-Creation-Date":"","PO-Revision-Date":"","Last-Translator":"","Language-Team":"","Language":"da","MIME-Version":"1.0","Content-Type":"text/plain; charset=UTF-8","Content-Transfer-Encoding":"8bit","Plural-Forms":"nplurals=2; plural=(n != 1);","X-Generator":"Poedit 3.2.2"},"translations":{"":{"":{"msgid":"","msgstr":["Project-Id-Version: \nPOT-Creation-Date: \nPO-Revision-Date: \nLast-Translator: \nLanguage-Team: \nLanguage: da\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\nX-Generator: Poedit 3.2.2\n"]},"Explore":{"msgid":"Explore","msgstr":["Udforsk"]},"You":{"msgid":"You","msgstr":["Dig"]}}}}
+{
+  "charset": "utf-8",
+  "headers": {
+    "Project-Id-Version": "",
+    "POT-Creation-Date": "",
+    "PO-Revision-Date": "",
+    "Last-Translator": "",
+    "Language-Team": "",
+    "Language": "da",
+    "MIME-Version": "1.0",
+    "Content-Type": "text/plain; charset=UTF-8",
+    "Content-Transfer-Encoding": "8bit",
+    "Plural-Forms": "nplurals=2; plural=(n != 1);",
+    "X-Generator": "Poedit 3.2.2"
+  },
+  "translations": {
+    "": {
+      "": {
+        "msgid": "",
+        "msgstr": [
+          "Project-Id-Version: \nPOT-Creation-Date: \nPO-Revision-Date: \nLast-Translator: \nLanguage-Team: \nLanguage: da\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\nX-Generator: Poedit 3.2.2\n"
+        ]
+      },
+      "Explore": { "msgid": "Explore", "msgstr": ["Udforsk"] },
+      "You": { "msgid": "You", "msgstr": ["Dig"] }
+    }
+  }
+}

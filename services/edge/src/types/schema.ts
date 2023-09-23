@@ -44,9 +44,7 @@ export type ResponseFailData<E = unknown> = {
   error: z.infer<typeof error>;
 };
 
-export type ResponseData<T> = PrettifyObject<
-  ResponseSuccessData<T> | ResponseFailData
->;
+export type ResponseData<T> = PrettifyObject<ResponseSuccessData<T> | ResponseFailData>;
 
 export const requestData = z.object({
   type: z.enum(RequestType),
@@ -71,12 +69,10 @@ export type FunctionResponse<T = any> =
 type RemoveOpSuffix<T> = T extends `${infer U}_${RequestType}` ? U : T;
 export type GetDataOpKeys<
   T extends string,
-  K extends `${T}_${RequestType}` = `${T}_${RequestType}`
+  K extends `${T}_${RequestType}` = `${T}_${RequestType}`,
 > = K extends keyof FunctionDataOp ? K : never;
 
-export type FunctionNameDataOpMap<
-  T extends RemoveOpSuffix<keyof FunctionDataOp>
-> = FunctionDataOp[GetDataOpKeys<T>];
+export type FunctionNameDataOpMap<T extends RemoveOpSuffix<keyof FunctionDataOp>> = FunctionDataOp[GetDataOpKeys<T>];
 
 // -----------------------------------------------------------
 

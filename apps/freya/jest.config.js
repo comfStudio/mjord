@@ -34,11 +34,7 @@ function pathsToModuleNameMapper(srcPath, paths, opts) {
       if (key.match(monoRepoNamespaceRegex)) {
         // check if paths is relative
         if (p.startsWith(".")) {
-          p = path.posix.join(
-            monoRepoRoot,
-            "node_modules",
-            item.replace("/*", "/$1")
-          );
+          p = path.posix.join(monoRepoRoot, "node_modules", item.replace("/*", "/$1"));
         }
       }
     }
@@ -69,22 +65,10 @@ const nodeModulesIgnorePatterns = [
 module.exports = {
   preset: "jest-expo",
   rootDir,
-  transformIgnorePatterns: [
-    `node_modules/(?!${nodeModulesIgnorePatterns.join("|")})`,
-  ],
-  testMatch: [
-    "**/__tests__/**/(*.)+(spec|test).[jt]s?(x)",
-    "**/?(*.)+(spec|test).[jt]s?(x)",
-  ],
-  setupFilesAfterEnv: [
-    "./__tests__/setup.ts",
-    "@testing-library/jest-native/extend-expect",
-  ],
-  moduleDirectories: [
-    "<rootDir>",
-    "<rootDir>/node_modules",
-    "<rootDir>/../../node_modules",
-  ],
+  transformIgnorePatterns: [`node_modules/(?!${nodeModulesIgnorePatterns.join("|")})`],
+  testMatch: ["**/__tests__/**/(*.)+(spec|test).[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+  setupFilesAfterEnv: ["./__tests__/setup.ts", "@testing-library/jest-native/extend-expect"],
+  moduleDirectories: ["<rootDir>", "<rootDir>/node_modules", "<rootDir>/../../node_modules"],
   moduleNameMapper: {
     recoil: "recoil/native",
     ...pathsToModuleNameMapper(baseUrl, compilerOptions.paths, {

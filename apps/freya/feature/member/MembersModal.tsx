@@ -1,9 +1,9 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from "react-native";
 
 import Modal from "@/components/Modal";
 import { useGroupMembers } from "@/services/group";
 
-import MemberList from './MemberList';
+import MemberList from "./MemberList";
 
 export default function MembersModal({
   groupId,

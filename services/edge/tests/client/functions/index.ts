@@ -10,9 +10,7 @@ export const functionSuite = describe({
 
 type ThisFunction<T> = T & UnwrapSuite<typeof functionSuite>;
 
-export function describeFunction<T = {}>(
-  name: string
-): TestSuite<ThisFunction<T>> {
+export function describeFunction<T = {}>(name: string): TestSuite<ThisFunction<T>> {
   return describe({
     suite: functionSuite,
     name,

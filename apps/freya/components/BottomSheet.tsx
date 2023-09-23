@@ -1,13 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  Dimensions,
-  Pressable,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useEffect, useRef, useState } from "react";
+import { Animated, Dimensions, Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function BottomSheet({
   isVisible: controlledIsVisible,
@@ -29,8 +22,7 @@ export default function BottomSheet({
   const slideAnimation = useRef(new Animated.Value(0)).current;
 
   const [isVisibleInternal, setIsVisibleInternal] = useState(false);
-  const isVisible =
-    controlledIsVisible !== undefined ? controlledIsVisible : isVisibleInternal;
+  const isVisible = controlledIsVisible !== undefined ? controlledIsVisible : isVisibleInternal;
 
   useEffect(() => {
     if (isVisible) {
@@ -59,10 +51,7 @@ export default function BottomSheet({
   }
 
   return (
-    <View
-      style={[styles.container, { paddingBottom: insets.bottom }]}
-      pointerEvents="box-none"
-    >
+    <View style={[styles.container, { paddingBottom: insets.bottom }]} pointerEvents="box-none">
       <TouchableOpacity
         style={styles.overlay}
         activeOpacity={1}
@@ -77,10 +66,7 @@ export default function BottomSheet({
         onLayout={(e) => {
           setContentHeight(e.nativeEvent.layout.height);
         }}
-        style={[
-          styles.contentContainer,
-          { minHeight, transform: [{ translateY }] },
-        ]}
+        style={[styles.contentContainer, { minHeight, transform: [{ translateY }] }]}
       >
         <Pressable
           onPress={(e) => {

@@ -1,5 +1,5 @@
-import { corsHeaders } from 'common/cors';
-import constant from 'constant';
+import { corsHeaders } from "common/cors";
+import constant from "constant";
 import { ConnInfo, Handler, serve as denoServe, ServeInit } from "std/server";
 import {
   anyResponseData,
@@ -10,9 +10,9 @@ import {
   requestData,
   ResponseData,
 } from "types/schema";
-import { ZodError } from 'zod';
+import { ZodError } from "zod";
 
-import setupServices from './services/index.ts';
+import setupServices from "./services/index.ts";
 import { getClient, getUserId, Req } from "./supabase.ts";
 
 export async function initialize() {
@@ -21,7 +21,6 @@ export async function initialize() {
   constant.service = await setupServices();
   console.log("Finished initializing");
 }
-
 
 export async function requestInitialize(request: Request) {
   const req = request as Req;
@@ -57,9 +56,7 @@ async function validateRequest(name: string, req: Req) {
       functionDataOp[key].parse(data);
     }
   } catch (error) {
-    throw new Deno.errors.InvalidData(
-      `Validation failed: ${(error as ZodError).message}`
-    );
+    throw new Deno.errors.InvalidData(`Validation failed: ${(error as ZodError).message}`);
   }
 
   return data as RequestBody;
@@ -67,11 +64,7 @@ async function validateRequest(name: string, req: Req) {
 
 export async function serve<
   N extends FunctionName,
-  H extends (
-    body: FunctionNameDataOpMap<N>,
-    request: Req,
-    connInfo: ConnInfo
-  ) => Promise<Resp<any>> | Resp<any>
+  H extends (body: FunctionNameDataOpMap<N>, request: Req, connInfo: ConnInfo) => Promise<Resp<any>> | Resp<any>,
 >(name: N, handler: H, options?: ServeInit) {
   console.log(`Loaded ${name} edge function`);
   await initialize();
@@ -87,10 +80,7 @@ export async function serve<
     let res: Response;
 
     try {
-      const data = (await validateRequest(
-        name,
-        req
-      )) as FunctionNameDataOpMap<N>;
+      const data = (await validateRequest(name, req)) as FunctionNameDataOpMap<N>;
       res = await handler(data, req, connInfo);
     } catch (error) {
       console.debug(error);

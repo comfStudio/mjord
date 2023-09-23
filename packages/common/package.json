@@ -5,7 +5,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rimraf .turbo && rimraf lib && rimraf dist && rimraf *.tsbuildinfo"
+    "clean": "rimraf .turbo && rimraf lib && rimraf dist && rimraf *.tsbuildinfo",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:prettier": "prettier --check ."
   },
   "dependencies": {
     "ts-error": "^1.0.6",

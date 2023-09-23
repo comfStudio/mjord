@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { useState } from "react";
+import { TouchableOpacity } from "react-native";
 
 import Label from "@/components/Label";
 
-import MapModal from './MapModal';
+import MapModal from "./MapModal";
 
 export default function LocationLabel({
   data,
@@ -27,11 +27,7 @@ export default function LocationLabel({
         onClose={() => setVisible(false)}
       />
       <TouchableOpacity onPress={() => setVisible(false)}>
-        <Label
-          {...props}
-          value={data?.location_name ?? data?.address ?? "Unknown"}
-          icon="location-on"
-        />
+        <Label {...props} value={data?.location_name ?? data?.address ?? "Unknown"} icon="location-on" />
       </TouchableOpacity>
     </>
   );

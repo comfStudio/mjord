@@ -15,74 +15,58 @@ import {
   selectorFamily,
   SerializableParam,
   useRecoilCallback,
-} from 'recoil';
+} from "recoil";
 
-RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false
+RecoilEnv.RECOIL_DUPLICATE_ATOM_KEY_CHECKING_ENABLED = false;
 
-
-export function defineAtom<T>(
-  options: Optional<AtomOptions<T>, 'key'>,
-  family?: false
-): RecoilState<T>;
+export function defineAtom<T>(options: Optional<AtomOptions<T>, "key">, family?: false): RecoilState<T>;
 export function defineAtom<T, P extends SerializableParam = SerializableParam>(
-  options: Optional<AtomFamilyOptions<T, P>, 'key'>,
+  options: Optional<AtomFamilyOptions<T, P>, "key">,
   family: true
 ): (param: P) => RecoilState<T>;
-export function defineAtom<
-  T,
-  P extends SerializableParam = SerializableParam,
-  F extends undefined | true = undefined
->(
-  options:
-    | Optional<AtomOptions<T>, 'key'>
-    | Optional<AtomFamilyOptions<T, P>, 'key'>,
+export function defineAtom<T, P extends SerializableParam = SerializableParam, F extends undefined | true = undefined>(
+  options: Optional<AtomOptions<T>, "key"> | Optional<AtomFamilyOptions<T, P>, "key">,
   family?: F
 ): F extends undefined ? RecoilState<T> : (param: P) => RecoilState<T> {
-  return { ...options, family, _type: 'atom' } as any;
+  return { ...options, family, _type: "atom" } as any;
 }
 
 export function defineSelector<T>(
-  options: Optional<ReadOnlySelectorOptions<T>, 'key'>,
+  options: Optional<ReadOnlySelectorOptions<T>, "key">,
   family?: false
 ): RecoilValueReadOnly<T>;
 export function defineSelector<T>(
-  options: Optional<ReadWriteSelectorOptions<T>, 'key'>,
+  options: Optional<ReadWriteSelectorOptions<T>, "key">,
   family?: false
 ): RecoilState<T>;
-export function defineSelector<
-  T,
-  P extends SerializableParam = SerializableParam
->(
-  options: Optional<ReadOnlySelectorFamilyOptions<T, P>, 'key'>,
+export function defineSelector<T, P extends SerializableParam = SerializableParam>(
+  options: Optional<ReadOnlySelectorFamilyOptions<T, P>, "key">,
   family: true
 ): (param: P) => RecoilValueReadOnly<T>;
-export function defineSelector<
-  T,
-  P extends SerializableParam = SerializableParam
->(
-  options: Optional<ReadWriteSelectorOptions<T>, 'key'>,
+export function defineSelector<T, P extends SerializableParam = SerializableParam>(
+  options: Optional<ReadWriteSelectorOptions<T>, "key">,
   family: true
 ): (param: P) => RecoilState<T>;
 export function defineSelector<
   T,
   O extends
-  | Optional<ReadOnlySelectorOptions<T>, 'key'>
-  | Optional<ReadOnlySelectorFamilyOptions<T, P>, 'key'>
-  | Optional<ReadWriteSelectorOptions<T>, 'key'>
-  | Optional<ReadWriteSelectorFamilyOptions<T, P>, 'key'>,
+    | Optional<ReadOnlySelectorOptions<T>, "key">
+    | Optional<ReadOnlySelectorFamilyOptions<T, P>, "key">
+    | Optional<ReadWriteSelectorOptions<T>, "key">
+    | Optional<ReadWriteSelectorFamilyOptions<T, P>, "key">,
   P extends SerializableParam = SerializableParam,
-  F extends undefined | true = undefined
+  F extends undefined | true = undefined,
 >(
   options: O,
   family?: F
 ): F extends undefined
-  ? O extends Optional<ReadWriteSelectorOptions<T>, 'key'>
-  ? RecoilState<T>
-  : RecoilValueReadOnly<T>
-  : O extends Optional<ReadWriteSelectorFamilyOptions<T, P>, 'key'>
+  ? O extends Optional<ReadWriteSelectorOptions<T>, "key">
+    ? RecoilState<T>
+    : RecoilValueReadOnly<T>
+  : O extends Optional<ReadWriteSelectorFamilyOptions<T, P>, "key">
   ? (param: P) => RecoilState<T>
   : (param: P) => RecoilValueReadOnly<T> {
-  return { ...options, family, _type: 'selector' } as any;
+  return { ...options, family, _type: "selector" } as any;
 }
 
 export default class StateBlock {
@@ -91,8 +75,8 @@ export default class StateBlock {
       const opts = { ...cls[k], family: undefined, _type: undefined };
       const key = opts.key ?? `${cls.name}_` + k;
 
-      const func = cls[k]._type === 'atom' ? atom : selector;
-      const funcFamily = cls[k]._type === 'atom' ? atomFamily : selectorFamily;
+      const func = cls[k]._type === "atom" ? atom : selector;
+      const funcFamily = cls[k]._type === "atom" ? atomFamily : selectorFamily;
 
       if (cls[k].family) {
         cls[k] = funcFamily({ ...opts, key });
@@ -104,14 +88,10 @@ export default class StateBlock {
   }
 }
 
-
 interface RecoilSnapshotStateObj {
   get?: <T>(atom: RecoilValue<T>) => T;
   getPromise?: <T>(atom: RecoilValue<T>) => Promise<T>;
-  set?: <T>(
-    atom: RecoilState<T>,
-    valOrUpdater: T | ((currVal: T) => T)
-  ) => void;
+  set?: <T>(atom: RecoilState<T>, valOrUpdater: T | ((currVal: T) => T)) => void;
   reset?: (atom: RecoilState<any>) => void;
 }
 
@@ -149,10 +129,7 @@ export function getRecoilValuePromise<T>(atom: RecoilValue<T>): Promise<T> {
   return state.getPromise!(atom);
 }
 
-export function setRecoilValue<T>(
-  atom: RecoilState<T>,
-  valOrUpdater: T | ((currVal: T) => T)
-) {
+export function setRecoilValue<T>(atom: RecoilState<T>, valOrUpdater: T | ((currVal: T) => T)) {
   state.set!(atom, valOrUpdater);
 }
 

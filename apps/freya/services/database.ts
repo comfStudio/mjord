@@ -1,17 +1,11 @@
+import constant, { ServiceType } from "@app/constants";
 
-
-
-import constant, { ServiceType } from '@app/constants';
-
-import { Service } from './base';
+import { Service } from "./base";
 
 export default class Database extends Service {
+  constructor() {
+    super(ServiceType.Database);
+  }
 
-    constructor() {
-        super(ServiceType.Database);
-
-    }
-
-    async init() {
-    }
+  async init() {}
 }

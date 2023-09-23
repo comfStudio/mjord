@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from "react-native";
 
 import { formatDate } from "@app/misc/utils";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import Label from './Label';
+import Label from "./Label";
 
 export default function DateLabel({
   value,
@@ -15,15 +15,7 @@ export default function DateLabel({
   let valueStr = formatDate(value);
 
   return (
-    <Label
-      style={style}
-      icon={
-        <MaterialCommunityIcons
-          name="clock"
-          style={[dateStyles.dateLabelText]}
-        />
-      }
-    >
+    <Label style={style} icon={<MaterialCommunityIcons name="clock" style={[dateStyles.dateLabelText]} />}>
       <Text style={dateStyles.dateLabelText}>{valueStr}</Text>
     </Label>
   );
@@ -59,28 +51,14 @@ export function DateRangeLabel({
   return (
     <View style={[dateRangeStyles.container, style]}>
       {start && (
-        <Label
-          icon={
-            <MaterialCommunityIcons
-              name="clock"
-              style={dateRangeStyles.dateLabelText}
-            />
-          }
-        >
+        <Label icon={<MaterialCommunityIcons name="clock" style={dateRangeStyles.dateLabelText} />}>
           <Text style={dateRangeStyles.dateLabelText}>{startStr}</Text>
         </Label>
       )}
       {end && (
         <>
           <Text>-</Text>
-          <Label
-            icon={
-              <MaterialCommunityIcons
-                name="clock"
-                style={dateRangeStyles.dateLabelText}
-              />
-            }
-          >
+          <Label icon={<MaterialCommunityIcons name="clock" style={dateRangeStyles.dateLabelText} />}>
             <Text style={dateRangeStyles.dateLabelText}>{endStr}</Text>
           </Label>
         </>

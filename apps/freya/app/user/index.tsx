@@ -1,11 +1,4 @@
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { t } from "@mjord/common";
@@ -25,10 +18,7 @@ export default function UserScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.userInfo}>
-        <Image
-          source={{ uri: userData.profilePicture }}
-          style={styles.profilePicture}
-        />
+        <Image source={{ uri: userData.profilePicture }} style={styles.profilePicture} />
         <Text style={styles.userName}>{userData.name}</Text>
       </View>
 

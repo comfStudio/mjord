@@ -10,10 +10,7 @@ import {
 } from "@app/styles/theme";
 import { AllSize, sizeFromUnion } from "@app/styles/variants";
 import { MaterialIcons } from "@expo/vector-icons";
-import {
-  Icon as NativeIcon,
-  IconButtonProps,
-} from "@expo/vector-icons/build/createIconSet";
+import { Icon as NativeIcon, IconButtonProps } from "@expo/vector-icons/build/createIconSet";
 
 import { createComponent } from "./";
 
@@ -48,15 +45,7 @@ type IconProps<G extends string = IconNames> = {
   ThemeProps<"hidden" | "allSize">;
 
 const Icon = createComponent(function Icon(
-  {
-    hidden,
-    icon: Icon,
-    name,
-    overrideStyle,
-    style,
-    size = "md",
-    ...props
-  }: IconProps,
+  { hidden, icon: Icon, name, overrideStyle, style, size = "md", ...props }: IconProps,
   ref
 ) {
   const stl = useStyles(styles, overrideStyle);
@@ -75,12 +64,7 @@ const Icon = createComponent(function Icon(
   }
 
   return !Icon ? (
-    <MaterialIcons
-      {...props}
-      ref={ref}
-      style={compStyles}
-      name={name as IconNames}
-    />
+    <MaterialIcons {...props} ref={ref} style={compStyles} name={name as IconNames} />
   ) : (
     <Icon {...props} ref={ref} style={compStyles} name={name} />
   );

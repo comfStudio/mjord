@@ -1,7 +1,7 @@
-import { useRouter } from 'expo-router';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRouter } from "expo-router";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import { ImageSkeleton } from './Skeleton';
+import { ImageSkeleton } from "./Skeleton";
 
 export default function ListItem({
   imageUrl,
@@ -62,12 +62,7 @@ export default function ListItem({
       }
     >
       {image && (
-        <ImageSkeleton
-          loading={true}
-          style={styles.image}
-          height={64}
-          width={64}
-        >
+        <ImageSkeleton loading={true} style={styles.image} height={64} width={64}>
           <Image style={styles.image} source={{ uri: imageUrl }} />
         </ImageSkeleton>
       )}

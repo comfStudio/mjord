@@ -50,9 +50,7 @@ export default function Login2Screen() {
         constant.log.e("Failed to get profile after login");
         throw new Error("Failed to get profile after login");
       }
-      userRequireOnboarding(profile)
-        ? router.push(ROUTES.LOGIN_ONBOARDING)
-        : router.push(ROUTES.USER);
+      userRequireOnboarding(profile) ? router.push(ROUTES.LOGIN_ONBOARDING) : router.push(ROUTES.USER);
     }
   });
 
@@ -77,9 +75,7 @@ export default function Login2Screen() {
         }}
       />
       <View style={styles.container}>
-        <Text
-          style={styles.title}
-        >{t`We've sent a magic code to your email!`}</Text>
+        <Text style={styles.title}>{t`We've sent a magic code to your email!`}</Text>
         <View style={styles.emailView}>
           <Text style={styles.emailText}>{loginState?.email}</Text>
           <Button
@@ -101,26 +97,12 @@ export default function Login2Screen() {
           keyboardType="number-pad"
           placeholder={t`Code`}
         />
-        {failed === "login" && (
-          <Text
-            style={styles.errorSegmentText}
-          >{t`Code has expired or is invalid`}</Text>
-        )}
+        {failed === "login" && <Text style={styles.errorSegmentText}>{t`Code has expired or is invalid`}</Text>}
         {failed === "resend" && (
-          <Text
-            style={styles.errorSegmentText}
-          >{t`Failed to resend magic code. Try again later.`}</Text>
+          <Text style={styles.errorSegmentText}>{t`Failed to resend magic code. Try again later.`}</Text>
         )}
-        {errors?.token?.message && (
-          <Text style={styles.errorSegmentText}>{errors?.token?.message}</Text>
-        )}
-        <Button
-          primary
-          disabled={!isValid}
-          iconName="arrow-forward"
-          style={styles.loginButton}
-          onPress={onLogin}
-        />
+        {errors?.token?.message && <Text style={styles.errorSegmentText}>{errors?.token?.message}</Text>}
+        <Button primary disabled={!isValid} iconName="arrow-forward" style={styles.loginButton} onPress={onLogin} />
       </View>
     </>
   );

@@ -7,13 +7,7 @@ import { createStyles, useStyles } from "@app/styles/theme";
 
 type IconNames = React.ComponentProps<typeof Icon>["name"];
 
-export function AdvisoryLabel({
-  children,
-  icon = "info",
-}: {
-  children?: string;
-  icon?: React.ReactNode | IconNames;
-}) {
+export function AdvisoryLabel({ children, icon = "info" }: { children?: string; icon?: React.ReactNode | IconNames }) {
   let iconEl: React.ReactNode;
 
   const stl = useStyles(styles);

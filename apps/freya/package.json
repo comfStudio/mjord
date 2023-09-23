@@ -10,6 +10,8 @@
     "upgrade": "dotenv -c development expo install --fix",
     "translate": "ttag po2json",
     "test": "jest",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:prettier": "prettier --check .",
     "updateSnapshots": "jest -u --coverage=false"
   },
   "devDependencies": {

@@ -1,11 +1,6 @@
 import { describe, it, ItArgs, TestSuite } from "std/testing/bdd";
 
-function suiteMap<T>(
-  testParam: any,
-  name: string,
-  map: Record<string, string>,
-  suite?: TestSuite<T>
-) {
+function suiteMap<T>(testParam: any, name: string, map: Record<string, string>, suite?: TestSuite<T>) {
   return describe({
     name,
     suite,
@@ -39,9 +34,7 @@ export function itAnonAuth<T>(...args: ItArgs<T & { [k: string]: any }>) {
     base_suite
   );
 
-  const anonArgs = args
-    .slice(0, suite_idx)
-    .concat(anonSuite, ...args.slice(suite_idx + (base_suite ? 1 : 0)));
+  const anonArgs = args.slice(0, suite_idx).concat(anonSuite, ...args.slice(suite_idx + (base_suite ? 1 : 0)));
 
   it(...(anonArgs as ItArgs<T>));
 
@@ -55,9 +48,7 @@ export function itAnonAuth<T>(...args: ItArgs<T & { [k: string]: any }>) {
     base_suite
   );
 
-  const authArgs = args
-    .slice(0, suite_idx)
-    .concat(authSuite, ...args.slice(suite_idx + (base_suite ? 1 : 0)));
+  const authArgs = args.slice(0, suite_idx).concat(authSuite, ...args.slice(suite_idx + (base_suite ? 1 : 0)));
 
   it(...(authArgs as ItArgs<T>));
 }

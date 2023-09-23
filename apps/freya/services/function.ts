@@ -1,9 +1,9 @@
-import constant, { ServiceType } from '@app/constants';
-import { FunctionError } from '@app/misc/error';
-import RaiseError from '@mjord/common/lib/error';
-import { InvokeOptions, InvokeReturn } from '@mjord/edge/functions';
-import { FunctionName, RequestType } from '@mjord/edge/schema';
-import { FunctionsHttpError } from '@supabase/supabase-js';
+import constant, { ServiceType } from "@app/constants";
+import { FunctionError } from "@app/misc/error";
+import RaiseError from "@mjord/common/lib/error";
+import { InvokeOptions, InvokeReturn } from "@mjord/edge/functions";
+import { FunctionName, RequestType } from "@mjord/edge/schema";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import {
   QueryClient,
   QueryFunction,
@@ -11,26 +11,19 @@ import {
   useQuery,
   UseQueryOptions,
   UseQueryResult,
-} from '@tanstack/react-query';
+} from "@tanstack/react-query";
 
-import { Service } from './base';
+import { Service } from "./base";
 
-export type FunctionReturn<
-  T extends FunctionName,
-  Opt extends InvokeOptions<T, RequestType> | undefined
-> =
+export type FunctionReturn<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> | undefined> =
   | {
-      data: Opt extends InvokeOptions<T, any>
-        ? NonNullable<InvokeReturn<T, Opt["body"]>["data"]>
-        : unknown;
+      data: Opt extends InvokeOptions<T, any> ? NonNullable<InvokeReturn<T, Opt["body"]>["data"]> : unknown;
       error: undefined;
     }
   | {
       data: undefined;
       error: FunctionError<
-        Opt extends InvokeOptions<T, any>
-          ? NonNullable<InvokeReturn<T, Opt["body"]>["error"]>
-          : never
+        Opt extends InvokeOptions<T, any> ? NonNullable<InvokeReturn<T, Opt["body"]>["error"]> : never
       >;
     };
 export default class Function extends Service {
@@ -40,10 +33,10 @@ export default class Function extends Service {
 
   async init() {}
 
-  async invoke<
-    T extends FunctionName,
-    Opt extends InvokeOptions<T, RequestType> | undefined = undefined
-  >(name: T, options?: Opt) {
+  async invoke<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> | undefined = undefined>(
+    name: T,
+    options?: Opt
+  ) {
     const { data, error } = await this.safeInvoke(name, options);
 
     if (error) {
@@ -53,14 +46,11 @@ export default class Function extends Service {
     return data as NonNullable<FunctionReturn<T, Opt>["data"]>;
   }
 
-  async safeInvoke<
-    T extends FunctionName,
-    Opt extends InvokeOptions<T, RequestType> | undefined = undefined
-  >(name: T, options?: Opt): Promise<FunctionReturn<T, Opt>> {
-    const { data: d, error: e } = await constant.supabase.functions.invoke(
-      name,
-      options
-    );
+  async safeInvoke<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> | undefined = undefined>(
+    name: T,
+    options?: Opt
+  ): Promise<FunctionReturn<T, Opt>> {
+    const { data: d, error: e } = await constant.supabase.functions.invoke(name, options);
 
     let error: FunctionReturn<T, Opt>["error"] = d?.error;
 
@@ -87,10 +77,7 @@ export function getQueryClient() {
       defaultOptions: {
         mutations: {},
         queries: {
-          staleTime:
-            process.env.NODE_ENV !== "production"
-              ? Infinity
-              : 1000 * 60 * 60 * 1, // 1 hours
+          staleTime: process.env.NODE_ENV !== "production" ? Infinity : 1000 * 60 * 60 * 1, // 1 hours
         },
       },
     });
@@ -99,10 +86,10 @@ export function getQueryClient() {
   return queryClient;
 }
 
-function createQueryFunc<
-  T extends FunctionName,
-  Opt extends InvokeOptions<T, RequestType> = never
->(name: T, options?: Opt) {
+function createQueryFunc<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> = never>(
+  name: T,
+  options?: Opt
+) {
   const service = constant.service.get(ServiceType.Function);
 
   return (async ({ signal }: QueryFunctionContext) => {
@@ -119,10 +106,7 @@ export function useSupabaseClient() {
   return constant.supabase;
 }
 
-export function useFunction<
-  T extends FunctionName,
-  Opt extends InvokeOptions<T, RequestType> = never
->(
+export function useFunction<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> = never>(
   name: T,
   options?: Opt,
   queryOptions?: UseQueryOptions<
@@ -134,16 +118,10 @@ export function useFunction<
 
   return useQuery(key, createQueryFunc<T, Opt>(name, options), {
     ...(queryOptions as any),
-  }) as UseQueryResult<
-    NonNullable<FunctionReturn<T, Opt>["data"]>,
-    NonNullable<FunctionReturn<T, Opt>["error"]>
-  >;
+  }) as UseQueryResult<NonNullable<FunctionReturn<T, Opt>["data"]>, NonNullable<FunctionReturn<T, Opt>["error"]>>;
 }
 
-export function queryFunction<
-  T extends FunctionName,
-  Opt extends InvokeOptions<T, RequestType> = never
->(
+export function queryFunction<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> = never>(
   name: T,
   options?: Opt,
   queryOptions?: UseQueryOptions<
@@ -155,9 +133,5 @@ export function queryFunction<
 
   const key = ["function", name, options];
 
-  return client.fetchQuery(
-    key,
-    createQueryFunc<T, Opt>(name, options),
-    queryOptions
-  );
+  return client.fetchQuery(key, createQueryFunc<T, Opt>(name, options), queryOptions);
 }

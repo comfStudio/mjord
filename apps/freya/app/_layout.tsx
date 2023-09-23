@@ -1,35 +1,26 @@
-import 'react-native-url-polyfill/auto';
+import "react-native-url-polyfill/auto";
 
-import { getLocales } from 'expo-localization';
-import { SplashScreen, Tabs, useNavigation, usePathname } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  AppState as NativeAppState,
-  Platform,
-} from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { RecoilRoot, useSetRecoilState } from 'recoil';
+import { getLocales } from "expo-localization";
+import { SplashScreen, Tabs, useNavigation, usePathname } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, AppState as NativeAppState, Platform } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { RecoilRoot, useSetRecoilState } from "recoil";
 
-import { AuthListener } from '@/feature/auth/Auth';
-import setupServices from '@/services';
-import { AppState, setupState } from '@/state';
-import { languages } from '@/state/_app';
-import constant, { ROUTES } from '@app/constants';
-import langDA from '@app/i18n/da.json';
-import { ThemeProvider } from '@app/styles/theme';
-import { Feather } from '@expo/vector-icons';
-import { addLocale, t, useLocale } from '@mjord/common';
-import getLogger from '@mjord/logger';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
-import { createClient } from '@supabase/supabase-js';
-import {
-  focusManager,
-  onlineManager,
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { AuthListener } from "@/feature/auth/Auth";
+import setupServices from "@/services";
+import { AppState, setupState } from "@/state";
+import { languages } from "@/state/_app";
+import constant, { ROUTES } from "@app/constants";
+import langDA from "@app/i18n/da.json";
+import { ThemeProvider } from "@app/styles/theme";
+import { Feather } from "@expo/vector-icons";
+import { addLocale, t, useLocale } from "@mjord/common";
+import getLogger from "@mjord/logger";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import NetInfo from "@react-native-community/netinfo";
+import { createClient } from "@supabase/supabase-js";
+import { focusManager, onlineManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import type { AppStateStatus } from "react-native";
 
@@ -45,18 +36,14 @@ export async function main() {
   setupState();
 
   constant.log("Setting up supabase");
-  constant.supabase = createClient(
-    constant.options.SUPABASE_URL,
-    constant.options.SUPABASE_ANON_KEY,
-    {
-      auth: {
-        storage: AsyncStorage,
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: false,
-      },
-    }
-  );
+  constant.supabase = createClient(constant.options.SUPABASE_URL, constant.options.SUPABASE_ANON_KEY, {
+    auth: {
+      storage: AsyncStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
+  });
 
   constant.log("Setting up react query");
   constant.client = new QueryClient();
@@ -96,10 +83,7 @@ function useRefetchOnFocus() {
       }
     }
 
-    const subscription = NativeAppState.addEventListener(
-      "change",
-      onAppStateChange
-    );
+    const subscription = NativeAppState.addEventListener("change", onAppStateChange);
 
     return () => subscription.remove();
   }, []);
@@ -172,7 +156,7 @@ export default function RootLayout() {
     }
   }, [appIsReady]);
 
-  const nav = useNavigation()
+  const nav = useNavigation();
 
   if (!appIsReady) {
     return <ActivityIndicator />;
@@ -188,12 +172,11 @@ export default function RootLayout() {
             <Tabs
               backBehavior="history"
               initialRouteName="(main)/home"
-              screenListeners={({ navigation, route}) => {
+              screenListeners={({ navigation, route }) => {
                 const nav: Navigation = navigation;
                 if (navigation) {
-
                 }
-                return {}
+                return {};
               }}
               screenOptions={{
                 headerShown: true,
@@ -206,18 +189,14 @@ export default function RootLayout() {
                 name="(main)/home"
                 options={{
                   title: t`Explore`,
-                  tabBarIcon: ({ color }) => (
-                    <Feather name="navigation" color={color} size={26} />
-                  ),
+                  tabBarIcon: ({ color }) => <Feather name="navigation" color={color} size={26} />,
                 }}
               />
               <Tabs.Screen
                 name="user"
                 options={{
                   title: t`You`,
-                  tabBarIcon: ({ color }) => (
-                    <Feather name="user" color={color} size={26} />
-                  ),
+                  tabBarIcon: ({ color }) => <Feather name="user" color={color} size={26} />,
                 }}
               />
             </Tabs>

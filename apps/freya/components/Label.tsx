@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
 
 type IconNames = React.ComponentProps<typeof MaterialIcons>["name"];
 
@@ -23,12 +23,7 @@ export default function Label({
   let iconEl: React.ReactNode;
 
   if (typeof icon === "string") {
-    iconEl = (
-      <MaterialIcons
-        style={[styles.icon, iconStyle]}
-        name={icon as IconNames}
-      />
-    );
+    iconEl = <MaterialIcons style={[styles.icon, iconStyle]} name={icon as IconNames} />;
   } else {
     iconEl = icon;
   }

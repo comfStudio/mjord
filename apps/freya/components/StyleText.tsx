@@ -27,18 +27,7 @@ type TextProps = {} & React.ComponentProps<typeof Text> &
   ThemeProps<"variant" | "size" | "disabled" | "muted">;
 
 const StyleText = createComponent<TextProps, Text>(function StyleText(
-  {
-    style,
-    overrideStyle,
-    disabled,
-    muted,
-    primary,
-    tertiary,
-    secondary,
-    children,
-    size,
-    ...props
-  }: TextProps,
+  { style, overrideStyle, disabled, muted, primary, tertiary, secondary, children, size, ...props }: TextProps,
   ref
 ) {
   const stl = useStyles(styles, overrideStyle);

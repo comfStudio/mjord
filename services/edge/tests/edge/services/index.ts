@@ -11,9 +11,7 @@ export const serviceSuite = describe({
 
 type ThisService<T> = { service: T } & UnwrapSuite<typeof serviceSuite>;
 
-export function describeService<T extends Service>(service: {
-  new (): T;
-}): TestSuite<ThisService<T>> {
+export function describeService<T extends Service>(service: { new (): T }): TestSuite<ThisService<T>> {
   return describe({
     suite: serviceSuite,
     name: service.constructor.name,

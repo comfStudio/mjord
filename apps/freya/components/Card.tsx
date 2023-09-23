@@ -30,12 +30,7 @@ export default function Card({
         })
       }
     >
-      <ImageSkeleton
-        style={styles.image}
-        loading={true}
-        height={200}
-        width={200}
-      >
+      <ImageSkeleton style={styles.image} loading={true} height={200} width={200}>
         <Image source={{ uri: imageUrl }} style={styles.image} />
       </ImageSkeleton>
       <View style={styles.content}>

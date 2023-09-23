@@ -1,12 +1,8 @@
-import { Redirect, usePathname } from 'expo-router';
-import { ReactElement } from 'react';
-import { Text, View } from 'react-native';
+import { Redirect, usePathname } from "expo-router";
+import { ReactElement } from "react";
+import { Text, View } from "react-native";
 
-import {
-  useAuthUser,
-  useProfile,
-  userRequireOnboarding,
-} from "@/services/user";
+import { useAuthUser, useProfile, userRequireOnboarding } from "@/services/user";
 import constant, { ROUTES } from "@app/constants";
 
 function OnboardUser({ children }: { children: React.ReactNode }) {
@@ -22,11 +18,7 @@ function OnboardUser({ children }: { children: React.ReactNode }) {
   }
 
   // TODO: onboard data should be in profiles.extra
-  if (
-    data &&
-    userRequireOnboarding(data) &&
-    !path.startsWith(ROUTES.LOGIN_ONBOARDING)
-  ) {
+  if (data && userRequireOnboarding(data) && !path.startsWith(ROUTES.LOGIN_ONBOARDING)) {
     constant.log.d("User require onboarding");
     return <Redirect href={ROUTES.LOGIN_ONBOARDING} />;
   }

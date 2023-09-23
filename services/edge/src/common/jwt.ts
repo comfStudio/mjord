@@ -25,9 +25,7 @@ export function decode<T extends DecodedJWT = SupabaseJWTToken>(token: string) {
   return jose.decodeJwt(token) as T;
 }
 
-const JWT_CACHE = new LRUCacheMap<string, string>(
-  constant.JWT_ENCODED_CACHE_LIMIT
-);
+const JWT_CACHE = new LRUCacheMap<string, string>(constant.JWT_ENCODED_CACHE_LIMIT);
 
 export async function encode(
   data: DecodedJWT,
@@ -73,10 +71,7 @@ export async function encode(
   });
 
   if (fillDetails) {
-    jwt = jwt
-      .setIssuedAt()
-      .setIssuer(constant.JWT_ISSUER)
-      .setExpirationTime(constant.JWT_EXPIRES_IN);
+    jwt = jwt.setIssuedAt().setIssuer(constant.JWT_ISSUER).setExpirationTime(constant.JWT_EXPIRES_IN);
 
     if (!data?.aud) {
       jwt = jwt.setAudience(defaultAud);

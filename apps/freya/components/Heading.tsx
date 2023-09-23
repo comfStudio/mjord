@@ -3,12 +3,7 @@ import React from "react";
 import StyleText from "@/components/StyleText";
 import { booleanFromArray } from "@app/misc/utils";
 import { HeadingSize } from "@app/styles/sizing";
-import {
-  composeStyles,
-  createStyles,
-  defineComponentStyles,
-  useStyles,
-} from "@app/styles/theme";
+import { composeStyles, createStyles, defineComponentStyles, useStyles } from "@app/styles/theme";
 
 import { createComponent } from "./";
 
@@ -20,10 +15,7 @@ declare module "@app/styles/interface" {
   }
 }
 
-type HeadingProps = { [k in HeadingSize]?: boolean } & Omit<
-  React.ComponentProps<typeof StyleText>,
-  "size"
->;
+type HeadingProps = { [k in HeadingSize]?: boolean } & Omit<React.ComponentProps<typeof StyleText>, "size">;
 
 const Heading = createComponent(function Heading(
   { overrideStyle, style, h1, h2, h3, h4, ...props }: HeadingProps,
@@ -40,14 +32,7 @@ const Heading = createComponent(function Heading(
     style
   );
 
-  return (
-    <StyleText
-      {...props}
-      ref={ref}
-      style={compStyles}
-      overrideStyle={overrideStyle}
-    />
-  );
+  return <StyleText {...props} ref={ref} style={compStyles} overrideStyle={overrideStyle} />;
 });
 
 export default Heading;

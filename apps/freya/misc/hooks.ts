@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useReducer } from "react";
 
 export function useToggle<T = boolean>(options: readonly T[] = [false, true] as any) {
   const [[option], toggle] = useReducer((state: T[], action: React.SetStateAction<T>) => {

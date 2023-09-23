@@ -12,17 +12,8 @@ export default function HomeScreen() {
       <View style={styles.cardContainer}>
         <HorizontalGroupCardList data={data} />
       </View>
-      <View
-        style={[
-          styles.listContainer,
-          { width: Dimensions.get("screen").width },
-        ]}
-      >
-        <VerticalLoadMoreGroupList
-          initialPageSize={30}
-          pageSize={10}
-          data={data}
-        />
+      <View style={[styles.listContainer, { width: Dimensions.get("screen").width }]}>
+        <VerticalLoadMoreGroupList initialPageSize={30} pageSize={10} data={data} />
       </View>
     </ScrollView>
   );

@@ -19,12 +19,7 @@ import StyleText from "./StyleText";
 declare module "@app/styles/interface" {
   export interface ComponentStyles {
     button: defineComponentStyles<{
-      names:
-        | "icon"
-        | "primaryIcon"
-        | "secondaryIcon"
-        | Size
-        | ThemePropsNames<"variant" | "disabled" | "outline">;
+      names: "icon" | "primaryIcon" | "secondaryIcon" | Size | ThemePropsNames<"variant" | "disabled" | "outline">;
       overrides: "text" | "icon";
     }>;
   }
@@ -93,13 +88,7 @@ const Button = createComponent<ButtonProps, TouchableOpacity>(function Button(
           {value}
         </StyleText>
       )}
-      <Icon
-        name={iconName}
-        {...iconProps}
-        size={size}
-        style={iconStyles as any}
-        overrideStyle={stl.overrides?.icon}
-      />
+      <Icon name={iconName} {...iconProps} size={size} style={iconStyles as any} overrideStyle={stl.overrides?.icon} />
       {children}
     </TouchableOpacity>
   );

@@ -1,10 +1,9 @@
+import { useRouter } from "expo-router";
+import { useCallback, useEffect } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
-import { useRouter } from 'expo-router';
-import { useCallback, useEffect } from 'react';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-
-import { UserState } from '@/state';
-import constant, { ROUTES, ServiceType } from '@app/constants';
+import { UserState } from "@/state";
+import constant, { ROUTES, ServiceType } from "@app/constants";
 import { ProfileData } from "@mjord/edge/db";
 import { useMutation } from "@tanstack/react-query";
 
@@ -35,11 +34,7 @@ export default class User extends Service {
       data: { user },
     } = await constant.supabase.auth.getUser();
 
-    const { data, error } = await constant.supabase
-      .from("profiles")
-      .update(profile)
-      .eq("id", user.id)
-      .single();
+    const { data, error } = await constant.supabase.from("profiles").update(profile).eq("id", user.id).single();
 
     if (error) {
       throw error;
@@ -72,9 +67,7 @@ export default class User extends Service {
 }
 
 export class UserHelpers {
-  static validEmailDomains = ["post.au.dk", "uni.au.dk"].sort((a, b) =>
-    a.localeCompare(b)
-  );
+  static validEmailDomains = ["post.au.dk", "uni.au.dk"].sort((a, b) => a.localeCompare(b));
 }
 
 export function userRequireOnboarding(profile: ProfileData) {
@@ -90,22 +83,20 @@ export function useAuthListener() {
 
   useEffect(() => {
     if (!client?.auth) return;
-    const { data: authListener } = client.auth.onAuthStateChange(
-      async (event, session) => {
-        switch (event) {
-          case "MFA_CHALLENGE_VERIFIED":
-          case "TOKEN_REFRESHED":
-          case "USER_UPDATED":
-          case "INITIAL_SESSION":
-          case "SIGNED_IN":
-            setUser(session?.user ?? null);
-            break;
-          case "SIGNED_OUT":
-            setUser(null);
-            break;
-        }
+    const { data: authListener } = client.auth.onAuthStateChange(async (event, session) => {
+      switch (event) {
+        case "MFA_CHALLENGE_VERIFIED":
+        case "TOKEN_REFRESHED":
+        case "USER_UPDATED":
+        case "INITIAL_SESSION":
+        case "SIGNED_IN":
+          setUser(session?.user ?? null);
+          break;
+        case "SIGNED_OUT":
+          setUser(null);
+          break;
       }
-    );
+    });
 
     return () => {
       authListener?.subscription?.unsubscribe?.();
@@ -156,15 +147,15 @@ export function useProfile() {
 }
 
 export function useUpdateProfile() {
-    const service = constant.service.get(ServiceType.User);
-    const user = useAuthUser();
+  const service = constant.service.get(ServiceType.User);
+  const user = useAuthUser();
 
-    const m = useMutation({
-        mutationFn: async (profile: Omit<ProfileData, "id">) => {
-            const data = await service.updateProfile(profile);
-            return data;
-        }
-    })
+  const m = useMutation({
+    mutationFn: async (profile: Omit<ProfileData, "id">) => {
+      const data = await service.updateProfile(profile);
+      return data;
+    },
+  });
 
-    return m
+  return m;
 }

@@ -17,12 +17,8 @@ import { t } from "@mjord/common";
 function AcceptedDomainsSegment() {
   return (
     <Segment style={styles.acceptedDomains}>
-      <Text
-        style={styles.acceptedDomainsTitle}
-      >{t`We currently only accept signups from the following domains:`}</Text>
-      <Text style={styles.acceptedDomainsText}>
-        {UserHelpers.validEmailDomains.join(", ")}
-      </Text>
+      <Text style={styles.acceptedDomainsTitle}>{t`We currently only accept signups from the following domains:`}</Text>
+      <Text style={styles.acceptedDomainsText}>{UserHelpers.validEmailDomains.join(", ")}</Text>
     </Segment>
   );
 }
@@ -82,26 +78,14 @@ export default function Login1Screen() {
           keyboardType="email-address"
           placeholder={t`Email`}
         />
-        {loginFailed && (
-          <Text
-            style={styles.errorSegmentText}
-          >{t`Failed to login. Try again later.`}</Text>
-        )}
+        {loginFailed && <Text style={styles.errorSegmentText}>{t`Failed to login. Try again later.`}</Text>}
         {errors?.email?.message &&
           (errors?.email?.message === "domain" ? (
             <AcceptedDomainsSegment />
           ) : (
-            <Text style={styles.errorSegmentText}>
-              {errors?.email?.message}
-            </Text>
+            <Text style={styles.errorSegmentText}>{errors?.email?.message}</Text>
           ))}
-        <Button
-          primary
-          disabled={!isValid}
-          iconName="arrow-forward"
-          style={styles.loginButton}
-          onPress={onSubmit}
-        />
+        <Button primary disabled={!isValid} iconName="arrow-forward" style={styles.loginButton} onPress={onSubmit} />
       </View>
     </>
   );

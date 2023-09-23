@@ -19,20 +19,11 @@ export default function FeaturedEvents({ groupId }: { groupId: number }) {
 
   return (
     <Segment transparent>
-      <VerticalLoadMoreList
-        pageSize={5}
-        data={data?.future ?? []}
-        renderItem={renderItemFuture}
-      />
+      <VerticalLoadMoreList pageSize={5} data={data?.future ?? []} renderItem={renderItemFuture} />
       <View style={styles.sectionContainer}>
         <Text style={styles.sectionTitle}>{t`Past events`}</Text>
       </View>
-      <VerticalLoadMoreList
-        initialPageSize={2}
-        pageSize={3}
-        data={data?.past ?? []}
-        renderItem={renderItemPast}
-      />
+      <VerticalLoadMoreList initialPageSize={2} pageSize={3} data={data?.past ?? []} renderItem={renderItemPast} />
     </Segment>
   );
 }

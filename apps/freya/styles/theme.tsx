@@ -1,29 +1,11 @@
-import {
-  createContext,
-  useContext,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  Appearance,
-  ImageStyle,
-  StyleProp,
-  StyleSheet,
-  TextStyle,
-  useColorScheme,
-  ViewStyle,
-} from "react-native";
+import { createContext, useContext, useLayoutEffect, useMemo, useState } from "react";
+import { Appearance, ImageStyle, StyleProp, StyleSheet, TextStyle, useColorScheme, ViewStyle } from "react-native";
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRecoilValue } from "recoil";
 
 import { deepMerge } from "@app/misc/utils";
 import { AppState } from "@app/state";
-import {
-  ComponentStyles,
-  VariantTypeGroups,
-  VariantTypes,
-} from "@app/styles/interface";
+import { ComponentStyles, VariantTypeGroups, VariantTypes } from "@app/styles/interface";
 
 import { Colors } from "./colors";
 import sizing, { Sizing } from "./sizing";
@@ -62,14 +44,8 @@ type NamedOverridesStyles<S, T extends SpeficStyleTypes<S>> = PrettifyObject<
   } & NamedNativeStyles<Omit<S, "overrides">, Omit<T, "overrides">>
 >;
 
-export type NamedStyles<
-  S,
-  T extends SpeficStyleTypes<S> = {}
-> = GetStylesOverrides<S> extends never
-  ? NamedNativeStyles<
-      Omit<S, "overrides">,
-      SpeficStyleTypes<Omit<S, "overrides">>
-    >
+export type NamedStyles<S, T extends SpeficStyleTypes<S> = {}> = GetStylesOverrides<S> extends never
+  ? NamedNativeStyles<Omit<S, "overrides">, SpeficStyleTypes<Omit<S, "overrides">>>
   : NamedOverridesStyles<S, T>;
 
 export type StyleFactory<S = any, T extends SpeficStyleTypes<S> = any> = {
@@ -97,13 +73,7 @@ interface ContextProps {
 export class ThemeManager {
   context: ContextProps;
 
-  constructor({
-    variant = "light",
-    insets,
-  }: {
-    variant: ThemeVariant;
-    insets?: EdgeInsets;
-  }) {
+  constructor({ variant = "light", insets }: { variant: ThemeVariant; insets?: EdgeInsets }) {
     this.context = {
       manager: this,
       variant,
@@ -137,9 +107,7 @@ export class ThemeManager {
         break;
     }
 
-    const theme = this.context.theme
-      ? deepMerge(this.context.theme, ctheme)
-      : (ctheme as Theme);
+    const theme = this.context.theme ? deepMerge(this.context.theme, ctheme) : (ctheme as Theme);
 
     this.context = {
       ...this.context,
@@ -181,24 +149,13 @@ export class ThemeManager {
 
 const ThemeContext = createContext(undefined as any as ContextProps);
 
-export function ThemeProvider({
-  variant,
-  children,
-}: {
-  variant?: ThemeVariant | null;
-  children: React.ReactNode;
-}) {
+export function ThemeProvider({ variant, children }: { variant?: ThemeVariant | null; children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const userVariant = useRecoilValue(AppState.themeVariant);
-  const [currentVariant, setVariant] = useState<ThemeVariant>(
-    variant ?? userVariant ?? colorScheme ?? "light"
-  );
+  const [currentVariant, setVariant] = useState<ThemeVariant>(variant ?? userVariant ?? colorScheme ?? "light");
 
-  const manager = useMemo(
-    () => new ThemeManager({ variant: currentVariant, insets }),
-    []
-  );
+  const manager = useMemo(() => new ThemeManager({ variant: currentVariant, insets }), []);
 
   useLayoutEffect(() => {
     const sub = Appearance.addChangeListener(({ colorScheme }) => {
@@ -216,11 +173,7 @@ export function ThemeProvider({
 
   useLayoutEffect(() => {}, [currentVariant]);
 
-  return (
-    <ThemeContext.Provider value={manager.context}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={manager.context}>{children}</ThemeContext.Provider>;
 }
 
 export function useThemeManager() {
@@ -239,14 +192,11 @@ type SCreateStyles<C> = C extends keyof ComponentStyles
 
 type NCreateStyles<S = any> = NamedStyles<S, SpeficStyleTypes<S>>;
 
-type OCreateStyles<C extends keyof ComponentStyles | NCreateStyles> =
-  C extends keyof ComponentStyles
-    ? NamedStyles<SCreateStyles<C>, SpeficStyleTypes<SCreateStyles<C>>>
-    : C;
+type OCreateStyles<C extends keyof ComponentStyles | NCreateStyles> = C extends keyof ComponentStyles
+  ? NamedStyles<SCreateStyles<C>, SpeficStyleTypes<SCreateStyles<C>>>
+  : C;
 
-export function createStyles<
-  C extends keyof ComponentStyles | NamedStyles<any, any>
->(
+export function createStyles<C extends keyof ComponentStyles | NamedStyles<any, any>>(
   styles: ((t: Theme) => OCreateStyles<C>) | OCreateStyles<C>
 ): StyleFactory<OCreateStyles<C>, SpeficStyleTypes<OCreateStyles<C>>> {
   const f = typeof styles === "function" ? styles : () => styles;
@@ -278,10 +228,7 @@ export function composeStyles<S extends unknown>(
     }
 
     if (filter[key]) {
-      if (
-        (typeof filter[key] === "function" && filter[key]()) ||
-        filter[key] === true
-      ) {
+      if ((typeof filter[key] === "function" && filter[key]()) || filter[key] === true) {
         acc.push(styles[key]);
       }
     }
@@ -291,14 +238,9 @@ export function composeStyles<S extends unknown>(
   return [...s, ...propStyles.filter(Boolean)] as StyleProp<any>;
 }
 
-export interface ThemeStyleProps<
-  C,
-  Override extends keyof ComponentStyles = never
-> {
+export interface ThemeStyleProps<C, Override extends keyof ComponentStyles = never> {
   style?: ComponentStyleProp<C>;
-  overrideStyle?: Override extends never
-    ? never
-    : Partial<ComponentStyles[Override]> | undefined;
+  overrideStyle?: Override extends never ? never : Partial<ComponentStyles[Override]> | undefined;
 }
 
 type OmitNever<T> = { [K in keyof T as T[K] extends never ? never : K]: T[K] };
@@ -309,27 +251,25 @@ type _ThemePropsHelper<props, T> = keyof T & props extends never
       [p in keyof Pick<T, keyof T & props>]: T[p];
     };
 
-type _ThemeProps<props extends keyof VariantTypes | keyof VariantTypeGroups> =
-  OmitNever<_ThemePropsHelper<props, VariantTypes>> &
-    UnionToIntersection<
-      _ThemePropsHelper<props, VariantTypeGroups>[keyof VariantTypeGroups &
-        props]
-    >;
+type _ThemeProps<props extends keyof VariantTypes | keyof VariantTypeGroups> = OmitNever<
+  _ThemePropsHelper<props, VariantTypes>
+> &
+  UnionToIntersection<_ThemePropsHelper<props, VariantTypeGroups>[keyof VariantTypeGroups & props]>;
 
-export type ThemeProps<
-  props extends keyof VariantTypes | keyof VariantTypeGroups
-> = Partial<PrettifyObject<OmitNever<_ThemeProps<props>>>>;
+export type ThemeProps<props extends keyof VariantTypes | keyof VariantTypeGroups> = Partial<
+  PrettifyObject<OmitNever<_ThemeProps<props>>>
+>;
 
-export type ThemePropsNames<
-  props extends keyof VariantTypes | keyof VariantTypeGroups
-> = keyof OmitNever<_ThemeProps<props>>;
+export type ThemePropsNames<props extends keyof VariantTypes | keyof VariantTypeGroups> = keyof OmitNever<
+  _ThemeProps<props>
+>;
 
 export type defineComponentStyles<
   T extends {
     names?: string;
     overrides?: keyof ComponentStyles;
     customOverrides?: string;
-  }
+  },
 > = UnionToIntersection<
   { base: NativeStyle } & (T["names"] extends undefined
     ? {}

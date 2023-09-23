@@ -72,13 +72,7 @@ export function LineSkeleton({
       style={style}
     >
       {Array.from({ length: lines }).map((_, i) => (
-        <Rect
-          key={i}
-          x="0"
-          y={i * lineHeight + margin}
-          width={width}
-          height={lineHeight}
-        />
+        <Rect key={i} x="0" y={i * lineHeight + margin} width={width} height={lineHeight} />
       ))}
     </ContentLoader>
   );

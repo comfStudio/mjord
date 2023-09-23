@@ -1,5 +1,5 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
 import Modal from "@/components/Modal";
 

@@ -1,0 +1,3 @@
+{
+  "extends": ["@mjord/custom/expo", "prettier"]
+}

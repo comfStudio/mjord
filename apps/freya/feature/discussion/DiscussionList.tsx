@@ -40,10 +40,5 @@ export function VerticalGroupList({
   data: BasicGroupWithMediaData[];
   onPress?: React.ComponentProps<typeof GroupList>["onPress"];
 }) {
-  return (
-    <VerticalList
-      data={data}
-      renderItem={({ item }) => <GroupList data={item} onPress={onPress} />}
-    />
-  );
+  return <VerticalList data={data} renderItem={({ item }) => <GroupList data={item} onPress={onPress} />} />;
 }

@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from "react-native";
 
 import ListItem from "@/components/ListItem";
 import { VerticalLoadMoreList } from "@/components/VerticalList";
@@ -8,11 +8,7 @@ export function MemberItem({ data }: { data: GroupMemberWithProfileData }) {
   return <ListItem title={data?.profile?.name} description="hello world" />;
 }
 
-export default function MemberList({
-  data,
-}: {
-  data: GroupMemberWithProfileData[];
-}) {
+export default function MemberList({ data }: { data: GroupMemberWithProfileData[] }) {
   const renderItem = (item) => {
     return <MemberItem data={item} />;
   };

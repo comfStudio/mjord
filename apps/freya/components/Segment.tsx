@@ -21,15 +21,7 @@ declare module "@app/styles/interface" {
   export interface ComponentStyles {
     segment: defineComponentStyles<{
       names:
-        | ThemePropsNames<
-            | "secondary"
-            | "tertiary"
-            | "rounded"
-            | "padded"
-            | "margin"
-            | "edge"
-            | "transparent"
-          >
+        | ThemePropsNames<"secondary" | "tertiary" | "rounded" | "padded" | "margin" | "edge" | "transparent">
         | "marginSm"
         | "marginMd"
         | "marginLg"
@@ -43,29 +35,10 @@ declare module "@app/styles/interface" {
 const Segment = createComponent<
   ThemeStyleProps<typeof View> &
     Omit<React.ComponentProps<typeof View>, "style"> &
-    ThemeProps<
-      | "secondary"
-      | "tertiary"
-      | "rounded"
-      | "padded"
-      | "margin"
-      | "edge"
-      | "transparent"
-    >,
+    ThemeProps<"secondary" | "tertiary" | "rounded" | "padded" | "margin" | "edge" | "transparent">,
   View
 >(function Segment(
-  {
-    padded,
-    margin,
-    secondary,
-    tertiary,
-    transparent,
-    rounded,
-    edge,
-    style,
-    overrideStyle,
-    ...props
-  },
+  { padded, margin, secondary, tertiary, transparent, rounded, edge, style, overrideStyle, ...props },
   ref
 ) {
   const stl = useStyles(styles, overrideStyle);
@@ -155,14 +128,13 @@ const styles = createStyles<"segment">((t) => ({
   },
 }));
 
-export const EdgeSegment = createComponent<
-  Omit<React.ComponentProps<typeof Segment>, "edge">,
-  View
->(function EdgeSegment({ style, ...props }, ref) {
-  const stl = useStyles(edgeSegmentStyles);
+export const EdgeSegment = createComponent<Omit<React.ComponentProps<typeof Segment>, "edge">, View>(
+  function EdgeSegment({ style, ...props }, ref) {
+    const stl = useStyles(edgeSegmentStyles);
 
-  return <Segment {...props} ref={ref} edge style={[stl.base, style]} />;
-});
+    return <Segment {...props} ref={ref} edge style={[stl.base, style]} />;
+  }
+);
 
 const edgeSegmentStyles = createStyles((t) => ({
   base: {

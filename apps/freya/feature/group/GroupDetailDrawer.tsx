@@ -1,14 +1,14 @@
-import { useRouter } from 'expo-router';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useRecoilState } from 'recoil';
+import { useRouter } from "expo-router";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useRecoilState } from "recoil";
 
 import Button from "@/components/Button";
 import { ImageSkeleton } from "@/components/Skeleton";
 import { GroupState } from "@/state";
 import BottomSheet from "@app/components/BottomSheet";
 import { ROUTES } from "@app/constants";
-import { Ionicons } from '@expo/vector-icons';
-import { t } from '@mjord/common';
+import { Ionicons } from "@expo/vector-icons";
+import { t } from "@mjord/common";
 
 export default function GroupDetailDrawer() {
   const [group, setGroup] = useRecoilState(GroupState.currentGroupDetail);

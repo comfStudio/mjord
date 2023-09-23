@@ -19,8 +19,7 @@ console.debug("Loaded environment variables:", envs);
 // Set up the configuration for the Supabase client
 export const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
 export const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-export const supabaseServiceRoleKey =
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+export const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 export const supabaseJwtSecret = Deno.env.get("SUPABASE_JWT_SECRET") ?? "";
 
 export function getDefaultOptions(): SupabaseClientOptions<"public"> {
@@ -58,10 +57,7 @@ export const testUser = {
   password: "test1234",
 };
 
-export async function getClient(
-  user = true,
-  options?: SupabaseClientOptions<"public">
-) {
+export async function getClient(user = true, options?: SupabaseClientOptions<"public">) {
   if (user && testClients.user) {
     return testClients.user;
   } else if (!user && testClients.anon) {
@@ -83,13 +79,8 @@ export async function getClient(
     const { error } = await client.auth.signInWithPassword(testUser);
 
     if (error) {
-      if (!supabaseServiceRoleKey)
-        throw new Error("supabaseServiceRoleKey is required.");
-      const serviceClient: Client = createClient(
-        supabaseUrl,
-        supabaseServiceRoleKey,
-        options
-      );
+      if (!supabaseServiceRoleKey) throw new Error("supabaseServiceRoleKey is required.");
+      const serviceClient: Client = createClient(supabaseUrl, supabaseServiceRoleKey, options);
       testClients.all.push(serviceClient);
 
       const createUser = async () => {
@@ -104,11 +95,7 @@ export async function getClient(
       let { e, userData } = await createUser();
 
       if (e?.message.includes("already been registered")) {
-        const { data } = await serviceClient
-          .from("profile")
-          .select("id")
-          .eq("name", testProfile.name)
-          .single();
+        const { data } = await serviceClient.from("profile").select("id").eq("name", testProfile.name).single();
 
         if (!data?.id) {
           throw new Error("Failed to find test user to delete");
