@@ -28,6 +28,7 @@
     "@supabase/functions-js": "https://esm.sh/@supabase/functions-js@2.1.4",
     "xhr_polyfill": "https://deno.land/x/xhr@0.3.0/mod.ts",
     "zod": "https://deno.land/x/zod@v3.22.2/mod.ts",
-    "jose": "https://deno.land/x/jose@v4.14.6/index.ts"
+    "jose": "https://deno.land/x/jose@v4.14.6/index.ts",
+    "hotscript": "npm:hotscript@~1.0.13"
   }
 }

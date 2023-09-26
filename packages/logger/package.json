@@ -16,6 +16,6 @@
     "@grabrinc/isomorphic-logger": "https://github.com/iSplasher/isomorphic-logger#commit=c49fbe2d479ca12ec68937e4cc010963554708b2"
   },
   "devDependencies": {
-    "tsup": "^6.7.0"
+    "tsup": "^7.2.0"
   }
 }

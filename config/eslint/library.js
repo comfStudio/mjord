@@ -16,6 +16,7 @@ module.exports = {
     JSX: true,
   },
   ignorePatterns: ["node_modules/", "dist/", "lib/", "coverage/"],
+  plugins: ["react-hooks"],
   // add rules configurations here
   rules: {},
 };

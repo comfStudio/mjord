@@ -1,4 +1,6 @@
 import type { Logger } from "@mjord/logger";
+import EventEmitter from "eventemitter3";
+
 import { SupabaseClient } from "@supabase/supabase-js";
 import { QueryClient } from "@tanstack/react-query";
 
@@ -28,8 +30,12 @@ export enum ROUTES {
   TERMS_OF_SERVICE = "/terms-of-service",
 }
 
+export interface EventMap {
+  initialized: (success: boolean) => void;
+}
+
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export class Constant {
+export default class constant {
   static initialized = false;
 
   static log: Logger;
@@ -42,18 +48,12 @@ export class Constant {
 
   static service: ServiceLocator;
 
-  //   static storage: LocalForage;
-
   static options = {
     SUPABASE_URL: process.env.SUPABASE_URL ?? "",
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ?? "",
   };
 }
 
-global.constant = global.constant || Constant;
+global.constantEmitter = global.constantEmitter || new EventEmitter();
 // eslint-disable-next-line prefer-destructuring
-const constant: typeof Constant = global.constant;
-
-export default constant;
-
-// ---------------------------------------------------------------------
+export const constantEmitter: EventEmitter<EventMap> = global.constantEmitter;

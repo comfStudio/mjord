@@ -4,6 +4,8 @@ import { GroupWithMediaData, ProfileWithMediaData } from "./db.ts";
 import { FunctionDataOp, FunctionName, RequestType, ResponseFailData, ResponseSuccessData } from "./schema.ts";
 import { Join } from "./utils.ts";
 
+// import {Tuples, Pipe, Strings} from 'hotscript'
+
 export interface FunctionResponseMap<T extends string, B extends InvokeBody<T, string>> {
   profile_get: ProfileWithMediaData;
   featured_get: B extends {
@@ -21,6 +23,8 @@ export interface InvokeOptions<T extends string, O extends string> extends Funct
 }
 
 type FunctionOp<T extends string, O extends string> = Join<[T, O], "_">;
+// type FunctionOp<T extends string, O extends string> = Pipe<[T, O], [Tuples.Join<"_">]>
+// const b: Pipe<["profile", "get"], [Tuples.Map<Strings.ToString>, Tuples.Join<"_">] > = "profile_get";
 export type InvokeReturn<T extends FunctionName, B extends InvokeBody<T, string>> =
   | ResponseSuccessData<FunctionResponseMap<T, B>[FunctionOp<T, B extends { type: string } ? B["type"] : never>]>
   | ResponseFailData;

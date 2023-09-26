@@ -11,8 +11,6 @@ itAnonAuth(suite, "get", async function () {
     },
   });
 
-  console.log("testType", this.testType, { data, error });
-
   if (this.testType === "auth") {
     this.expect(error).toBeFalsy();
     this.expect(data).toBeTruthy();

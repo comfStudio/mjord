@@ -19,6 +19,8 @@ const project = existsSync(tsconfig) ? resolve(process.cwd(), "tsconfig.json") :
 module.exports = {
   extends: [
     "eslint:recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
     "plugin:@typescript-eslint/recommended",
     "turbo",
     "prettier", // has to be last
@@ -33,12 +35,21 @@ module.exports = {
       typescript: {
         project,
       },
+      node: true,
     },
+    "import/extensions": [".js", ".jsx", ".ts", ".tsx", ".json"],
   },
   ignorePatterns: ["node_modules", "dist", "coverage/"],
   // add rules configurations here
   rules: {
+    "no-prototype-builtins": "off",
+    "import/order": "off",
     "import/no-default-export": "off",
     "@typescript-eslint/no-var-requires": "warn",
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/ban-ts-comment": "warn",
+    radix: "off",
+    "turbo/no-undeclared-env-vars": "warn",
   },
 };

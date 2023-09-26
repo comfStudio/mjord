@@ -1,3 +1,4 @@
+import * as SystemUI from "expo-system-ui";
 import { createContext, useContext, useLayoutEffect, useMemo, useState } from "react";
 import { Appearance, ImageStyle, StyleProp, StyleSheet, TextStyle, useColorScheme, ViewStyle } from "react-native";
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -6,6 +7,7 @@ import { useRecoilValue } from "recoil";
 import { deepMerge } from "@app/misc/utils";
 import { AppState } from "@app/state";
 import { ComponentStyles, VariantTypeGroups, VariantTypes } from "@app/styles/interface";
+import * as ReactNavigation from "@react-navigation/native";
 
 import { Colors } from "./colors";
 import sizing, { Sizing } from "./sizing";
@@ -44,7 +46,7 @@ type NamedOverridesStyles<S, T extends SpeficStyleTypes<S>> = PrettifyObject<
   } & NamedNativeStyles<Omit<S, "overrides">, Omit<T, "overrides">>
 >;
 
-export type NamedStyles<S, T extends SpeficStyleTypes<S> = {}> = GetStylesOverrides<S> extends never
+export type NamedStyles<S, T extends SpeficStyleTypes<S> = object> = GetStylesOverrides<S> extends never
   ? NamedNativeStyles<Omit<S, "overrides">, SpeficStyleTypes<Omit<S, "overrides">>>
   : NamedOverridesStyles<S, T>;
 
@@ -56,7 +58,7 @@ export interface Theme {
   colors: Partial<Colors>;
   spacing: Spacing;
   sizing: Sizing;
-  typography: {};
+  typography: object;
   insets: EdgeInsets;
 }
 
@@ -112,16 +114,13 @@ export class ThemeManager {
     this.context = {
       ...this.context,
       theme,
-      variant: variant,
+      variant,
     };
 
     return this.context;
   }
 
-  mergeOverrides<S extends unknown>(
-    styles: NamedStyles<S>,
-    ...overrides: (Partial<S> | undefined | null)[]
-  ): NamedStyles<S> {
+  mergeOverrides<S>(styles: NamedStyles<S>, ...overrides: (Partial<S> | undefined | null)[]): NamedStyles<S> {
     const s = { ...styles };
 
     overrides.forEach((o) => {
@@ -171,9 +170,35 @@ export function ThemeProvider({ variant, children }: { variant?: ThemeVariant | 
     return sub.remove;
   }, [userVariant]);
 
-  useLayoutEffect(() => {}, [currentVariant]);
+  useLayoutEffect(() => {
+    if (currentVariant !== manager.context.variant) {
+      const ctx = manager.setVariant(currentVariant);
+      if (ctx.theme.colors.pageBackground) {
+        SystemUI.setBackgroundColorAsync(ctx.theme.colors.pageBackground);
+      }
+    }
+  }, [currentVariant, manager]);
 
-  return <ThemeContext.Provider value={manager.context}>{children}</ThemeContext.Provider>;
+  const ReactNavigationTheme = useMemo(() => {
+    const theme = manager.context.theme;
+    return {
+      dark: currentVariant === "dark",
+      colors: {
+        primary: theme.colors.primary ?? ReactNavigation.DefaultTheme.colors.primary,
+        background: theme.colors.pageBackground ?? ReactNavigation.DefaultTheme.colors.background,
+        card: theme.colors.primaryBackground ?? ReactNavigation.DefaultTheme.colors.card,
+        text: theme.colors.text ?? ReactNavigation.DefaultTheme.colors.text,
+        border: theme.colors.tertiaryBackground ?? ReactNavigation.DefaultTheme.colors.border,
+        notification: theme.colors.tertiaryBackground ?? ReactNavigation.DefaultTheme.colors.notification,
+      },
+    };
+  }, [manager.context.variant]);
+
+  return (
+    <ThemeContext.Provider value={manager.context}>
+      <ReactNavigation.ThemeProvider value={ReactNavigationTheme}>{children}</ReactNavigation.ThemeProvider>
+    </ThemeContext.Provider>
+  );
 }
 
 export function useThemeManager() {
@@ -205,7 +230,7 @@ export function createStyles<C extends keyof ComponentStyles | NamedStyles<any, 
   };
 }
 
-export function useStyles<S extends unknown>(
+export function useStyles<S>(
   style: StyleFactory<S>,
   ...overrides: (Partial<S> | undefined | null)[]
 ): NamedStyles<S, SpeficStyleTypes<S>> {
@@ -217,7 +242,7 @@ export function useStyles<S extends unknown>(
   }, [ctx.theme, ...overrides]);
 }
 
-export function composeStyles<S extends unknown>(
+export function composeStyles<S>(
   styles: NamedStyles<S, SpeficStyleTypes<S>>,
   filter: { [P in keyof S]?: boolean | (() => boolean) },
   ...propStyles: (StyleProp<any> | undefined)[]
@@ -272,19 +297,19 @@ export type defineComponentStyles<
   },
 > = UnionToIntersection<
   { base: NativeStyle } & (T["names"] extends undefined
-    ? {}
+    ? object
     : {
         [P in NonNullable<T["names"]>]: NativeStyle;
       }) &
     (T["overrides"] extends undefined
-      ? {}
+      ? object
       : {
           overrides?: {
             [P in NonNullable<T["overrides"]>]?: Partial<ComponentStyles[P]>;
           };
         }) &
     (T["customOverrides"] extends undefined
-      ? {}
+      ? object
       : {
           overrides?: {
             [P in NonNullable<T["customOverrides"]>]: NativeStyle;

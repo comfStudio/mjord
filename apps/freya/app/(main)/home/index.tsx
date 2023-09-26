@@ -3,17 +3,24 @@ import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 import { HorizontalGroupCardList } from "@/feature/group/GroupCard";
 import { VerticalLoadMoreGroupList } from "@/feature/group/GroupList";
 import { useFeaturedGroups } from "@/services/group";
+import RefreshControl from "@app/components/RefreshControl";
+import { useRefreshByUser } from "@app/misc/hooks";
 
 export default function HomeScreen() {
-  const { data } = useFeaturedGroups();
+  const { data, refetch } = useFeaturedGroups();
+
+  const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={<RefreshControl refreshing={isRefetchingByUser} onRefresh={refetchByUser} />}
+    >
       <View style={styles.cardContainer}>
-        <HorizontalGroupCardList data={data} />
+        <HorizontalGroupCardList data={data ?? []} />
       </View>
       <View style={[styles.listContainer, { width: Dimensions.get("screen").width }]}>
-        <VerticalLoadMoreGroupList initialPageSize={30} pageSize={10} data={data} />
+        <VerticalLoadMoreGroupList initialPageSize={30} pageSize={10} data={data ?? []} />
       </View>
     </ScrollView>
   );

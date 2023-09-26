@@ -1,9 +1,9 @@
 import "react-native-url-polyfill/auto";
 
 import { getLocales } from "expo-localization";
-import { SplashScreen, Tabs, useNavigation, usePathname } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, AppState as NativeAppState, Platform } from "react-native";
+import { SplashScreen, Tabs, usePathname } from "expo-router";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useState } from "react";
+import { AppState as NativeAppState, Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { RecoilRoot, useSetRecoilState } from "recoil";
 
@@ -11,51 +11,60 @@ import { AuthListener } from "@/feature/auth/Auth";
 import setupServices from "@/services";
 import { AppState, setupState } from "@/state";
 import { languages } from "@/state/_app";
-import constant, { ROUTES } from "@app/constants";
+import constant, { constantEmitter, ROUTES } from "@app/constants";
 import langDA from "@app/i18n/da.json";
+import { useInitialized } from "@app/misc/hooks";
+import { getQueryClient } from "@app/services/function";
 import { ThemeProvider } from "@app/styles/theme";
+import { Poppins_500Medium, useFonts } from "@expo-google-fonts/poppins";
 import { Feather } from "@expo/vector-icons";
 import { addLocale, t, useLocale } from "@mjord/common";
 import getLogger from "@mjord/logger";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import { createClient } from "@supabase/supabase-js";
-import { focusManager, onlineManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { focusManager, onlineManager, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 
 import type { AppStateStatus } from "react-native";
-
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export async function main() {
-  constant.log = getLogger();
+  try {
+    if (!constant.log) {
+      constant.log = getLogger();
+    }
 
-  constant.log("initializing app");
+    constant.log("initializing app");
 
-  constant.log("Setting up states");
-  setupState();
+    constant.log("Setting up states");
+    setupState();
 
-  constant.log("Setting up supabase");
-  constant.supabase = createClient(constant.options.SUPABASE_URL, constant.options.SUPABASE_ANON_KEY, {
-    auth: {
-      storage: AsyncStorage,
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: false,
-    },
-  });
+    constant.log("Setting up supabase");
+    constant.supabase = createClient(constant.options.SUPABASE_URL, constant.options.SUPABASE_ANON_KEY, {
+      auth: {
+        storage: AsyncStorage,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+      },
+    });
 
-  constant.log("Setting up react query");
-  constant.client = new QueryClient();
+    constant.log("Setting up services");
+    constant.service = await setupServices();
 
-  constant.log("Setting up services");
-  constant.service = await setupServices();
+    constant.initialized = true;
 
-  constant.initialized = true;
+    applyLocale();
 
-  applyLocale();
+    constant.log("initialized app");
 
-  constant.log("initialized app");
+    constantEmitter.emit("initialized", true);
+  } catch (error) {
+    constantEmitter.emit("initialized", false);
+    constant.log?.e?.("Error initializing app", (error as any)?.message);
+    throw error;
+  }
 }
 
 function applyLocale() {
@@ -95,18 +104,71 @@ function useOnlineStatusManagement() {
   useEffect(() => {
     onlineManager.setEventListener((setOnline) => {
       return NetInfo.addEventListener((state) => {
-        setOnline(!!state.isConnected);
-        setIsOnline(!!state.isConnected);
+        setOnline(!!state.isConnected && !!state.isInternetReachable);
+        setIsOnline(!!state.isConnected && !!state.isInternetReachable);
       });
     });
   }, []);
+}
+
+function initReducer(state: { main: boolean; fonts: boolean }, { type }: { type: "main" | "fonts" }) {
+  return { ...state, [type]: true };
 }
 
 function Init() {
   useOnlineStatusManagement();
   useRefetchOnFocus();
 
+  const initialized = useInitialized();
+  const client = useQueryClient();
+
+  useLayoutEffect(() => {
+    if (initialized) {
+      constant.log.i("Refetching queries");
+      client
+        .invalidateQueries({
+          refetchType: "all",
+        })
+        .then(() => {
+          return client.refetchQueries();
+        });
+    }
+  }, [initialized, client]);
+
   return null;
+}
+
+function useInit() {
+  const [ready, dispatchReady] = useReducer(initReducer, { main: false, fonts: false });
+
+  // main
+
+  useMemo(() => {
+    if (constant.initialized) {
+      dispatchReady({ type: "main" });
+    } else {
+      main().then(() => dispatchReady({ type: "main" }));
+    }
+  }, []);
+
+  // fonts
+
+  const [fontsLoaded, fontError] = useFonts({
+    Poppins_500Medium,
+  });
+
+  useLayoutEffect(() => {
+    if (fontsLoaded || fontError) {
+      constant?.log?.i?.("Fonts loaded");
+      dispatchReady({ type: "fonts" });
+    } else {
+      if (!constant.initialized) {
+        constant?.log?.i?.("Loading fonts");
+      }
+    }
+  }, [fontsLoaded, fontError]);
+
+  return Object.values(ready).every((v) => v);
 }
 
 function HiddenTabs() {
@@ -133,38 +195,46 @@ function HiddenTabs() {
 }
 
 export default function RootLayout() {
-  const [appIsReady, setAppIsReady] = useState(false);
+  const appIsReady = useInit();
+
+  const [revealed, setRevealed] = useState(constant.initialized);
 
   const path = usePathname();
 
   useEffect(() => {
-    main().then(() => setAppIsReady(true));
+    if (!constant.initialized) {
+      constant?.log?.d?.("Navigating to", path);
+    }
+  }, [path]);
+
+  const { client } = useMemo(() => {
+    if (!constant.log) {
+      constant.log = getLogger();
+    }
+
+    if (!constant.client) {
+      constant.client = getQueryClient();
+    }
+
+    return {
+      client: constant.client,
+    };
+  }, []);
+
+  const reveal = useCallback(async () => {
+    await SplashScreen.hideAsync();
+    setRevealed(true);
   }, []);
 
   useEffect(() => {
-    constant.log.d("Navigating to", path);
-  }, [path]);
-
-  const onLayoutRootView = useCallback(async () => {
-    if (appIsReady) {
-      // This tells the splash screen to hide immediately! If we call this after
-      // `setAppIsReady`, then we may see a blank screen while the app is
-      // loading its initial state and rendering its first pixels. So instead,
-      // we hide the splash screen once we know the root view has already
-      // performed layout.
-      await SplashScreen.hideAsync();
+    if (appIsReady && !revealed) {
+      reveal();
     }
-  }, [appIsReady]);
-
-  const nav = useNavigation();
-
-  if (!appIsReady) {
-    return <ActivityIndicator />;
-  }
+  }, [revealed, appIsReady]);
 
   return (
     <RecoilRoot>
-      <QueryClientProvider client={constant.client}>
+      <QueryClientProvider client={client}>
         <SafeAreaProvider>
           <ThemeProvider>
             <AuthListener redirect={ROUTES.HOME} />
@@ -172,12 +242,6 @@ export default function RootLayout() {
             <Tabs
               backBehavior="history"
               initialRouteName="(main)/home"
-              screenListeners={({ navigation, route }) => {
-                const nav: Navigation = navigation;
-                if (navigation) {
-                }
-                return {};
-              }}
               screenOptions={{
                 headerShown: true,
                 title: "",

@@ -1,10 +1,11 @@
-import constant, { ServiceType } from "@app/constants";
+import constant, { constantEmitter, ServiceType } from "@app/constants";
 import { FunctionError } from "@app/misc/error";
-import RaiseError from "@mjord/common/lib/error";
+import RaiseError, { NoOpError } from "@mjord/common/error";
 import { InvokeOptions, InvokeReturn } from "@mjord/edge/functions";
 import { FunctionName, RequestType } from "@mjord/edge/schema";
 import { FunctionsHttpError } from "@supabase/supabase-js";
 import {
+  QueryCache,
   QueryClient,
   QueryFunction,
   QueryFunctionContext,
@@ -50,6 +51,7 @@ export default class Function extends Service {
     name: T,
     options?: Opt
   ): Promise<FunctionReturn<T, Opt>> {
+    constant.log.i("Invoking function", name);
     const { data: d, error: e } = await constant.supabase.functions.invoke(name, options);
 
     let error: FunctionReturn<T, Opt>["error"] = d?.error;
@@ -69,14 +71,20 @@ export default class Function extends Service {
   }
 }
 
-let queryClient: QueryClient | undefined;
-
 export function getQueryClient() {
+  let queryClient: QueryClient | undefined = constant.client;
+
   if (!queryClient) {
     queryClient = new QueryClient({
+      queryCache: new QueryCache({
+        onError: (err, query) => {
+          constant.log.e(`Query error [${query.queryKey}]: `, err?.message);
+        },
+      }),
       defaultOptions: {
         mutations: {},
         queries: {
+          retry: 2,
           staleTime: process.env.NODE_ENV !== "production" ? Infinity : 1000 * 60 * 60 * 1, // 1 hours
         },
       },
@@ -86,13 +94,45 @@ export function getQueryClient() {
   return queryClient;
 }
 
+let waiting = false;
+
 function createQueryFunc<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> = never>(
   name: T,
   options?: Opt
 ) {
-  const service = constant.service.get(ServiceType.Function);
+  return (async ({ signal, queryKey }: QueryFunctionContext) => {
+    let service = constant.service?.get?.(ServiceType.Function);
 
-  return (async ({ signal }: QueryFunctionContext) => {
+    if (!service && !constant.initialized) {
+      await new Promise<void>((resolve, reject) => {
+        constant.log?.i("Query waiting for service initialization:", queryKey);
+        constantEmitter.once("initialized", (s) => {
+          if (s) {
+            resolve();
+          } else {
+            reject(new NoOpError("Service not initialized [failed to initialize]"));
+          }
+        });
+
+        signal.addEventListener("abort", () => {
+          resolve();
+        });
+
+        setTimeout(() => {
+          reject(new NoOpError("Service not initialized [timeout error]"));
+        });
+      });
+
+      if (signal.aborted) {
+        return undefined;
+      }
+      service = constant.service?.get?.(ServiceType.Function);
+    }
+
+    if (!service) {
+      throw new NoOpError("Service not initialized");
+    }
+
     const data = await service.invoke(name, {
       // signal,
       ...options,
@@ -116,8 +156,10 @@ export function useFunction<T extends FunctionName, Opt extends InvokeOptions<T,
 ) {
   const key = ["function", name, options];
 
-  return useQuery(key, createQueryFunc<T, Opt>(name, options), {
-    ...(queryOptions as any),
+  return useQuery({
+    queryKey: key,
+    queryFn: createQueryFunc<T, Opt>(name, options),
+    ...queryOptions,
   }) as UseQueryResult<NonNullable<FunctionReturn<T, Opt>["data"]>, NonNullable<FunctionReturn<T, Opt>["error"]>>;
 }
 
@@ -133,5 +175,9 @@ export function queryFunction<T extends FunctionName, Opt extends InvokeOptions<
 
   const key = ["function", name, options];
 
-  return client.fetchQuery(key, createQueryFunc<T, Opt>(name, options), queryOptions);
+  return client.fetchQuery({
+    queryKey: key,
+    queryFn: createQueryFunc<T, Opt>(name, options),
+    ...queryOptions,
+  });
 }

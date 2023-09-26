@@ -1,9 +1,7 @@
-/* eslint-disable global-require */
 /* eslint-disable no-console */
 import {
   createConsoleProcessor,
   createDateAndLevelPrependProcessor,
-  createStackTraceTransformProcessor,
   createThrottleProcessor,
   Logger,
   LogLevel,
@@ -12,14 +10,13 @@ import {
 } from "@grabrinc/isomorphic-logger";
 
 function createObjectTransformProcessor(): Processor {
-    return (
-        records: Record[]
-    ): Promise<Record[]> | Record[] | Promise<null> | null => {
-        return records.map((v, i) => ({
-            ...v,
-            messages: v.messages,
-        }));
-    };
+  return (records: Record[]): Promise<Record[]> | Record[] | Promise<null> | null => {
+    console.debug({ records });
+    return records.map((v, i) => ({
+      ...v,
+      messages: v.messages,
+    }));
+  };
 }
 
 export default function setupLogger() {
@@ -31,12 +28,10 @@ export default function setupLogger() {
 
   logger.channel(
     ...[
-      createStackTraceTransformProcessor(), // Converts error objects to string representing stack trace.
+      // createStackTraceTransformProcessor(), // Converts error objects to string representing stack trace.
       createDateAndLevelPrependProcessor(), // Prepends every message with date and time.
       // @ts-expect-error
-      process.env.NODE_ENV !== "test"
-        ? createThrottleProcessor({ delay: 100, length: 10 })
-        : undefined, // Batch logged messages.
+      process.env.NODE_ENV !== "test" ? createThrottleProcessor({ delay: 100, length: 10 }) : undefined, // Batch logged messages.
       createObjectTransformProcessor(),
       createConsoleProcessor(), // Write batched messages to console.
     ].filter(Boolean)

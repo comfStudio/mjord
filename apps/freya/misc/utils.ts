@@ -76,10 +76,10 @@ export function isObject(item: any) {
   return typeof item === "object" && !Array.isArray(item);
 }
 
-export function deepMerge<A = Object, B = Object>(target: A, source: B): A & B {
+export function deepMerge<A = object, B = object>(target: A, source: B): A & B {
   const isDeep = (prop: string) =>
     isObject(source[prop]) &&
-    // @ts-expect-error
+    // @ts-expect-error: .
     target.hasOwnProperty(prop) &&
     isObject(target[prop]);
 
@@ -90,7 +90,11 @@ export function deepMerge<A = Object, B = Object>(target: A, source: B): A & B {
     .reduce((a, b) => ({ ...a, ...b }), {});
 
   return {
-    ...(target as Object),
-    ...(replaced as Object),
+    ...(target as object),
+    ...(replaced as object),
   } as A & B;
+}
+
+export async function wait(ms: number) {
+  return new Promise<true>((resolve) => setTimeout(() => resolve(true), ms));
 }

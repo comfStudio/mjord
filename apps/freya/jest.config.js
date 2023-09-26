@@ -75,6 +75,7 @@ module.exports = {
       monoRepoNamespace: "@mjord",
     }),
   },
+  
   collectCoverage: true,
   collectCoverageFrom: [
     "**/*.{ts,tsx}",

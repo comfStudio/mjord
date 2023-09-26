@@ -1,3 +1,6 @@
 {
-  "extends": ["@mjord/custom/expo", "prettier"]
+  "extends": ["@mjord/custom/expo", "prettier"],
+  "rules": {
+    "import/no-unresolved": "off"
+  }
 }
