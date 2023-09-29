@@ -1,6 +1,7 @@
 import constant, { constantEmitter, ServiceType } from "@app/constants";
 import { FunctionError } from "@app/misc/error";
 import RaiseError, { NoOpError } from "@mjord/common/error";
+import { LRUCacheMap, queuedThrottle, throttle } from "@mjord/common/utility";
 import { InvokeOptions, InvokeReturn } from "@mjord/edge/functions";
 import { FunctionName, RequestType } from "@mjord/edge/schema";
 import { FunctionsHttpError } from "@supabase/supabase-js";
@@ -9,6 +10,7 @@ import {
   QueryClient,
   QueryFunction,
   QueryFunctionContext,
+  QueryOptions,
   useQuery,
   UseQueryOptions,
   UseQueryResult,
@@ -94,14 +96,78 @@ export function getQueryClient() {
   return queryClient;
 }
 
-let waiting = false;
+type QFunc<T extends FunctionName, Opt extends InvokeOptions<T, RequestType>> = QueryFunction<
+  NonNullable<FunctionReturn<T, Opt>["data"]>
+> & {
+  cancel: () => void;
+};
+
+const throttleMap = new LRUCacheMap<QFunc<any, any>, string>(1000);
+
+type CustomOptions = {
+  throttle?: {
+    enable?: boolean;
+    wait: number;
+    key?: any;
+  };
+};
 
 function createQueryFunc<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> = never>(
+  queryKey: any,
   name: T,
-  options?: Opt
+  options?: Opt,
+  customOptions?: CustomOptions
 ) {
-  return (async ({ signal, queryKey }: QueryFunctionContext) => {
+  const key = JSON.stringify({ queryKey, customOptions });
+
+  const throttleOptions = customOptions?.throttle ?? ({} as NonNullable<CustomOptions["throttle"]>);
+  throttleOptions.enable = throttleOptions.enable ?? true;
+  throttleOptions.wait = throttleOptions.wait ?? 500;
+
+  const tKey = throttleOptions.key ?? key;
+  if (throttleOptions.enable && throttleMap.has(tKey)) {
+    return throttleMap.get(tKey) as QFunc<T, Opt>;
+  }
+
+  const f = async ({ signal, queryKey }: QueryFunctionContext) => {
+    const service = constant.service?.get?.(ServiceType.Function);
+
+    const data = await service.invoke(name, {
+      // signal,
+      ...options,
+    } as Opt);
+
+    return data;
+  };
+
+  let func = f;
+
+  let throttled: ReturnType<typeof queuedThrottle> | undefined = undefined;
+  if (throttleOptions.enable) {
+    throttled = queuedThrottle((...args) => {
+      return new Promise((resolve, reject) => {
+        // @ts-expect-error: .
+        (f(...args) as Promise<T>)
+          .then((v) => {
+            return resolve(v);
+          })
+          .catch(reject);
+      });
+    }, throttleOptions.wait);
+
+    func = async (...args) => {
+      return throttled!(...args).then((v) => v ?? null);
+    };
+  }
+
+  const final = (async (args: QueryFunctionContext) => {
     let service = constant.service?.get?.(ServiceType.Function);
+
+    if (throttled) {
+      args.signal.addEventListener("abort", () => {
+        throttled?.cancel();
+      });
+    }
 
     if (!service && !constant.initialized) {
       await new Promise<void>((resolve, reject) => {
@@ -114,7 +180,7 @@ function createQueryFunc<T extends FunctionName, Opt extends InvokeOptions<T, Re
           }
         });
 
-        signal.addEventListener("abort", () => {
+        args.signal.addEventListener("abort", () => {
           resolve();
         });
 
@@ -123,8 +189,8 @@ function createQueryFunc<T extends FunctionName, Opt extends InvokeOptions<T, Re
         });
       });
 
-      if (signal.aborted) {
-        return undefined;
+      if (args.signal.aborted) {
+        return null;
       }
       service = constant.service?.get?.(ServiceType.Function);
     }
@@ -133,13 +199,20 @@ function createQueryFunc<T extends FunctionName, Opt extends InvokeOptions<T, Re
       throw new NoOpError("Service not initialized");
     }
 
-    const data = await service.invoke(name, {
-      // signal,
-      ...options,
-    } as Opt);
+    return func(args);
+  }) as QFunc<T, Opt>;
 
-    return data;
-  }) as QueryFunction<NonNullable<FunctionReturn<T, Opt>["data"]>>;
+  if (throttleOptions.enable) {
+    throttleMap.set(tKey, final);
+  }
+
+  final.cancel = () => {
+    if (throttled) {
+      throttled.cancel();
+    }
+  };
+
+  return final;
 }
 
 export function useSupabaseClient() {
@@ -149,16 +222,19 @@ export function useSupabaseClient() {
 export function useFunction<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> = never>(
   name: T,
   options?: Opt,
-  queryOptions?: UseQueryOptions<
-    NonNullable<FunctionReturn<T, Opt>["data"]>,
-    NonNullable<FunctionReturn<T, Opt>["error"]>
-  >
+  queryOptions?: Omit<
+    UseQueryOptions<NonNullable<FunctionReturn<T, Opt>["data"]>, NonNullable<FunctionReturn<T, Opt>["error"]>>,
+    "queryKey"
+  > &
+    CustomOptions
 ) {
   const key = ["function", name, options];
 
+  const queryFn = createQueryFunc<T, Opt>(key, name, options, queryOptions);
+
   return useQuery({
     queryKey: key,
-    queryFn: createQueryFunc<T, Opt>(name, options),
+    queryFn,
     ...queryOptions,
   }) as UseQueryResult<NonNullable<FunctionReturn<T, Opt>["data"]>, NonNullable<FunctionReturn<T, Opt>["error"]>>;
 }
@@ -166,10 +242,11 @@ export function useFunction<T extends FunctionName, Opt extends InvokeOptions<T,
 export function queryFunction<T extends FunctionName, Opt extends InvokeOptions<T, RequestType> = never>(
   name: T,
   options?: Opt,
-  queryOptions?: UseQueryOptions<
-    NonNullable<FunctionReturn<T, Opt>["data"]>,
-    NonNullable<FunctionReturn<T, Opt>["error"]>
-  >
+  queryOptions?: Omit<
+    QueryOptions<NonNullable<FunctionReturn<T, Opt>["data"]>, NonNullable<FunctionReturn<T, Opt>["error"]>>,
+    "queryKey"
+  > &
+    CustomOptions
 ) {
   const client = getQueryClient();
 
@@ -177,7 +254,7 @@ export function queryFunction<T extends FunctionName, Opt extends InvokeOptions<
 
   return client.fetchQuery({
     queryKey: key,
-    queryFn: createQueryFunc<T, Opt>(name, options),
+    queryFn: createQueryFunc<T, Opt>(key, name, options, queryOptions),
     ...queryOptions,
   });
 }

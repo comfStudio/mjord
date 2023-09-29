@@ -124,14 +124,10 @@ function Init() {
 
   useLayoutEffect(() => {
     if (initialized) {
-      constant.log.i("Refetching queries");
-      client
-        .invalidateQueries({
-          refetchType: "all",
-        })
-        .then(() => {
-          return client.refetchQueries();
-        });
+      constant.log.d("Invalidating queries");
+      client.invalidateQueries({
+        refetchType: "all",
+      });
     }
   }, [initialized, client]);
 

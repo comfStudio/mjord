@@ -72,29 +72,3 @@ export function trueFromUnion<O extends Record<string, boolean>, U extends keyof
   );
 }
 
-export function isObject(item: any) {
-  return typeof item === "object" && !Array.isArray(item);
-}
-
-export function deepMerge<A = object, B = object>(target: A, source: B): A & B {
-  const isDeep = (prop: string) =>
-    isObject(source[prop]) &&
-    // @ts-expect-error: .
-    target.hasOwnProperty(prop) &&
-    isObject(target[prop]);
-
-  const replaced = Object.getOwnPropertyNames(source)
-    .map((prop) => ({
-      [prop]: isDeep(prop) ? deepMerge(target[prop], source[prop]) : source[prop],
-    }))
-    .reduce((a, b) => ({ ...a, ...b }), {});
-
-  return {
-    ...(target as object),
-    ...(replaced as object),
-  } as A & B;
-}
-
-export async function wait(ms: number) {
-  return new Promise<true>((resolve) => setTimeout(() => resolve(true), ms));
-}

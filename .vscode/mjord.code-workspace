@@ -25,6 +25,10 @@
       "path": "../packages/common"
     },
     {
+      "name": "📦 @mjord/email",
+      "path": "../packages/email"
+    },
+    {
       "name": "📦 @mjord/logger",
       "path": "../packages/logger"
     },
@@ -46,7 +50,8 @@
       "🚀 @mjord/backend",
       "⚙️ @mjord/tsconfig",
       "⚙️ @mjord/prettier",
-      "⚙️ @mjord/eslint-config-custom"
+      "⚙️ @mjord/eslint-config-custom",
+      "📦 @mjord/email"
     ],
     "monorepoWorkspace.folders.regex.apps": "^app|web|api|frontend|backend|services",
     "deno.importMap": "./services/edge/src/import_map.json",

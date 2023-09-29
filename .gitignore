@@ -16,6 +16,8 @@ npm-debug.*
 *.tsbuildinfo
 .turbo
 
+.react-email/
+
 # yarn
 .yarn/*
 !.yarn/releases

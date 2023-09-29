@@ -68,12 +68,20 @@ export default class Group extends Service {
 }
 
 export function useFeaturedGroups() {
-  const r = useFunction("featured", {
-    body: {
-      type: "get",
-      entity: "group",
+  const r = useFunction(
+    "featured",
+    {
+      body: {
+        type: "get",
+        entity: "group",
+      },
     },
-  });
+    {
+      throttle: {
+        wait: 3000,
+      },
+    }
+  );
   return r;
 }
 

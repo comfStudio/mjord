@@ -3,6 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
 
+    "experimentalDecorators": true,
+
     "paths": {
       "@app/*": ["./*"],
       "@/feature/*": ["./feature/*"],

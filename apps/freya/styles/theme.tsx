@@ -4,9 +4,9 @@ import { Appearance, ImageStyle, StyleProp, StyleSheet, TextStyle, useColorSchem
 import { EdgeInsets, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRecoilValue } from "recoil";
 
-import { deepMerge } from "@app/misc/utils";
 import { AppState } from "@app/state";
 import { ComponentStyles, VariantTypeGroups, VariantTypes } from "@app/styles/interface";
+import { objectMerge, PlainObject } from "@mjord/common/utility";
 import * as ReactNavigation from "@react-navigation/native";
 
 import { Colors } from "./colors";
@@ -54,13 +54,13 @@ export type StyleFactory<S = any, T extends SpeficStyleTypes<S> = any> = {
   factory: (theme: Theme) => NamedStyles<S, T>;
 };
 
-export interface Theme {
+export type Theme = {
   colors: Partial<Colors>;
   spacing: Spacing;
   sizing: Sizing;
   typography: object;
   insets: EdgeInsets;
-}
+};
 
 export type CustomTheme = DeepPartial<Theme>;
 
@@ -109,7 +109,9 @@ export class ThemeManager {
         break;
     }
 
-    const theme = this.context.theme ? deepMerge(this.context.theme, ctheme) : (ctheme as Theme);
+    const theme = this.context.theme
+      ? (objectMerge(this.context.theme as PlainObject, ctheme) as Theme)
+      : (ctheme as Theme);
 
     this.context = {
       ...this.context,
