@@ -4,14 +4,14 @@ import { useSetRecoilState } from "recoil";
 
 import ListItem from "@/components/ListItem";
 import VerticalList, { VerticalLoadMoreList } from "@/components/VerticalList";
-import { BasicGroupWithMediaData } from "@/services/group";
 import { GroupState } from "@/state";
+import { GroupWithMediaData } from "@mjord/edge/db";
 
 export default function GroupListItem({
   data,
   onPress,
 }: {
-  data: BasicGroupWithMediaData;
+  data: GroupWithMediaData;
   onPress?: React.ComponentProps<typeof TouchableOpacity>["onPress"];
 }) {
   const setGroup = useSetRecoilState(GroupState.currentGroupDetail);
@@ -21,7 +21,7 @@ export default function GroupListItem({
       image
       title={data.title}
       imageUrl={data?.primary_media?.url}
-      description={data.description}
+      description={data?.description}
       onPress={
         onPress ??
         ((e) => {
@@ -38,7 +38,7 @@ export function VerticalGroupList({
   data,
   onPress,
 }: {
-  data: BasicGroupWithMediaData[];
+  data: GroupWithMediaData[];
   onPress?: React.ComponentProps<typeof GroupListItem>["onPress"];
 }) {
   return <VerticalList data={data} renderItem={({ item }) => <GroupListItem data={item} onPress={onPress} />} />;
@@ -49,7 +49,7 @@ export function VerticalLoadMoreGroupList({
   onPress,
   ...props
 }: {
-  data: BasicGroupWithMediaData[];
+  data: GroupWithMediaData[];
   onPress?: React.ComponentProps<typeof GroupListItem>["onPress"];
 } & Omit<React.ComponentProps<typeof VerticalLoadMoreList>, "renderItem" | "data">) {
   return (

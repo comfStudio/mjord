@@ -1,12 +1,13 @@
 import { FunctionInvokeOptions, FunctionsResponse } from "@supabase/functions-js";
-import { GroupWithMediaData, ProfileWithMediaData } from "./db.ts";
+import { GroupData, ProfileData } from "./db.ts";
 import { FunctionDataOp, FunctionName, RequestType, ResponseFailData, ResponseSuccessData } from "./schema.ts";
 import { Join } from "./utils.ts";
 export interface FunctionResponseMap<T extends string, B extends InvokeBody<T, string>> {
-    profile_get: ProfileWithMediaData;
+    group_get: GroupData<"media?">;
+    profile_get: ProfileData<"media?">;
     featured_get: B extends {
         entity: "group";
-    } ? GroupWithMediaData[] : never;
+    } ? GroupData<"media?">[] : never;
     [key: string]: unknown;
 }
 export interface InvokeOptions<T extends string, O extends string> extends FunctionInvokeOptions {

@@ -1,5 +1,7 @@
 import { corsHeaders } from "common/cors";
-import constant from "constant";
+import { DB } from "common/db";
+import { decode } from "common/jwt";
+import constant, { DatabaseRole } from "constant";
 import { ConnInfo, Handler, serve as denoServe, ServeInit } from "std/server";
 import {
   anyResponseData,
@@ -13,17 +15,19 @@ import {
 import { ZodError } from "zod";
 
 import setupServices from "./services/index.ts";
-import { getClient, getUserId, Req } from "./supabase.ts";
+import { getAnonClient, getClient, getUserId, Req } from "./supabase.ts";
 
 export async function initialize() {
   console.log("Initializing...");
 
+  constant.db = new DB();
   constant.service = await setupServices();
   console.log("Finished initializing");
 }
 
 export async function requestInitialize(request: Request) {
   const req = request as Req;
+
   try {
     req.userId = await getUserId(req);
   } catch (error) {
@@ -32,7 +36,27 @@ export async function requestInitialize(request: Request) {
     }
   }
 
-  req.client = await getClient(request);
+  if (req.headers.has("Authorization")) {
+    const token = req.headers.get("Authorization")?.split(" ")?.[1] ?? "";
+    if (token) {
+      req.jwtData = decode(token);
+      if (req?.userId) {
+        req.jwtData = {
+          ...req.jwtData,
+          role: DatabaseRole.BackendAuthenticated,
+          aud: DatabaseRole.BackendAuthenticated,
+        };
+      } else {
+        req.jwtData = {
+          ...req.jwtData,
+          role: DatabaseRole.BackendAnon,
+          aud: DatabaseRole.BackendAnon,
+        };
+      }
+    }
+  }
+
+  req.client = req?.userId ? await getClient(req) : await getAnonClient(req);
 
   return req;
 }
@@ -42,7 +66,7 @@ async function validateRequest(name: string, req: Req) {
   try {
     data = await req.json();
   } catch (_error) {
-    throw new Deno.errors.InvalidData("Invalid request body");
+    throw new Deno.errors.InvalidData(`Invalid request body (${req?.url})`);
   }
 
   try {
@@ -56,7 +80,7 @@ async function validateRequest(name: string, req: Req) {
       functionDataOp[key].parse(data);
     }
   } catch (error) {
-    throw new Deno.errors.InvalidData(`Validation failed: ${(error as ZodError).message}`);
+    throw new Deno.errors.InvalidData(`Validation failed (${req?.url}): ${(error as ZodError).message}`);
   }
 
   return data as RequestBody;

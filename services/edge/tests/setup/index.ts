@@ -1,5 +1,5 @@
 import { requestInitialize } from "common/serve";
-import { Client } from "common/supabase";
+import { Client, wrapClient } from "common/supabase";
 import constant from "constant";
 import { load } from "https://deno.land/std@0.201.0/dotenv/mod.ts";
 import * as path from "std/path";
@@ -13,6 +13,13 @@ const envs = await load({
   export: true,
   allowEmptyValues: true,
 });
+
+for (const key in envs) {
+  if (key in constant.env) {
+    // @ts-expect-error: .
+    constant.env[key] = envs[key];
+  }
+}
 
 console.debug("Loaded environment variables:", envs);
 
@@ -72,7 +79,7 @@ export async function getClient(user = true, options?: SupabaseClientOptions<"pu
 
   const key = supabaseAnonKey;
 
-  const client: Client = createClient(supabaseUrl, key, options);
+  const client = wrapClient(createClient(supabaseUrl, key, options));
   testClients.all.push(client);
 
   if (user) {
@@ -80,7 +87,7 @@ export async function getClient(user = true, options?: SupabaseClientOptions<"pu
 
     if (error) {
       if (!supabaseServiceRoleKey) throw new Error("supabaseServiceRoleKey is required.");
-      const serviceClient: Client = createClient(supabaseUrl, supabaseServiceRoleKey, options);
+      const serviceClient = wrapClient(createClient(supabaseUrl, supabaseServiceRoleKey, options));
       testClients.all.push(serviceClient);
 
       const createUser = async () => {
@@ -144,11 +151,11 @@ export const requestTestToken = {
   default: "",
 };
 
-export async function setupRequest(props?: { services?: boolean }) {
+export async function setupRequest(user = true, props?: { services?: boolean; db?: boolean }) {
   let token = requestTestToken.default;
 
   if (!token) {
-    const client = await getClient(true, {
+    const client = await getClient(user, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
@@ -160,11 +167,13 @@ export async function setupRequest(props?: { services?: boolean }) {
       data: { session },
     } = await client.auth.getSession();
 
-    if (!session) {
+    if (!session && user) {
       throw new Error("No session found");
+    } else if (session) {
+      token = session.access_token;
+    } else {
+      token = supabaseAnonKey;
     }
-
-    token = session.access_token;
   }
 
   const req = new Request(supabaseUrl, {
@@ -173,10 +182,20 @@ export async function setupRequest(props?: { services?: boolean }) {
     },
   });
 
-  constant.env.JWT_SECRET = "test";
   constant.env.SUPABASE_URL = supabaseUrl;
   constant.env.SUPABASE_ANON_KEY = supabaseAnonKey;
   constant.env.SUPABASE_SERVICE_ROLE_KEY = supabaseServiceRoleKey;
 
-  return await requestInitialize(req);
+  return [
+    await requestInitialize(req),
+    async () => {
+      if (props?.services) {
+      }
+
+      if (props?.db) {
+        await constant.db.close();
+        constant.db = undefined as any;
+      }
+    },
+  ] as const;
 }

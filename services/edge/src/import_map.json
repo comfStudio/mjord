@@ -5,15 +5,19 @@
     "types/functions": "./types/functions.ts",
 
     "constant": "./common/constant.ts",
+    "common/db": "./common/db.ts",
     "common/utils": "./common/utils.ts",
+    "common/error": "./common/error.ts",
     "common/cors": "./common/cors.ts",
     "common/jwt": "./common/jwt.ts",
     "common/serve": "./common/serve.ts",
     "common/supabase": "./common/supabase.ts",
+    "common/fragments": "./common/fragments.ts",
 
     "common/services/base": "./common/services/base.ts",
     "common/services/database": "./common/services/database.ts",
     "common/services/user": "./common/services/user.ts",
+    "common/services/group": "./common/services/group.ts",
 
     "tests/setup": "../tests/setup/index.ts",
     "tests/suite": "../tests/setup/suite.ts",
@@ -23,12 +27,15 @@
     "std/path": "https://deno.land/std@0.188.0/path/mod.ts",
     "std/assert": "https://deno.land/std@0.201.0/assert/mod.ts",
     "std/testing/bdd": "https://deno.land/std@0.201.0/testing/bdd.ts",
+    "std/testing/mock": "https://deno.land/std@0.204.0/testing/mock.ts",
 
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.33.1",
-    "@supabase/functions-js": "https://esm.sh/@supabase/functions-js@2.1.4",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.38.0",
+    "@supabase/functions-js": "https://esm.sh/@supabase/functions-js@2.1.5",
+    "@supabase/postgrest-js": "https://esm.sh/@supabase/postgrest-js@1.8.4",
     "xhr_polyfill": "https://deno.land/x/xhr@0.3.0/mod.ts",
     "zod": "https://deno.land/x/zod@v3.22.2/mod.ts",
     "jose": "https://deno.land/x/jose@v4.14.6/index.ts",
-    "hotscript": "npm:hotscript@~1.0.13"
+    "hotscript": "npm:hotscript@~1.0.13",
+    "postgresjs": "https://deno.land/x/postgresjs@v3.3.5/mod.js"
   }
 }

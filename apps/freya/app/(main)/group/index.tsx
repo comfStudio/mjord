@@ -22,7 +22,7 @@ import { t } from "@mjord/common";
 export default function DetailScreen() {
   const [membersVisible, setMembersVisible] = useState(false);
   const { id } = useLocalSearchParams();
-  const groupId = parseInt((id as string) || "0");
+  const groupId = (id as string) ?? "";
 
   const theme = useTheme();
 

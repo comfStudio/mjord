@@ -95,6 +95,7 @@ export const functionDataOp = {
   }),
   group_get: requestDataOp.extend({
     type: dataOpMap.get,
+    id: z.string(),
   }),
   featured_get: requestDataOp.extend({
     type: dataOpMap.get,

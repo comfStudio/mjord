@@ -788,6 +788,12 @@ export interface Database {
                 };
                 Returns: boolean;
             };
+            get_group: {
+                Args: {
+                    rowid: string;
+                };
+                Returns: Record<string, unknown>[];
+            };
             typeid_check: {
                 Args: {
                     tid: Database["public"]["CompositeTypes"]["typeid"];
@@ -809,12 +815,12 @@ export interface Database {
             };
             typeid_print: {
                 Args: {
-                    tid: Database["public"]["CompositeTypes"]["typeid"];
+                    tid: string;
                 };
                 Returns: string;
             } | {
                 Args: {
-                    tid: string;
+                    tid: Database["public"]["CompositeTypes"]["typeid"];
                 };
                 Returns: string;
             };

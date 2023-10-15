@@ -1,4 +1,5 @@
 import type { ServiceLocator } from "./services/base.ts";
+import type { DB } from "./db.ts";
 
 export enum ServiceType {
   Database,
@@ -20,6 +21,10 @@ export default class constant {
   static JWT_ALGORITHM = "HS256";
   static JWT_EXPIRES_IN = "3h";
 
+  static DB_POOL_LIMIT = 10;
+  static DB_IDLE_TIMEOUT = 20; // seconds
+  static DB_MAX_LIFETIME = 60 * 10; // seconds
+
   static DEFAULT_BACKEND_AUD = DatabaseRole.BackendAnon;
   static DEFAULT_BACKEND_ROLE = DatabaseRole.BackendAnon;
 
@@ -33,4 +38,5 @@ export default class constant {
   };
 
   static service: ServiceLocator;
+  static db: DB;
 }

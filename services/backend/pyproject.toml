@@ -16,6 +16,7 @@ httpx = "^0.24.1"
 [tool.poetry.scripts]
 tables = "sql.sql:main"
 seed = "sql.seed:main"
+functions = "sql.function:main"
 
 [build-system]
 requires = ["poetry-core"]

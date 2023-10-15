@@ -2,6 +2,7 @@
   "name": "@mjord/backend",
   "scripts": {
     "dev": "docker compose -p mjord-backend up -d && cd supabase/docker && docker compose --env-file .env.dev -p mjord-supabase up -d",
+    "build": "docker compose -p mjord-backend build && cd supabase/docker && docker compose --env-file .env.dev -p mjord-supabase build",
     "down": "docker compose -p mjord-backend down && cd supabase/docker && docker compose --env-file .env.dev -p mjord-supabase down",
     "restart:edge": "cd supabase/docker && docker compose --env-file .env.dev -p mjord-supabase restart functions",
     "seed": "poetry run seed",

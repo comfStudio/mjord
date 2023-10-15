@@ -163,20 +163,23 @@ export declare const functionDataOp: {
     }>;
     group_get: z.ZodObject<{
         type: z.ZodLiteral<"get">;
+        id: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         type: "get";
+        id: string;
     }, {
         type: "get";
+        id: string;
     }>;
     featured_get: z.ZodObject<{
         type: z.ZodLiteral<"get">;
         entity: z.ZodEnum<["group", "event"]>;
     }, "strip", z.ZodTypeAny, {
         type: "get";
-        entity: "event" | "group";
+        entity: "group" | "event";
     }, {
         type: "get";
-        entity: "event" | "group";
+        entity: "group" | "event";
     }>;
 };
 export type FunctionDataOp = {

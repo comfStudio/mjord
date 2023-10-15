@@ -1,4 +1,6 @@
+import { Client } from "common/supabase";
 import { describe, it, ItArgs, TestSuite } from "std/testing/bdd";
+import { Tables } from "types/db";
 
 function suiteMap<T>(testParam: any, name: string, map: Record<string, string>, suite?: TestSuite<T>) {
   return describe({
@@ -51,4 +53,27 @@ export function itAnonAuth<T>(...args: ItArgs<T & { [k: string]: any }>) {
   const authArgs = args.slice(0, suite_idx).concat(authSuite, ...args.slice(suite_idx + (base_suite ? 1 : 0)));
 
   it(...(authArgs as ItArgs<T>));
+}
+
+export async function fetchData(
+  edgeClient: Client,
+  table: Tables,
+  apply: (builder: any) => any = (b) => b
+): Promise<Record<string, any>> {
+  const { data, error } = await apply(edgeClient.from(table).select("id::text")).limit(1).single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data as any;
+}
+
+export async function fetchId(
+  edgeClient: Client,
+  table: Tables,
+  apply: (builder: any) => any = (b) => b
+): Promise<string> {
+  const data = await fetchData(edgeClient, table, apply);
+  return data?.id as any;
 }

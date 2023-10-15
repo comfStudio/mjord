@@ -1,6 +1,7 @@
+import { ProfileFragments } from "common/fragments";
 import { Client, getUserId } from "common/supabase";
 import { ServiceType } from "constant";
-import { ProfileWithMediaData } from "types/db";
+import { ProfileData } from "types/db";
 
 import { Service } from "./base.ts";
 
@@ -14,27 +15,13 @@ export default class User extends Service {
   async getProfile(client: Client) {
     const uid = await getUserId(client);
 
-    const { data, error } = await client
-      .from("profile")
-      .select(
-        `
-        *,
-        media:media_id (
-          id,
-          type,
-          thumbnail_url,
-          url
-        )
-    `
-      )
-      .eq("id", uid)
-      .single();
+    const { data, error } = await client.from("profile").select(ProfileFragments.profile()).eq("id", uid).single();
 
     if (error) {
       throw error;
     }
 
     // @ts-expect-error: .
-    return data as ProfileWithMediaData;
+    return data as ProfileData<"media?">;
   }
 }

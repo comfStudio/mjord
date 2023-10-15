@@ -1,5 +1,6 @@
 import { it } from "std/testing/bdd";
 import { testProfile } from "tests/setup";
+import { fetchId } from "tests/setup/utils";
 import { clientSuite } from "tests/suite";
 
 const suite = clientSuite;
@@ -27,9 +28,33 @@ it(suite, "allowed to query own profile when authenticated", async function () {
   this.expect(data?.[0]).toHaveProperty("name", testProfile.name);
 });
 
-it(suite, "not allowed to query anything when authenticated", async function () {
+it(suite, "not allowed to query anything even when authenticated", async function () {
   const { data, error } = await this.client.from("group").select().limit(10);
 
   this.expect(data).toHaveLength(0);
   this.expect(error).toBeFalsy();
+});
+
+it(suite, "not allowed to call db function when anon", async function () {
+  const gid = await fetchId(this.edgeClient, "group", (b) => b.eq("visibility", "public"));
+  const { data, error } = await this.anonClient.rpc("get_group", {
+    rowid: gid,
+  });
+
+  this.expect(data).toBeFalsy();
+  this.expect(error).toBeTruthy();
+  this.expect(error?.message).toContain("permission denied");
+  this.expect(error?.message).toContain("group");
+});
+
+it(suite, "not allowed to call db function even when authenticated", async function () {
+  const gid = await fetchId(this.edgeClient, "group", (b) => b.eq("visibility", "public"));
+  const { data, error } = await this.client.rpc("get_group", {
+    rowid: gid,
+  });
+
+  this.expect(data).toBeFalsy();
+  this.expect(error).toBeTruthy();
+  this.expect(error?.message).toContain("permission denied");
+  this.expect(error?.message).toContain("group");
 });

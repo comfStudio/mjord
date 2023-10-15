@@ -1,4 +1,4 @@
-import { Client, Req } from "common/supabase";
+import { Client, getUserId, Req } from "common/supabase";
 import { expect as jestExpect } from "https://deno.land/x/expect/mod.ts";
 // @deno-types="npm:@types/chai@^4.3.6"
 import { expect as chaiExpect } from "npm:chai@^4.3.8";
@@ -75,10 +75,10 @@ async function getResponse(res: FunctionResponse) {
 
   let error: any = d?.error;
 
-  if (e instanceof FunctionsHttpError) {
+  if (e instanceof FunctionsHttpError || (e as any)?.name === "FunctionsHttpError") {
     error = (await res.error?.context.json())?.error;
   } else if (e) {
-    throw new Error("Not implemented");
+    throw new Error(`Not implemented: ${e}`);
   }
 
   return {
@@ -97,16 +97,27 @@ export const clientSuite = describe({
     this: {
       client: Client;
       anonClient: Client;
+      edgeClient: Client;
+      userId: string;
+      _teardown: () => Promise<void>;
     } & UnwrapSuite<typeof suite> &
       invokeFunctions
   ) {
-    this.anonClient = await getClient(false);
-    this.anonClient = await getClient(false);
     this.client = await getClient(true);
+    this.anonClient = await getClient(false);
+
+    const [req, teardown] = await setupRequest();
+    this._teardown = teardown;
+
+    this.edgeClient = req?.client!;
+    this.userId = await getUserId(this.client);
     this.invoke = (name, options) => this.client.functions.invoke(name, options).then(getResponse);
     this.anonInvoke = (name, options) => this.anonClient.functions.invoke(name, options).then(getResponse);
   },
-  async afterAll() {},
+  async afterAll() {
+    this?.edgeClient?.auth?.stopAutoRefresh();
+    await this._teardown();
+  },
 });
 
 /**
@@ -115,9 +126,32 @@ export const clientSuite = describe({
 export const edgeSuite = describe({
   name: "Edge",
   suite: suite,
-  async beforeAll(this: { req: Req; client: Client } & UnwrapSuite<typeof suite> & invokeFunctions) {
-    this.req = await setupRequest();
+  async beforeAll(
+    this: {
+      req: Req;
+      anonReq: Req;
+      anonClient: Client;
+      client: Client;
+      userId: string;
+      _teardown: () => Promise<void>;
+    } & UnwrapSuite<typeof suite> &
+      invokeFunctions
+  ) {
+    const [req, teardown1] = await setupRequest(true);
+    this.req = req;
     this.client = this.req.client;
+    const [anonReq, teardown2] = await setupRequest(false);
+    this.anonReq = anonReq;
+    this.anonClient = this.anonReq.client;
+
+    this._teardown = async () => {
+      await teardown1();
+      await teardown2();
+    };
+    this.userId = await getUserId(this.client);
   },
-  afterAll: async () => {},
+  async afterAll() {
+    this.req.client.auth.stopAutoRefresh();
+    await this._teardown();
+  },
 });

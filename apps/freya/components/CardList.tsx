@@ -1,6 +1,6 @@
 import { FlatList, ListRenderItem, StyleSheet } from "react-native";
 
-import constant from "@app/constants";
+
 
 export function HorizontalCardList<T extends { id: any }>({
   data,
@@ -9,7 +9,6 @@ export function HorizontalCardList<T extends { id: any }>({
   data: T[];
   renderItem: ListRenderItem<T>;
 }) {
-  constant.log.d(JSON.stringify(data.map((item) => item.id)));
   return (
     <FlatList
       data={data}

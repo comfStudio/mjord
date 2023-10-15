@@ -1,4 +1,3 @@
-import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
 import * as jose from "https://deno.land/x/jose@v4.14.4/index.ts";
 
 console.log("main function started");
@@ -34,7 +33,7 @@ async function verifyJWT(jwt: string): Promise<boolean> {
   return true;
 }
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   const url = new URL(req.url);
   const { pathname } = url;
 

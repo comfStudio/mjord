@@ -8,6 +8,7 @@ sql_01_uuidv7 = r"""
 -- and a custom function will no longer be necessary.
 create or replace function uuid_generate_v7()
 returns uuid
+SECURITY DEFINER SET search_path = public
 as $$
 declare
   unix_ts_ms bytea;
@@ -30,6 +31,7 @@ sql_02_base32 = r"""
 -- Encodes a UUID as a base32 string
 create or replace function base32_encode(id uuid)
 returns text
+SECURITY DEFINER SET search_path = public
 as $$
 declare
   bytes bytea;
@@ -75,8 +77,10 @@ language plpgsql
 immutable;
 
 
-create or replace function base32_decode(s text) 
-returns uuid as $$
+create or replace function base32_decode(s text)
+returns uuid
+SECURITY DEFINER SET search_path = public
+as $$
 declare
   dec bytea = '\xFF FF FF FF FF FF FF FF FF FF'::bytea ||
               '\xFF FF FF FF FF FF FF FF FF FF'::bytea ||
@@ -104,7 +108,7 @@ declare
               '\xFF FF FF FF FF FF FF FF FF FF'::bytea ||
               '\xFF FF FF FF FF FF FF FF FF FF'::bytea ||
               '\xFF FF FF FF FF FF'::bytea;
-  v bytea = convert_to(s, 'UTF8');            
+  v bytea = convert_to(s, 'UTF8');
   id bytea = '\x00000000000000000000000000000000';
 begin
   if length(s) <> 26 then
@@ -140,7 +144,7 @@ begin
   then
     raise exception 'typeid suffix must only use characters from the base32 alphabet';
   end if;
-  
+
   if chr(get_byte(v, 0)) > '7' then
     raise exception 'typeid suffix must start with 0-7';
   end if;
@@ -193,6 +197,7 @@ sql_03b_typeid = r"""
 -- This depends on the `uuid_generate_v7` function defined in `uuid_v7.sql`.
 create or replace function typeid_generate(prefix text)
 returns typeid
+SECURITY DEFINER SET search_path = public
 as $$
 begin
   if (prefix is null) or not (prefix ~ '^[a-z]{0,63}$') then
@@ -209,6 +214,7 @@ volatile;
 -- NOTE: we might want to make the version check optional.
 create or replace function typeid_check(tid typeid, expected_type text)
 returns boolean
+SECURITY DEFINER SET search_path = public
 as $$
 declare
   prefix text;
@@ -231,6 +237,7 @@ immutable;
 -- Function that parses a string into a typeid.
 create or replace function typeid_parse(typeid_str text)
 returns typeid
+SECURITY DEFINER SET search_path = public
 as $$
 declare
   prefix text;
@@ -261,6 +268,7 @@ immutable;
 -- Function that serializes a typeid into a string.
 create or replace function typeid_print(tid typeid)
 returns text
+SECURITY DEFINER SET search_path = public
 as $$
 declare
   prefix text;
@@ -286,6 +294,7 @@ immutable;
 -- Function that serializes a uuid into a string.
 create or replace function typeid_print(tid uuid)
 returns text
+SECURITY DEFINER SET search_path = public
 as $$
 begin
   if (tid is null) then
@@ -298,7 +307,9 @@ language plpgsql
 immutable;
 
 CREATE OR REPLACE FUNCTION compare_type_id_equality(lhs_id typeid, rhs_id VARCHAR)
-    RETURNS BOOLEAN AS $$
+RETURNS BOOLEAN
+SECURITY DEFINER SET search_path = public
+AS $$
 SELECT lhs_id = typeid_parse(rhs_id);
 $$ LANGUAGE SQL IMMUTABLE;
 """
@@ -321,10 +332,10 @@ CREATE OPERATOR = (
 """
 
 typeid_sql = [
-    sql_01_uuidv7, 
-    sql_02_base32, 
-    sql_03a_typeid, 
-    sql_03b_typeid, 
-    sql_03c_typeid, 
-    # sql_03d_typeid # Operator overloading causes a lot of issues
+    sql_01_uuidv7,
+    sql_02_base32,
+    sql_03a_typeid,
+    sql_03b_typeid,
+    sql_03c_typeid,
+    sql_03d_typeid # Operator overloading causes a lot of issues
     ]

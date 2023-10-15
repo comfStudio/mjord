@@ -86,13 +86,12 @@ export function useFeaturedGroups() {
 }
 
 export function useGroup(id: number) {
-  const service = constant.service.get(ServiceType.Group);
-
-  const q = useQuery(["group", id], async () => {
-    const group = await service.getGroup(id);
-    return group;
+  const r = useFunction("group", {
+    body: {
+      type: "get",
+    },
   });
-  return q;
+  return r;
 }
 
 export function useGroupMembers(id: number, from: number = 0, to: number = 30) {

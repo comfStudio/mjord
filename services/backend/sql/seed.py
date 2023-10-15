@@ -10,6 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from random import choice
 from .sql import *
 from . import sql
+from . import function
 import httpx
 
 fake = Faker()
@@ -59,7 +60,7 @@ def create_user(email: str, password: str):
     with Session(get_engine()) as session:
         p = session.get(Profile, uid)
     return p
-    
+
 
 def generate_test_data(num_users, num_groups, num_discussions, num_reactions, num_tags):
     media_types = [x.value for x in Media_Type]
@@ -196,7 +197,7 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
                     _group_members.add(group_member.profile_id)
                     session.add(group_member)
                     group_member_ids.append(group_member.id)
-        
+
         print(f"Generated {num_group_members} GroupMembers.")
 
         print("Generating test data for Discussions...")
@@ -226,7 +227,7 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
                         discussion_id=discussion.id
                     )
 
-                    session.add(media) 
+                    session.add(media)
 
         session.commit()
         print(f"Generated {num_discussions} Discussions.")
@@ -254,7 +255,7 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
                         comment_id=comment.id
                     )
 
-                    session.add(media) 
+                    session.add(media)
 
 
         session.commit()
@@ -319,7 +320,7 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
                 if discussion_tag.tag_id not in _discussion_tags:
                     _discussion_tags.add(discussion_tag.tag_id)
                     session.add(discussion_tag)
-                
+
 
         session.commit()
 
@@ -335,7 +336,7 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
                 if event_tag.tag_id not in _event_tags:
                     _event_tags.add(event_tag.tag_id)
                     session.add(event_tag)
-                
+
 
         session.commit()
 
@@ -402,9 +403,10 @@ def generate_test_data(num_users, num_groups, num_discussions, num_reactions, nu
 
 def main():
     sql.main()
-    generate_test_data(250, 500, 500, 1000, 50)
-    # generate_test_data(5, 10, 50, 10, 10)
+    function.main()
+    # generate_test_data(250, 500, 500, 1000, 50)
+    generate_test_data(5, 10, 50, 10, 10)
 
 if __name__ == '__main__':
     main()
-    
+

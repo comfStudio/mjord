@@ -12,6 +12,7 @@ import typeid
 from .typeid import typeid_sql
 
 class DATABASE_ROLES:
+    __slots__ = ()
     backend_authenticated = "backend_authenticated"
     backend_anon = "backend_anon"
 
@@ -50,10 +51,33 @@ WITH
 ] + typeid_sql
 
 typeids = {}
+typeid_casts = {}
+
+cast_from_type_s = f"(text AS typeid)"
+cast_from_type = f"CREATE CAST {cast_from_type_s} WITH FUNCTION typeid_parse(text) AS IMPLICIT;"
+typeid_casts[cast_from_type_s] = cast_from_type
+
+cast_to_type_s = f"(typeid AS text)"
+cast_to_type = f"CREATE CAST {cast_to_type_s} WITH FUNCTION typeid_print(typeid) AS ASSIGNMENT;"
+typeid_casts[cast_to_type_s] = cast_to_type
 
 policies: set[str] = set()
 
+typeid_functions = {
+    "base32_decode": "",
+    "base32_encode": "",
+    "uuid_generate_v7": "",
+    "typeid_generate": "",
+    "typeid_parse": "",
+    "typeid_check": "",
+    "typeid_print(uuid)": "",
+    "typeid_print(typeid)": "",
+    "compare_type_id_equality": "",
+}
+
 functions = {}
+functions.update(typeid_functions)
+
 triggers = {}
 
 class TypeID(sa.types.UserDefinedType):
@@ -72,7 +96,7 @@ class TypeID(sa.types.UserDefinedType):
 
     def column_expression(self, col):
         return sa.func.typeid_print(col, type_=self)
-    
+
 
 IDType = TypeID
 IDTypeT = str
@@ -82,7 +106,7 @@ class IdMixin:
     @classmethod
     def typeid_name(cls):
         return f"{cls.__tablename__}_id"
-    
+
     @classmethod
     def typeid_check_name(cls):
         return cls.__tablename__.replace("_", "")
@@ -94,6 +118,13 @@ class IdMixin:
 
         table_type = f"CREATE DOMAIN {type_name} AS typeid CHECK (typeid_check(value, '{check_name}'));"
         typeids[type_name] = table_type
+
+        # postgresql ignores casts domains, but postgrest does not, so we define casts for the domain here
+        cast_to_type_s = f"({type_name} AS text)"
+        cast_to_type = f"CREATE CAST {cast_to_type_s} WITH FUNCTION typeid_print(typeid) AS IMPLICIT;"
+        typeid_casts[cast_to_type_s] = cast_to_type
+
+
         return orm.mapped_column(IDType(type_name), primary_key=True, server_default=sa.func.typeid_generate(check_name))
 
     @classmethod
@@ -127,7 +158,7 @@ class Enum(sa.Enum):
 
 class Geometry(sa.types.UserDefinedType):
     cache_ok = True
-    
+
     def get_col_spec(self):
         return "GEOMETRY"
 
@@ -139,14 +170,14 @@ class Geometry(sa.types.UserDefinedType):
 
 
 class Base(orm.DeclarativeBase):
-    _table_args__ = dict(schema=schema)
+    metadata = sa.MetaData(schema=schema)
 
     created_at: orm.Mapped[int] = orm.mapped_column(TIMESTAMP, nullable=False, server_default=sa.func.now())
     modified_at: orm.Mapped[int] = orm.mapped_column(TIMESTAMP, nullable=False, server_default=sa.func.now())
 
 
 def create_many_to_many(cls_name: str, table_name: str, left: str | tuple[str, str], right: str | tuple[str, str], bases=(Base, IdMixin)):
-    
+
     left_key = left[0] if isinstance(left, tuple) else left + "_id"
     right_key = right[0] if isinstance(right, tuple) else right + "_id"
 
@@ -187,7 +218,7 @@ def mutual_exclusive_check(table_name: str, *relations, allow_all_none=False):
 def create_private_policy(table: str | type[Base],
                        restrictive = False,
                        ):
-    
+
     table = table.__tablename__ if not isinstance(table, str) else table
 
     as_ = 'RESTRICTIVE' if restrictive else 'PERMISSIVE'
@@ -210,12 +241,12 @@ def create_private_policy(table: str | type[Base],
                         """)
 
     policies.update(p)
-    
+
 
 def create_user_read_policy(table: str | type[Base],
                               col: str = "id",
                        extra: list[str] | None = None):
-    
+
     table = table.__tablename__ if not isinstance(table, str) else table
 
 
@@ -235,7 +266,7 @@ def create_user_read_policy(table: str | type[Base],
                         """)
 
     policies.update(p)
-    
+
 
 functions["auth.register_row_modified"] = """
 CREATE FUNCTION auth.register_row_modified()
@@ -255,7 +286,7 @@ DO $$
 DECLARE
     t text;
 BEGIN
-    FOR t IN 
+    FOR t IN
         SELECT table_name FROM information_schema.columns
         WHERE table_schema = 'public'
         GROUP BY table_name
@@ -285,7 +316,7 @@ class Media(Base, IdMixin):
     _table_args__ = (
             mutual_exclusive_check(__tablename__, group_id, event_id, discussion_id, comment_id, allow_all_none=True),
         )
-    
+
 
 class Profile(Base, ExtraMixin):
     __tablename__ = "profile"
@@ -392,7 +423,7 @@ class Reaction(Base, IdMixin):
     reaction: orm.Mapped[str] = orm.mapped_column(ShortString, nullable=False)
 
     profile_id: orm.Mapped[ProfileIDT] = orm.mapped_column(sa.ForeignKey("profile.id", ondelete="SET NULL"), nullable=True, server_default=sa.text("auth.uid()"))
-    
+
     discussion_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("discussion.id", ondelete="CASCADE"), nullable=True)
     comment_id: orm.Mapped[IDTypeT] = orm.mapped_column(sa.ForeignKey("comment.id", ondelete="CASCADE"), nullable=True)
 
@@ -445,7 +476,7 @@ class History(Base, IdMixin, ExtraMixin):
     def __table_args__(cls):
         table_names = Base.metadata.tables.keys()
         exclude = [cls.__tablename__]
-        tup = tuple([f"'{t}'" for t in table_names if t not in exclude])
+        tup = tuple([f"'{t.split('.')[1]}'" for t in table_names if t not in exclude])
 
         return (
             sa.CheckConstraint(
@@ -473,8 +504,8 @@ AS $$
         FROM jsonb_each(to_jsonb(OLD)) O
             CROSS JOIN jsonb_each(to_jsonb(NEW)) N
         WHERE O.key = N.key AND O.value <> N.value);
-    END IF;  
-  
+    END IF;
+
     IF (TG_OP = 'DELETE') THEN
         INSERT INTO {History.__tablename__}(profile_id, action, row_id, table_name, table_data)
         VALUES (
@@ -517,14 +548,16 @@ AS $$
 $$;
 """
 
+table_updates_to_ignore = [History.__tablename__]
+
 triggers["on_db_update"] = f"""
 DO $$
 DECLARE
     t text;
 BEGIN
-    FOR t IN 
+    FOR t IN
         SELECT table_name FROM information_schema.columns
-        WHERE table_schema = 'public' AND table_name != '{History.__tablename__}'
+        WHERE table_schema = 'public' AND table_name NOT IN ({','.join([f"'{t}'" for t in table_updates_to_ignore])})
         GROUP BY table_name
     LOOP
         EXECUTE format('CREATE TRIGGER on_db_update
@@ -550,12 +583,17 @@ def create_extensions(engine: sa.Engine):
                 if "already exists" not in str(e):
                     raise e
                 conn.rollback()
-            
+
 
 def create_typeids(engine: sa.Engine):
 
     with engine.connect() as conn:
         for p in typeids.values():
+            conn.execute(sa.text(p))
+            conn.commit()
+
+    with engine.connect() as conn:
+        for p in typeid_casts.values():
             conn.execute(sa.text(p))
             conn.commit()
 
@@ -569,8 +607,10 @@ def create_policies(engine: sa.Engine):
 def create_functions_and_triggers(engine: sa.Engine):
 
     with engine.connect() as conn:
-        for f in functions.keys():
-            conn.execute(sa.text(functions[f]))
+        for f, f_sql in functions.items():
+            if not f_sql:
+                continue
+            conn.execute(sa.text(f_sql))
         conn.commit()
 
     with engine.connect() as conn:
@@ -587,25 +627,27 @@ def create_tables(engine: sa.Engine):
 
     Base.metadata.create_all(engine)
 
-def set_privileges(engine: sa.Engine):
-    "See https://github.com/orgs/supabase/discussions/4547"
+FUNC_ROLES = ["supabase_admin", "service_role", DATABASE_ROLES.backend_authenticated, DATABASE_ROLES.backend_anon]
+REVOKE_FUNC_ROLES = ["anon", "authenticated"]
+
+def create_roles(engine: sa.Engine):
 
     stmts = []
 
-    dbname = "postgres"
-    role = "anon"
-    schemas = ["public", "storage"]
-    allow_public_functions_schemas = ["public"]
+    # Create new roles
+    authenticator = "authenticator"
+    superuser = "postgres"
 
-    stmts.append(f"""
-    REVOKE ALL PRIVILEGES ON DATABASE "{dbname}" FROM "{role}";
-    {"\n".join([f'REVOKE ALL PRIVILEGES ON SCHEMA "{s}" FROM "{role}";' for s in schemas])}
-    {"\n".join([f'REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "{s}" FROM "{role}";' for s in schemas])}
-
-    -- REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "{schema}" FROM "{role}";
-    {"\n".join([f'REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "{s}" FROM "{role}";' for s in schemas if s not in allow_public_functions_schemas])}
-    {"\n".join([f'REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "{s}" FROM "{role}";' for s in schemas])}
-    """)
+    stmts.append(f'''
+    CREATE ROLE "{DATABASE_ROLES.backend_authenticated}" INHERIT IN ROLE "authenticated" bypassrls;
+    GRANT "{DATABASE_ROLES.backend_authenticated}" to "{superuser}";
+    GRANT "{DATABASE_ROLES.backend_authenticated}" to "{authenticator}";
+    ''')
+    stmts.append(f'''
+    CREATE ROLE "{DATABASE_ROLES.backend_anon}" INHERIT IN ROLE "anon" bypassrls;
+    GRANT "{DATABASE_ROLES.backend_anon}" to "{superuser}";
+    GRANT "{DATABASE_ROLES.backend_anon}" to "{authenticator}";
+    ''')
 
 
     with engine.connect() as conn:
@@ -613,20 +655,72 @@ def set_privileges(engine: sa.Engine):
             conn.execute(sa.text(s))
         conn.commit()
 
+def set_privileges(engine: sa.Engine):
+    "See https://github.com/orgs/supabase/discussions/4547"
+
+
     stmts = []
 
-    # Create new roles
-    authenticator = "authenticator"
+    dbname = "postgres"
+    role = "anon"
+    schemas = ["public", "storage"]
 
-    stmts.append(f'''
-    CREATE ROLE "{DATABASE_ROLES.backend_authenticated}" INHERIT IN ROLE "authenticated" bypassrls;
-    GRANT "{DATABASE_ROLES.backend_authenticated}" to "{authenticator}";
-    ''')
-    stmts.append(f'''
-    CREATE ROLE "{DATABASE_ROLES.backend_anon}" INHERIT IN ROLE "anon" bypassrls;
-    GRANT "{DATABASE_ROLES.backend_anon}" to "{authenticator}";
-    ''')
+    # schemas to allow public functions
+    allow_public_functions_schemas = []
 
+    stmts.append(
+    f'REVOKE ALL PRIVILEGES ON DATABASE "{dbname}" FROM "{role}";'
+    + "\n" +
+    "\n".join([f'REVOKE ALL PRIVILEGES ON SCHEMA "{s}" FROM "{role}";' for s in schemas])
+    + "\n" +
+    "\n".join([f'REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "{s}" FROM "{role}";' for s in schemas])
+    + "\n" +
+    "\n".join([f'REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "{s}" FROM "{role}";' for s in schemas if s not in allow_public_functions_schemas])
+    + "\n" +
+    "\n".join([f'REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "{s}" FROM "{role}";' for s in schemas])
+    )
+
+    # set default privileges for new public functions
+    stmts.append(
+      f"""
+      ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM public;
+      """
+    )
+    stmts.extend([f'ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO "{r}"' for r in FUNC_ROLES])
+
+
+
+    for r in REVOKE_FUNC_ROLES:
+        stmts.append(
+            f"""
+            REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA public FROM "{r}";
+            """
+        )
+
+    # allow roles for public functions
+
+    for f in functions.keys():
+        if len(f.split(".")) > 1 and f.split(".")[0] != "public":
+            continue
+
+
+        for r in FUNC_ROLES:
+            stmts.append(
+                f"""
+                GRANT EXECUTE ON FUNCTION {f} TO "{r}";
+                """
+            )
+
+    # allow some functions to be completely public
+    completely_public_functions = [*typeid_functions.keys()]
+
+    for f in completely_public_functions:
+        for r in REVOKE_FUNC_ROLES:
+            stmts.append(
+                f"""
+                GRANT EXECUTE ON FUNCTION {f} TO "{r}";
+                """
+            )
 
     with engine.connect() as conn:
         for s in stmts:
@@ -639,7 +733,7 @@ def get_engine():
     pw = "your-super-secret-and-long-postgres-password"
     return sa.create_engine(f"postgresql://postgres:{pw}@127.0.0.1:{port}/postgres", echo=True)
 
-RESET_SQL = """
+RESET_SQL = f"""
 DO $$
 DECLARE
     table_rec RECORD;
@@ -647,9 +741,9 @@ BEGIN
     FOR table_rec IN (
         SELECT table_name
         FROM information_schema.tables
-        WHERE table_schema = 'public' AND table_catalog = current_database()
+        WHERE table_schema = '{schema}' AND table_catalog = current_database()
     ) LOOP
-        EXECUTE 'DROP TABLE IF EXISTS public.' || table_rec.table_name || ' CASCADE';
+        EXECUTE 'DROP TABLE IF EXISTS {schema}.' || table_rec.table_name || ' CASCADE';
     END LOOP;
 END $$;
 
@@ -682,9 +776,28 @@ def reset_db(engine: sa.Engine):
     # Typeids
 
     with engine.connect() as conn:
+        for f in typeid_casts.keys():
+            conn.execute(sa.text(f"DROP CAST IF EXISTS {f};"))
+        conn.commit()
+
+    with engine.connect() as conn:
         for f in typeids.keys():
             conn.execute(sa.text(f"DROP DOMAIN IF EXISTS {f} CASCADE;"))
         conn.commit()
+
+    # Roles
+
+    with engine.connect() as conn:
+        for k, f in DATABASE_ROLES.__dict__.items():
+            if k.startswith("_"):
+                continue
+            try:
+              conn.execute(sa.text(f"DROP ROLE IF EXISTS {f};"))
+            except Exception as e:
+              conn.rollback()
+              conn.execute(sa.text(f"DROP OWNED BY {f};"))
+              conn.execute(sa.text(f"DROP ROLE IF EXISTS {f};"))
+            conn.commit()
 
     return True
 
@@ -710,6 +823,7 @@ def main():
     engine = get_engine()
 
     if reset_db(engine):
+        create_roles(engine)
         create_extensions(engine)
         create_typeids(engine)
         create_tables(engine)

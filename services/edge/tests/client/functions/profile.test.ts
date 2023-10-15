@@ -14,7 +14,7 @@ itAnonAuth(suite, "get", async function () {
   if (this.testType === "auth") {
     this.expect(error).toBeFalsy();
     this.expect(data).toBeTruthy();
-    this.expect(data?.name).toBeTruthy();
+    this.expect(data).to.contain.keys(["name", "description", "modified_at"]);
   } else {
     this.expect(data?.name).toBeFalsy();
     this.expect(error).toBeTruthy();
