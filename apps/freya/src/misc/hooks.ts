@@ -1,3 +1,4 @@
+import * as FileSystem from "expo-file-system";
 import { useEffect, useMemo, useReducer, useState } from "react";
 
 import constant, { constantEmitter, ServiceType } from "@app/constants";
@@ -57,4 +58,13 @@ export function useRefreshByUser<T extends () => Promise<unknown>>(refetch: T) {
     isRefetchingByUser,
     refetchByUser,
   };
+}
+
+export function useI18nLangs() {
+  console.log({ assets: FileSystem.bundledAssets });
+  console.log({ assetsDir: FileSystem.bundleDirectory });
+
+  return useMemo(() => {
+    return [];
+  }, []);
 }

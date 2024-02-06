@@ -1,7 +1,9 @@
 import "react-native-url-polyfill/auto";
 
 import { getLocales } from "expo-localization";
-import { SplashScreen, Tabs, usePathname } from "expo-router";
+import { usePathname } from "expo-router";
+import { Tabs } from "expo-router/tabs";
+import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useState } from "react";
 import { AppState as NativeAppState, Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -12,7 +14,6 @@ import setupServices from "@/services";
 import { AppState, setupState } from "@/state";
 import { languages } from "@/state/_app";
 import constant, { constantEmitter, ROUTES } from "@app/constants";
-import langDA from "@app/i18n/da.json";
 import { useInitialized } from "@app/misc/hooks";
 import { getQueryClient } from "@app/services/function";
 import { ThemeProvider } from "@app/styles/theme";
@@ -69,9 +70,7 @@ export async function main() {
 
 function applyLocale() {
   const deviceLanguage = getLocales()[0].languageCode;
-  const langs = {
-    da: langDA,
-  };
+  const langs = {};
 
   languages.forEach((lang) => {
     if (lang === "en") return; // English is the default language

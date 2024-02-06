@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": [],
+      "label": "yarn: dev",
+      "detail": "turbo run dev --no-cache --continue --no-daemon",
+      "presentation": {
+        "group": "Build"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "start:app",
+      "problemMatcher": [],
+      "label": "yarn: start:app",
+      "detail": "yarn workspace @mjord/freya start",
+      "group": "build",
+      "presentation": {
+        "group": "Build"
+      }
+    },
+    {
+      "label": "start",
+      "dependsOn": ["yarn: dev", "yarn: start:app"],
+      "dependsOrder": "parallel",
+      "problemMatcher": ["$tsc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

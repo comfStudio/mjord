@@ -6,17 +6,17 @@
     "experimentalDecorators": true,
 
     "paths": {
-      "@app/*": ["./*"],
-      "@/feature/*": ["./feature/*"],
-      "@/components/*": ["./components/*"],
-      "@/services": ["./services/index"],
-      "@/services/*": ["./services/*"],
-      "@/state": ["./state/index"],
-      "@/state/*": ["./state/*"],
-      "@/styles": ["./styles/index"],
-      "@/styles/*": ["./styles/*"],
+      "@app/*": ["./src/*"],
+      "@/feature/*": ["./src/feature/*"],
+      "@/components/*": ["./src/components/*"],
+      "@/services": ["./src/services/index"],
+      "@/services/*": ["./src/services/*"],
+      "@/state": ["./src/state/index"],
+      "@/state/*": ["./src/state/*"],
+      "@/styles": ["./src/styles/index"],
+      "@/styles/*": ["./src/styles/*"],
       "@mjord/common/*": ["../../packages/common/lib/*"],
-      "@tests/*": ["./__tests__/*"]
+      "@tests/*": ["./src/__tests__/*"]
     }
   },
   "include": ["**/*.ts", "**/*.json", "**/*.tsx", "./types.d.ts", "../../packages/common/types.d.ts", "jest.config.js"],

@@ -11,7 +11,7 @@ import {
 } from "@app/styles/theme";
 import { AllSize } from "@app/styles/variants";
 
-import { sizeFromUnion } from "../styles/variants";
+import { sizeFromUnion } from "../../styles/variants";
 import { createComponent } from "./";
 
 declare module "@app/styles/interface" {

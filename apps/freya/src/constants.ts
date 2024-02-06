@@ -17,6 +17,10 @@ export enum ServiceType {
   // Tag,
 }
 
+export enum ASSET_PATHS {
+  I18N = "i18n",
+}
+
 export enum ROUTES {
   HOME = "/home",
   LOGIN = "/login",

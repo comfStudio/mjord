@@ -1,4 +1,4 @@
-import { renderRouter, screen } from "expo-router/src/testing-library";
+import { renderRouter, screen } from "expo-router/testing-library";
 import { View } from "react-native";
 import renderer from "react-test-renderer";
 
@@ -24,7 +24,6 @@ describe("HomeScreen", () => {
     );
 
     expect(screen).toHavePathname(initialUrl);
-
 
     const tree = screen.toJSON();
     expect(tree).toMatchSnapshot();
