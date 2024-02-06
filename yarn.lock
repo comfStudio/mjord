@@ -5668,23 +5668,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-ttag@https://github.com/iSplasher/babel-plugin-ttag#commit=0ce9f02410d851b8a8450eeaf767e025a1b9dfef":
-  version: 1.8.5
-  resolution: "babel-plugin-ttag@https://github.com/iSplasher/babel-plugin-ttag.git#commit=0ce9f02410d851b8a8450eeaf767e025a1b9dfef"
-  dependencies:
-    "@babel/generator": ^7.12.5
-    "@babel/template": ^7.10.4
-    "@babel/types": ^7.12.6
-    ajv: 6.12.3
-    babel-plugin-macros: ^2.8.0
-    dedent: 0.6.0
-    gettext-parser: 6.0.0
-    mkdirp: ^1.0.4
-    plural-forms: ^0.5.3
-  checksum: b34b320e756c697962ef8e5c624b0e1ee637b3bc24c704aecba65f65b7186ddf7d407ba96f06d428db0ddf76a8e49be5201f4836d393ee37119793b6bf3c7cbb
-  languageName: node
-  linkType: hard
-
 "babel-plugin-ttag@npm:1.8.5":
   version: 1.8.5
   resolution: "babel-plugin-ttag@npm:1.8.5"
@@ -5699,6 +5682,23 @@ __metadata:
     mkdirp: ^1.0.4
     plural-forms: ^0.5.3
   checksum: 58bc5adc789f06306c2f09a2860570b150ebc8aee14659a268055e724264ff6d06049eda405eaca0a667eba28c29b7eee9f67b570adf18f91bc198d2c80a3c0f
+  languageName: node
+  linkType: hard
+
+"babel-plugin-ttag@npm:^1.8.9":
+  version: 1.8.9
+  resolution: "babel-plugin-ttag@npm:1.8.9"
+  dependencies:
+    "@babel/generator": ^7.12.5
+    "@babel/template": ^7.10.4
+    "@babel/types": ^7.12.6
+    ajv: 6.12.3
+    babel-plugin-macros: ^2.8.0
+    dedent: 0.6.0
+    gettext-parser: 6.0.0
+    mkdirp: ^1.0.4
+    plural-forms: ^0.5.3
+  checksum: b31ebf790ea6f473dd506abe2ce90e191e31e1da34900e2d7a56bb6669b2a6e449490239e9c261a4b4bf587bb6265875784156f4cce7a3dea7eb2c6295e9cb76
   languageName: node
   linkType: hard
 
@@ -12753,7 +12753,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mjord@workspace:."
   dependencies:
-    babel-plugin-ttag: "https://github.com/iSplasher/babel-plugin-ttag#commit=0ce9f02410d851b8a8450eeaf767e025a1b9dfef"
+    babel-plugin-ttag: ^1.8.9
     dotenv-cli: ^7.1.0
     eslint: ^8.50.0
     hotscript: ^1.0.13

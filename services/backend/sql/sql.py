@@ -217,6 +217,7 @@ def mutual_exclusive_check(table_name: str, *relations, allow_all_none=False):
 
 def create_private_policy(table: str | type[Base],
                        restrictive = False,
+                       role = "service_role"
                        ):
 
     table = table.__tablename__ if not isinstance(table, str) else table
@@ -226,11 +227,11 @@ def create_private_policy(table: str | type[Base],
     p = []
 
     p.append(f"""
-        CREATE POLICY "Only service can access {table}."
+        CREATE POLICY "Only {role} can access {table}."
         ON "{table}"
         AS {as_}
         FOR ALL
-        TO service_role
+        TO {role}
         USING ( true )
         WITH CHECK ( true );
         """)
@@ -620,8 +621,10 @@ def create_functions_and_triggers(engine: sa.Engine):
 
 def create_tables(engine: sa.Engine):
     # add default policy on all tables
+    roles = ["service_role", DATABASE_ROLES.backend_anon]
     for t in Base.metadata.tables.values():
-        create_private_policy(t.name)
+        for r in roles:
+            create_private_policy(t.name, role=r)
 
     Base.metadata.reflect(engine, schema="auth", only=["users"])
 

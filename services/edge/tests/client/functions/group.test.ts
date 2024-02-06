@@ -45,6 +45,7 @@ it(suite, "can get existing visible group", async function () {
     },
   });
 
+  console.log(data);
   this.expect(error).toBeFalsy();
   this.expect(data).toBeTruthy();
   this.expect(data).to.contain.keys(["id", "media", "members", "title", "visibility"]);

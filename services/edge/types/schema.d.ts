@@ -165,11 +165,11 @@ export declare const functionDataOp: {
         type: z.ZodLiteral<"get">;
         id: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        type: "get";
         id: string;
+        type: "get";
     }, {
-        type: "get";
         id: string;
+        type: "get";
     }>;
     featured_get: z.ZodObject<{
         type: z.ZodLiteral<"get">;

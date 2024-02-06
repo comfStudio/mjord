@@ -11,17 +11,8 @@
       // "program": "${workspaceFolder}/main.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
-      "runtimeArgs": [
-        "test",
-        "tests/**/*.test.ts",
-        "--unstable",
-        "--import-map",
-        "./services/edge/src/import_map.json",
-        "--inspect-brk",
-        "--trace-ops",
-        "--allow-all"
-      ],
-      "attachSimplePort": 9229
+      "runtimeArgs": ["test", "tests/**/*.test.ts", "--unstable", "--import-map", "src/import_map.json", "--trace-ops", "--allow-all"],
+      "attachSimplePort": 0
     },
     {
       "request": "launch",
@@ -36,11 +27,10 @@
         "--unstable",
         "--import-map",
         "./src/import_map.json",
-        "--inspect-brk",
         "--trace-ops",
         "--allow-all"
       ],
-      "attachSimplePort": 9229
+      "attachSimplePort": 0
     }
   ]
 }
