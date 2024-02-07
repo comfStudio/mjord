@@ -3,7 +3,7 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: [
-      "transform-inline-environment-variables",
+      // "transform-inline-environment-variables",
       // [
       //   "ttag",
       //   {
