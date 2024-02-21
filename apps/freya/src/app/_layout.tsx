@@ -1,6 +1,5 @@
 import "react-native-url-polyfill/auto";
 
-import { getLocales } from "expo-localization";
 import { usePathname } from "expo-router";
 import { Tabs } from "expo-router/tabs";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,14 +11,13 @@ import { RecoilRoot, useSetRecoilState } from "recoil";
 import { AuthListener } from "@/feature/auth/Auth";
 import setupServices from "@/services";
 import { AppState, setupState } from "@/state";
-import { languages } from "@/state/_app";
 import constant, { constantEmitter, ROUTES } from "@app/constants";
-import { useInitialized } from "@app/misc/hooks";
+import { useAppLocale, useInitialized } from "@app/misc/hooks";
 import { getQueryClient } from "@app/services/function";
 import { ThemeProvider } from "@app/styles/theme";
 import { Poppins_500Medium, useFonts } from "@expo-google-fonts/poppins";
 import { Feather } from "@expo/vector-icons";
-import { addLocale, t, useLocale } from "@mjord/common";
+import { t } from "@mjord/common";
 import getLogger from "@mjord/logger";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
@@ -56,8 +54,6 @@ export async function main() {
 
     constant.initialized = true;
 
-    applyLocale();
-
     constant.log("initialized app");
 
     constantEmitter.emit("initialized", true);
@@ -66,21 +62,6 @@ export async function main() {
     constant.log?.e?.("Error initializing app", (error as any)?.message);
     throw error;
   }
-}
-
-function applyLocale() {
-  const deviceLanguage = getLocales()[0].languageCode;
-  const langs = {};
-
-  languages.forEach((lang) => {
-    if (lang === "en") return; // English is the default language
-    if (!langs[lang]) throw new Error(`Language ${lang}.json not found`);
-    addLocale(lang, langs[lang]);
-    if (lang === deviceLanguage) {
-      useLocale(lang);
-      constant.locale = lang;
-    }
-  });
 }
 
 function useRefetchOnFocus() {
@@ -115,6 +96,8 @@ function initReducer(state: { main: boolean; fonts: boolean }, { type }: { type:
 }
 
 function Init() {
+  useAppLocale();
+
   useOnlineStatusManagement();
   useRefetchOnFocus();
 
@@ -123,6 +106,7 @@ function Init() {
 
   useLayoutEffect(() => {
     if (initialized) {
+      constant.log.d("BACKEND_URL", constant.options.SUPABASE_URL);
       constant.log.d("Invalidating queries");
       client.invalidateQueries({
         refetchType: "all",
@@ -137,7 +121,6 @@ function useInit() {
   const [ready, dispatchReady] = useReducer(initReducer, { main: false, fonts: false });
 
   // main
-
   useMemo(() => {
     if (constant.initialized) {
       dispatchReady({ type: "main" });

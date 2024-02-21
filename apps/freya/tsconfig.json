@@ -15,6 +15,8 @@
       "@/state/*": ["./src/state/*"],
       "@/styles": ["./src/styles/index"],
       "@/styles/*": ["./src/styles/*"],
+      "@/misc": ["./src/misc/index"],
+      "@/misc/*": ["./src/misc/*"],
       "@mjord/common/*": ["../../packages/common/lib/*"],
       "@tests/*": ["./src/__tests__/*"]
     }

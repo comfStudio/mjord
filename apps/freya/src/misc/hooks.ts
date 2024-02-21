@@ -1,7 +1,13 @@
-import * as FileSystem from "expo-file-system";
+import { getLocales } from "expo-localization";
 import { useEffect, useMemo, useReducer, useState } from "react";
+import { useRecoilState } from "recoil";
 
+import { getFilename, readFile } from "@/misc/fs";
 import constant, { constantEmitter, ServiceType } from "@app/constants";
+import { AppState } from "@app/state";
+import { addLocale, LocaleData, useLocale } from "@mjord/common";
+
+import { useCachedAssetFiles } from "./assets";
 
 export function useInitialized() {
   const [initialized, setInitialized] = useToggle();
@@ -60,11 +66,57 @@ export function useRefreshByUser<T extends () => Promise<unknown>>(refetch: T) {
   };
 }
 
-export function useI18nLangs() {
-  console.log({ assets: FileSystem.bundledAssets });
-  console.log({ assetsDir: FileSystem.bundleDirectory });
+export function useAppLocale() {
+  const [chosenLanguage, setChosenLanguage] = useRecoilState(AppState.language);
 
-  return useMemo(() => {
-    return [];
-  }, []);
+  const assetFiles = useCachedAssetFiles(constant.assetPaths.I18N);
+  const [langContent, setLangContent] = useState<Record<string, LocaleData>>({});
+
+  useEffect(() => {
+    const langFiles = assetFiles.filter((f) => f.endsWith(".json"));
+
+    constant.log.d(`Available languages: ${langFiles.join(",")}`);
+
+    const ps: Promise<unknown>[] = [];
+    const contents = { ...langContent };
+
+    langFiles.forEach((langFile) => {
+      const lang = getFilename(langFile, { includeExtension: false });
+
+      if (lang === "en") return; // English is the default language
+      if (contents[lang]) return; // Already loaded
+
+      ps.push(
+        readFile(langFile).then((data) => {
+          const d = JSON.parse(data);
+          addLocale(lang, d);
+
+          contents[lang] = d;
+        })
+      );
+    });
+
+    Promise.all(ps).then(() => {
+      const deviceLanguage = getLocales()[0].languageCode;
+
+      let activeLang = !constant.locale && deviceLanguage ? deviceLanguage : chosenLanguage;
+
+      if (activeLang !== "en" && !contents[activeLang]) {
+        constant.log.e(`Language ${chosenLanguage}.json not found`);
+        activeLang = "en";
+      }
+
+      constant.log.i("Active language", activeLang);
+
+      setLangContent(contents);
+      setChosenLanguage((p) => {
+        constant.locale = activeLang;
+        return activeLang;
+      });
+    });
+  }, [chosenLanguage, assetFiles]);
+
+  useLocale(chosenLanguage);
+
+  return chosenLanguage;
 }

@@ -1,5 +1,7 @@
 import type { Logger } from "@mjord/logger";
 import EventEmitter from "eventemitter3";
+import Constants from "expo-constants";
+import * as FileSystem from "expo-file-system";
 
 import { SupabaseClient } from "@supabase/supabase-js";
 import { QueryClient } from "@tanstack/react-query";
@@ -15,10 +17,6 @@ export enum ServiceType {
   // Character,
   // Template,
   // Tag,
-}
-
-export enum ASSET_PATHS {
-  I18N = "i18n",
 }
 
 export enum ROUTES {
@@ -42,6 +40,8 @@ export interface EventMap {
 export default class constant {
   static initialized = false;
 
+  static isLive = Constants.appOwnership !== "expo";
+
   static log: Logger;
 
   static supabase: SupabaseClient<never>;
@@ -53,9 +53,22 @@ export default class constant {
   static service: ServiceLocator;
 
   static options = {
-    SUPABASE_URL: process.env.SUPABASE_URL ?? "",
-    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ?? "",
+    SUPABASE_URL: process.env.EXPO_PUBLIC_SUPABASE_URL ?? "",
+    SUPABASE_ANON_KEY: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "",
   };
+
+  static assetPaths = {
+    // bundleDirectory is 'asset://'
+    I18N: FileSystem.bundleDirectory + "/i18n",
+  };
+}
+
+if (!constant.isLive) {
+  // replace superbase url with correct local url during dev
+  if (constant.options.SUPABASE_URL.startsWith(":")) {
+    const expHost = Constants.experienceUrl.replace("exp://", "").split(":")[0];
+    constant.options.SUPABASE_URL = "http://" + expHost + constant.options.SUPABASE_URL;
+  }
 }
 
 global.constantEmitter = global.constantEmitter || new EventEmitter();
