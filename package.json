@@ -3,8 +3,8 @@
   "name": "mjord",
   "version": "1.0.0",
   "scripts": {
-    "build": "turbo run build --no-daemon",
-    "dev": "turbo run dev --no-cache --continue --no-daemon",
+    "build": "turbo run build --no-daemon --log-order=grouped",
+    "dev": "turbo run dev --no-cache --continue --no-daemon --log-order=grouped",
     "lint": "turbo run lint --no-cache --continue --no-daemon",
     "lint:prettier": "turbo run lint:prettier --no-cache --continue --no-daemon",
     "test": "turbo run test --no-daemon",
@@ -37,7 +37,7 @@
     "supabase": "^1.86.2",
     "tsc": "^2.0.4",
     "ttag-cli": "^1.10.5",
-    "turbo": "1.10.13",
+    "turbo": "1.13.*",
     "typescript": "^5.2.2"
   },
   "eslintConfig": {
