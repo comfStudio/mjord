@@ -1,4 +1,4 @@
-import { Text } from "react-native";
+import { Text } from 'react-native';
 
 import {
   composeStyles,
@@ -8,11 +8,10 @@ import {
   ThemePropsNames,
   ThemeStyleProps,
   useStyles,
-} from "@app/styles/theme";
-import { AllSize } from "@app/styles/variants";
+} from '@app/styles/theme';
+import { AllSize, sizeFromUnion } from '@app/styles/variants';
 
-import { sizeFromUnion } from "../../styles/variants";
-import { createComponent } from "./";
+import { createComponent } from './';
 
 declare module "@app/styles/interface" {
   export interface ComponentStyles {

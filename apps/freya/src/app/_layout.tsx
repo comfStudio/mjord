@@ -1,30 +1,30 @@
-import "react-native-url-polyfill/auto";
+import 'react-native-url-polyfill/auto';
 
-import { getLocales } from "expo-localization";
-import { usePathname } from "expo-router";
-import { Tabs } from "expo-router/tabs";
-import * as SplashScreen from "expo-splash-screen";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useState } from "react";
-import { AppState as NativeAppState, Platform } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { RecoilRoot, useSetRecoilState } from "recoil";
+import { getLocales } from 'expo-localization';
+import { usePathname } from 'expo-router';
+import { Tabs } from 'expo-router/tabs';
+import * as SplashScreen from 'expo-splash-screen';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useState } from 'react';
+import { AppState as NativeAppState, Platform } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { RecoilRoot, useSetRecoilState } from 'recoil';
 
-import { AuthListener } from "@/feature/auth/Auth";
-import setupServices from "@/services";
-import { AppState, setupState } from "@/state";
-import { languages } from "@/state/_app";
-import constant, { constantEmitter, ROUTES } from "@app/constants";
-import { useInitialized } from "@app/misc/hooks";
-import { getQueryClient } from "@app/services/function";
-import { ThemeProvider } from "@app/styles/theme";
-import { Poppins_500Medium, useFonts } from "@expo-google-fonts/poppins";
-import { Feather } from "@expo/vector-icons";
-import { addLocale, t, useLocale } from "@mjord/common";
-import getLogger from "@mjord/logger";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import NetInfo from "@react-native-community/netinfo";
-import { createClient } from "@supabase/supabase-js";
-import { focusManager, onlineManager, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { AuthListener } from '@/feature/auth/Auth';
+import setupServices from '@/services';
+import { AppState, setupState } from '@/state';
+import { languages } from '@/state/_app';
+import constant, { constantEmitter, ROUTES } from '@app/constants';
+import { useInitialized } from '@app/misc/hooks';
+import { getQueryClient } from '@app/services/function';
+import { ThemeProvider } from '@app/styles/theme';
+import { Poppins_500Medium, useFonts } from '@expo-google-fonts/poppins';
+import { Feather } from '@expo/vector-icons';
+import { addLocale, t, useLocale } from '@mjord/common';
+import getLogger from '@mjord/logger';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import { createClient } from '@supabase/supabase-js';
+import { focusManager, onlineManager, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 
 import type { AppStateStatus } from "react-native";
 // Keep the splash screen visible while we fetch resources
@@ -70,6 +70,9 @@ export async function main() {
 
 function applyLocale() {
   const deviceLanguage = getLocales()[0].languageCode;
+
+  constant.log.d("Detected device language", deviceLanguage);
+
   const langs = {};
 
   languages.forEach((lang) => {
@@ -77,6 +80,7 @@ function applyLocale() {
     if (!langs[lang]) throw new Error(`Language ${lang}.json not found`);
     addLocale(lang, langs[lang]);
     if (lang === deviceLanguage) {
+      constant.log.d("Setting locale to", lang);
       useLocale(lang);
       constant.locale = lang;
     }

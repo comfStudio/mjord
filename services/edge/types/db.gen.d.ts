@@ -1,7 +1,7 @@
 export type Json = string | number | boolean | null | {
     [key: string]: Json | undefined;
 } | Json[];
-export interface Database {
+export type Database = {
     public: {
         Tables: {
             comment: {
@@ -33,12 +33,14 @@ export interface Database {
                     {
                         foreignKeyName: "comment_discussion_id_fkey";
                         columns: ["discussion_id"];
+                        isOneToOne: false;
                         referencedRelation: "discussion";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "comment_profile_id_fkey";
                         columns: ["profile_id"];
+                        isOneToOne: false;
                         referencedRelation: "profile";
                         referencedColumns: ["id"];
                     }
@@ -70,12 +72,14 @@ export interface Database {
                     {
                         foreignKeyName: "comment_tags_comment_id_fkey";
                         columns: ["comment_id"];
+                        isOneToOne: false;
                         referencedRelation: "comment";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "comment_tags_tag_id_fkey";
                         columns: ["tag_id"];
+                        isOneToOne: false;
                         referencedRelation: "tag";
                         referencedColumns: ["id"];
                     }
@@ -119,18 +123,21 @@ export interface Database {
                     {
                         foreignKeyName: "discussion_event_id_fkey";
                         columns: ["event_id"];
+                        isOneToOne: false;
                         referencedRelation: "event";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "discussion_group_id_fkey";
                         columns: ["group_id"];
+                        isOneToOne: false;
                         referencedRelation: "group";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "discussion_profile_id_fkey";
                         columns: ["profile_id"];
+                        isOneToOne: false;
                         referencedRelation: "profile";
                         referencedColumns: ["id"];
                     }
@@ -162,12 +169,14 @@ export interface Database {
                     {
                         foreignKeyName: "discussion_tags_discussion_id_fkey";
                         columns: ["discussion_id"];
+                        isOneToOne: false;
                         referencedRelation: "discussion";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "discussion_tags_tag_id_fkey";
                         columns: ["tag_id"];
+                        isOneToOne: false;
                         referencedRelation: "tag";
                         referencedColumns: ["id"];
                     }
@@ -211,6 +220,7 @@ export interface Database {
                     {
                         foreignKeyName: "event_group_id_fkey";
                         columns: ["group_id"];
+                        isOneToOne: false;
                         referencedRelation: "group";
                         referencedColumns: ["id"];
                     }
@@ -242,12 +252,14 @@ export interface Database {
                     {
                         foreignKeyName: "event_members_event_id_fkey";
                         columns: ["event_id"];
+                        isOneToOne: false;
                         referencedRelation: "event";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "event_members_profile_id_fkey";
                         columns: ["profile_id"];
+                        isOneToOne: false;
                         referencedRelation: "profile";
                         referencedColumns: ["id"];
                     }
@@ -279,12 +291,14 @@ export interface Database {
                     {
                         foreignKeyName: "event_tags_event_id_fkey";
                         columns: ["event_id"];
+                        isOneToOne: false;
                         referencedRelation: "event";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "event_tags_tag_id_fkey";
                         columns: ["tag_id"];
+                        isOneToOne: false;
                         referencedRelation: "tag";
                         referencedColumns: ["id"];
                     }
@@ -322,6 +336,7 @@ export interface Database {
                     {
                         foreignKeyName: "group_media_id_fkey";
                         columns: ["media_id"];
+                        isOneToOne: false;
                         referencedRelation: "media";
                         referencedColumns: ["id"];
                     }
@@ -356,12 +371,14 @@ export interface Database {
                     {
                         foreignKeyName: "group_members_group_id_fkey";
                         columns: ["group_id"];
+                        isOneToOne: false;
                         referencedRelation: "group";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "group_members_profile_id_fkey";
                         columns: ["profile_id"];
+                        isOneToOne: false;
                         referencedRelation: "profile";
                         referencedColumns: ["id"];
                     }
@@ -393,12 +410,14 @@ export interface Database {
                     {
                         foreignKeyName: "group_tags_group_id_fkey";
                         columns: ["group_id"];
+                        isOneToOne: false;
                         referencedRelation: "group";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "group_tags_tag_id_fkey";
                         columns: ["tag_id"];
+                        isOneToOne: false;
                         referencedRelation: "tag";
                         referencedColumns: ["id"];
                     }
@@ -430,12 +449,14 @@ export interface Database {
                     {
                         foreignKeyName: "group_urls_group_id_fkey";
                         columns: ["group_id"];
+                        isOneToOne: false;
                         referencedRelation: "group";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "group_urls_url_id_fkey";
                         columns: ["url_id"];
+                        isOneToOne: false;
                         referencedRelation: "url";
                         referencedColumns: ["id"];
                     }
@@ -512,12 +533,14 @@ export interface Database {
                     {
                         foreignKeyName: "location_event_id_fkey";
                         columns: ["event_id"];
+                        isOneToOne: false;
                         referencedRelation: "event";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "location_group_id_fkey";
                         columns: ["group_id"];
+                        isOneToOne: false;
                         referencedRelation: "group";
                         referencedColumns: ["id"];
                     }
@@ -564,24 +587,28 @@ export interface Database {
                     {
                         foreignKeyName: "media_comment_id_fkey";
                         columns: ["comment_id"];
+                        isOneToOne: false;
                         referencedRelation: "comment";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "media_discussion_id_fkey";
                         columns: ["discussion_id"];
+                        isOneToOne: false;
                         referencedRelation: "discussion";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "media_event_id_fkey";
                         columns: ["event_id"];
+                        isOneToOne: false;
                         referencedRelation: "event";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "media_group_id_fkey";
                         columns: ["group_id"];
+                        isOneToOne: false;
                         referencedRelation: "group";
                         referencedColumns: ["id"];
                     }
@@ -622,12 +649,14 @@ export interface Database {
                     {
                         foreignKeyName: "profile_id_fkey";
                         columns: ["id"];
+                        isOneToOne: true;
                         referencedRelation: "users";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "profile_media_id_fkey";
                         columns: ["media_id"];
+                        isOneToOne: false;
                         referencedRelation: "media";
                         referencedColumns: ["id"];
                     }
@@ -659,12 +688,14 @@ export interface Database {
                     {
                         foreignKeyName: "profile_tags_profile_id_fkey";
                         columns: ["profile_id"];
+                        isOneToOne: false;
                         referencedRelation: "profile";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "profile_tags_tag_id_fkey";
                         columns: ["tag_id"];
+                        isOneToOne: false;
                         referencedRelation: "tag";
                         referencedColumns: ["id"];
                     }
@@ -702,18 +733,21 @@ export interface Database {
                     {
                         foreignKeyName: "reaction_comment_id_fkey";
                         columns: ["comment_id"];
+                        isOneToOne: false;
                         referencedRelation: "comment";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "reaction_discussion_id_fkey";
                         columns: ["discussion_id"];
+                        isOneToOne: false;
                         referencedRelation: "discussion";
                         referencedColumns: ["id"];
                     },
                     {
                         foreignKeyName: "reaction_profile_id_fkey";
                         columns: ["profile_id"];
+                        isOneToOne: false;
                         referencedRelation: "profile";
                         referencedColumns: ["id"];
                     }
@@ -815,12 +849,12 @@ export interface Database {
             };
             typeid_print: {
                 Args: {
-                    tid: string;
+                    tid: Database["public"]["CompositeTypes"]["typeid"];
                 };
                 Returns: string;
             } | {
                 Args: {
-                    tid: Database["public"]["CompositeTypes"]["typeid"];
+                    tid: string;
                 };
                 Returns: string;
             };
@@ -836,10 +870,52 @@ export interface Database {
         };
         CompositeTypes: {
             typeid: {
-                type: string;
-                uuid: string;
+                type: string | null;
+                uuid: string | null;
             };
         };
     };
-}
+};
+type PublicSchema = Database[Extract<keyof Database, "public">];
+export type Tables<PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] & PublicSchema["Views"]) | {
+    schema: keyof Database;
+}, TableName extends PublicTableNameOrOptions extends {
+    schema: keyof Database;
+} ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] & Database[PublicTableNameOrOptions["schema"]]["Views"]) : never = never> = PublicTableNameOrOptions extends {
+    schema: keyof Database;
+} ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] & Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+    Row: infer R;
+} ? R : never : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] & PublicSchema["Views"]) ? (PublicSchema["Tables"] & PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+    Row: infer R;
+} ? R : never : never;
+export type TablesInsert<PublicTableNameOrOptions extends keyof PublicSchema["Tables"] | {
+    schema: keyof Database;
+}, TableName extends PublicTableNameOrOptions extends {
+    schema: keyof Database;
+} ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"] : never = never> = PublicTableNameOrOptions extends {
+    schema: keyof Database;
+} ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+    Insert: infer I;
+} ? I : never : PublicTableNameOrOptions extends keyof PublicSchema["Tables"] ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+    Insert: infer I;
+} ? I : never : never;
+export type TablesUpdate<PublicTableNameOrOptions extends keyof PublicSchema["Tables"] | {
+    schema: keyof Database;
+}, TableName extends PublicTableNameOrOptions extends {
+    schema: keyof Database;
+} ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"] : never = never> = PublicTableNameOrOptions extends {
+    schema: keyof Database;
+} ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+    Update: infer U;
+} ? U : never : PublicTableNameOrOptions extends keyof PublicSchema["Tables"] ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+    Update: infer U;
+} ? U : never : never;
+export type Enums<PublicEnumNameOrOptions extends keyof PublicSchema["Enums"] | {
+    schema: keyof Database;
+}, EnumName extends PublicEnumNameOrOptions extends {
+    schema: keyof Database;
+} ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"] : never = never> = PublicEnumNameOrOptions extends {
+    schema: keyof Database;
+} ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName] : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"] ? PublicSchema["Enums"][PublicEnumNameOrOptions] : never;
+export {};
 //# sourceMappingURL=db.gen.d.ts.map
