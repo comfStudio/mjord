@@ -11,7 +11,14 @@
       // "program": "${workspaceFolder}/main.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
-      "runtimeArgs": ["test", "tests/**/*.test.ts", "--unstable", "--import-map", "src/import_map.json", "--trace-ops", "--allow-all"],
+      "runtimeArgs": [
+        "test",
+        "tests/**/*.test.ts",
+        "--import-map",
+        "src/import_map.json",
+        "--trace-leaks",
+        "--allow-all"
+      ],
       "attachSimplePort": 0
     },
     {
@@ -21,15 +28,7 @@
       // "program": "${workspaceFolder}/main.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
-      "runtimeArgs": [
-        "test",
-        "${file}",
-        "--unstable",
-        "--import-map",
-        "./src/import_map.json",
-        "--trace-ops",
-        "--allow-all"
-      ],
+      "runtimeArgs": ["test", "${file}", "--import-map", "./src/import_map.json", "--trace-leaks", "--allow-all"],
       "attachSimplePort": 0
     }
   ]

@@ -7,8 +7,8 @@
     "dev": "yarn gen && tsc -w",
     "restart": "restart:edge",
     "lint:prettier": "prettier --check .",
-    "test": "deno test tests/**/*.test.ts --allow-all --unstable --parallel --import-map=./src/import_map.json --trace-ops",
-    "test:watch": "deno test tests/**/*.test.ts --allow-all --unstable --watch --import-map=./src/import_map.json --trace-ops",
+    "test": "deno test tests/**/*.test.ts --allow-all --parallel --import-map=./src/import_map.json --trace-leaks",
+    "test:watch": "deno test tests/**/*.test.ts --allow-all --watch --import-map=./src/import_map.json --trace-leaks",
     "clean": "rimraf .turbo && rimraf lib && rimraf dist && rimraf *.tsbuildinfo"
   },
   "private": true,
