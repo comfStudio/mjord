@@ -1,6 +1,6 @@
-import { Slot } from "expo-router";
+import { Slot } from 'expo-router';
 
-import GroupDetailDrawer from "@/feature/group/GroupDetailDrawer";
+import GroupDetailDrawer from '@/feature/group/GroupDetailDrawer';
 
 export default function HomeLayout() {
   return (

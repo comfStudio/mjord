@@ -1,15 +1,18 @@
-import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
+import { Dimensions, ScrollView, StyleSheet, View } from 'react-native';
 
-import { HorizontalGroupCardList } from "@/feature/group/GroupCard";
-import { VerticalLoadMoreGroupList } from "@/feature/group/GroupList";
-import { useFeaturedGroups } from "@/services/group";
-import RefreshControl from "@app/components/RefreshControl";
-import { useRefreshByUser } from "@app/misc/hooks";
+import { HorizontalGroupCardList } from '@/feature/group/GroupCard';
+import { VerticalLoadMoreGroupList } from '@/feature/group/GroupList';
+import { useFeaturedGroups } from '@/services/group';
+import RefreshControl from '@app/components/RefreshControl';
+import constant from '@app/constants';
+import { useRefreshByUser } from '@app/misc/hooks';
 
 export default function HomeScreen() {
   const { data, refetch } = useFeaturedGroups();
 
   const { isRefetchingByUser, refetchByUser } = useRefreshByUser(refetch);
+
+  constant.log("data", data)
 
   return (
     <ScrollView

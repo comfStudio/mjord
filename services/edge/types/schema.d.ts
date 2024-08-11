@@ -190,10 +190,10 @@ export declare const functionDataOp: {
         entity: z.ZodEnum<["group", "event"]>;
     }>, "strip", z.ZodTypeAny, {
         type: "get";
-        entity: "event" | "group";
+        entity: "group" | "event";
     }, {
         type: "get";
-        entity: "event" | "group";
+        entity: "group" | "event";
     }>;
 };
 export type FunctionDataOp = {

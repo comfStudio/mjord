@@ -4,7 +4,14 @@ import { getLocales } from 'expo-localization';
 import { usePathname } from 'expo-router';
 import { Tabs } from 'expo-router/tabs';
 import * as SplashScreen from 'expo-splash-screen';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useReducer, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 import { AppState as NativeAppState, Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RecoilRoot, useSetRecoilState } from 'recoil';
@@ -24,7 +31,12 @@ import getLogger from '@mjord/logger';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import { createClient } from '@supabase/supabase-js';
-import { focusManager, onlineManager, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+import {
+  focusManager,
+  onlineManager,
+  QueryClientProvider,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import type { AppStateStatus } from "react-native";
 // Keep the splash screen visible while we fetch resources
@@ -76,6 +88,8 @@ function applyLocale() {
   const langs = {};
 
   languages.forEach((lang) => {
+    // TODO: fix this. Exception is causing blank app
+    return;
     if (lang === "en") return; // English is the default language
     if (!langs[lang]) throw new Error(`Language ${lang}.json not found`);
     addLocale(lang, langs[lang]);
