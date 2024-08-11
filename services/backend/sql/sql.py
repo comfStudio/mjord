@@ -630,8 +630,9 @@ def create_tables(engine: sa.Engine):
 
     Base.metadata.create_all(engine)
 
-FUNC_ROLES = ["supabase_admin", "service_role", DATABASE_ROLES.backend_authenticated, DATABASE_ROLES.backend_anon]
-REVOKE_FUNC_ROLES = ["anon", "authenticated"]
+FUNC_ROLES = ["supabase_admin", "service_role", DATABASE_ROLES.backend_authenticated, DATABASE_ROLES.backend_anon, "anon"]
+REVOKE_FUNC_ROLES = []
+# REVOKE_FUNC_ROLES = ["anon", "authenticated"]
 
 def create_roles(engine: sa.Engine):
 

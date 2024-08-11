@@ -1,5 +1,5 @@
-import { Resp, serve } from "common/serve";
-import constant, { ServiceType } from "constant";
+import { Resp, serve } from 'common/serve';
+import constant, { ServiceType } from 'constant';
 
 export const handler = await serve("featured", async (body, req) => {
   switch (body.type) {

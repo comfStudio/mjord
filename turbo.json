@@ -1,12 +1,13 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "tasks": {
     "build": {
       "outputs": ["dist/**", "lib/**"],
       "dependsOn": ["^build"]
     },
     "dev": {
       "cache": false,
+      "outputLogs": "full",
       "persistent": true
     },
     "clean": {
@@ -19,6 +20,13 @@
       "cache": false
     },
     "lint:prettier": {
+      "cache": false
+    },
+    "start:app": {
+      "persistent": true
+    },
+    "log:edge": {
+      "persistent": true,
       "cache": false
     }
   }
