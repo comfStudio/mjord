@@ -11,14 +11,7 @@
       // "program": "${workspaceFolder}/main.ts",
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "deno",
-      "runtimeArgs": [
-        "test",
-        "tests/**/*.test.ts",
-        "--import-map",
-        "src/import_map.json",
-        "--trace-leaks",
-        "--allow-all"
-      ],
+      "runtimeArgs": ["tests/**/*.test.ts", "--import-map", "./src/import_map.json", "--trace-leaks", "--allow-all"],
       "attachSimplePort": 0
     },
     {

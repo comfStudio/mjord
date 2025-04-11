@@ -6,7 +6,7 @@
     "down": "docker compose -p mjord-backend down && cd supabase/docker && docker compose --env-file .env.dev -p mjord-supabase down",
     "restart:edge": "cd supabase/docker && docker compose --env-file .env.dev -p mjord-supabase restart functions",
     "log:edge": "docker-compose -p mjord-supabase logs -f functions",
-    "seed": "poetry run seed",
+    "seed": "poetry install && poetry run seed",
     "git:supabase:pull": "cd ../.. && git subtree pull --prefix services/backend/supabase https://github.com/supabase/supabase.git master --squash"
   },
   "private": true,
